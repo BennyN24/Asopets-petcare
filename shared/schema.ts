@@ -54,7 +54,7 @@ export const pets = pgTable("pets", {
 });
 
 // Medical record types
-export const medicalRecordTypes = ["vaccine", "deworming", "treatment", "surgery", "checkup"] as const;
+export const medicalRecordTypes = ["vaccine", "deworming", "treatment", "surgery", "checkup", "lab-test"] as const;
 
 // Medical records table
 export const medicalRecords = pgTable("medical_records", {

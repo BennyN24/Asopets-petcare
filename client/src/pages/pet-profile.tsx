@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Syringe, PillBottle, Heart as MedicalKit, UserCog, Stethoscope, User, Calendar } from "lucide-react";
 import HealthSummaryCard from "@/components/health-summary-card";
 import MedicalTimeline from "@/components/medical-timeline";
+import QRCodeGenerator from "@/components/qr-code-generator";
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
 
 export default function PetProfile() {
@@ -117,9 +118,10 @@ export default function PetProfile() {
 
       <div className="p-4">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="records">Records</TabsTrigger>
+            <TabsTrigger value="qr">QR Code</TabsTrigger>
             <TabsTrigger value="info">Pet Info</TabsTrigger>
           </TabsList>
           
@@ -181,7 +183,7 @@ export default function PetProfile() {
                   </button>
 
                   <button 
-                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all col-span-2"
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
                     onClick={() => setLocation(`/pet/${petId}/checkup`)}
                   >
                     <div className="text-center">
@@ -189,6 +191,18 @@ export default function PetProfile() {
                         <Stethoscope className="text-purple-600 w-4 h-4" />
                       </div>
                       <p className="font-medium text-gray-900 text-sm">Check Up</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
+                    onClick={() => setLocation(`/pet/${petId}/lab-test`)}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Calendar className="text-indigo-600 w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Lab Test</p>
                     </div>
                   </button>
                 </div>

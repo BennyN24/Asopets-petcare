@@ -52,16 +52,39 @@ export default function MedicalRecordForm({
 
   const createRecordMutation = useMutation({
     mutationFn: async (data: InsertMedicalRecord) => {
-      await apiRequest("POST", `/api/pets/${petId}/medical-records`, data);
+      // Check if online - if not, save to offline storage
+      if (!navigator.onLine) {
+        const { OfflineStorage } = await import("@/lib/offline-storage");
+        const offlineId = OfflineStorage.saveRecord(data);
+        return { id: offlineId, offline: true };
+      }
+      
+      try {
+        await apiRequest("POST", `/api/pets/${petId}/medical-records`, data);
+        return { offline: false };
+      } catch (error) {
+        // If API fails, save offline as fallback
+        const { OfflineStorage } = await import("@/lib/offline-storage");
+        const offlineId = OfflineStorage.saveRecord(data);
+        return { id: offlineId, offline: true };
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "medical-records"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "reminders"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });
-      toast({
-        title: "Success",
-        description: `${recordType.charAt(0).toUpperCase() + recordType.slice(1)} record saved successfully!`,
-      });
+    onSuccess: (result) => {
+      if (result?.offline) {
+        toast({
+          title: "Saved Offline",
+          description: `${recordType.charAt(0).toUpperCase() + recordType.slice(1)} record saved offline. Will sync when online.`,
+          variant: "default",
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "medical-records"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "reminders"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });
+        toast({
+          title: "Success",
+          description: `${recordType.charAt(0).toUpperCase() + recordType.slice(1)} record saved successfully!`,
+        });
+      }
       onSuccess();
     },
     onError: (error) => {
