@@ -147,7 +147,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const recordData = insertMedicalRecordSchema.parse({ ...req.body, petId });
+      // Clean up empty date fields before validation
+      const cleanedData = { ...req.body, petId };
+      if (cleanedData.nextDueDate === '') {
+        cleanedData.nextDueDate = null;
+      }
+      if (cleanedData.dateAdministered === '') {
+        return res.status(400).json({ message: "Date administered is required" });
+      }
+      
+      const recordData = insertMedicalRecordSchema.parse(cleanedData);
       const record = await storage.createMedicalRecord(recordData);
       res.status(201).json(record);
     } catch (error) {

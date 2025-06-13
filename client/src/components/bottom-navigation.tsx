@@ -1,8 +1,8 @@
 import { useLocation } from "wouter";
-import { Home, Calendar, Bell, User } from "lucide-react";
+import { Home, Calendar, DollarSign, User } from "lucide-react";
 
 interface BottomNavigationProps {
-  activeTab: "home" | "schedule" | "alerts" | "profile";
+  activeTab: "home" | "schedule" | "expenses" | "profile";
 }
 
 export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
@@ -11,7 +11,7 @@ export default function BottomNavigation({ activeTab }: BottomNavigationProps) {
   const navItems = [
     { key: "home", icon: Home, label: "Home", path: "/" },
     { key: "schedule", icon: Calendar, label: "Schedule", path: "/schedule" },
-    { key: "alerts", icon: Bell, label: "Alerts", path: "/alerts" },
+    { key: "expenses", icon: DollarSign, label: "Expenses", path: "/expenses" },
     { key: "profile", icon: User, label: "Profile", path: "/profile" },
   ];
 
