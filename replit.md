@@ -1,0 +1,158 @@
+# VetBB - Pet Care Management System
+
+## Overview
+
+VetBB is a comprehensive pet care management application built as a full-stack web application with a mobile-first design. The system allows pet owners to manage their pets' medical records, track vaccinations, schedule reminders, and maintain complete health histories. The application uses modern web technologies with a focus on simplicity and user experience.
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite for development and production builds
+- **UI Framework**: Tailwind CSS with shadcn/ui component library
+- **State Management**: TanStack Query (React Query) for server state management
+- **Routing**: Wouter for lightweight client-side routing
+- **Form Handling**: React Hook Form with Zod validation
+- **Design System**: Mobile-first responsive design with consistent component library
+
+### Backend Architecture
+- **Runtime**: Node.js with Express.js framework
+- **Language**: TypeScript with ES modules
+- **API Design**: RESTful API architecture
+- **Session Management**: Express sessions with PostgreSQL storage
+- **Authentication**: Replit Auth integration with OIDC
+- **File Structure**: Monorepo structure with shared schemas between client and server
+
+### Database Architecture
+- **Database**: PostgreSQL with Drizzle ORM
+- **Schema Management**: Drizzle Kit for migrations and schema management
+- **Connection**: Neon Database serverless PostgreSQL
+- **Data Modeling**: Relational data structure with proper foreign key relationships
+
+## Key Components
+
+### Authentication System
+- Replit Auth integration using OpenID Connect (OIDC)
+- Session-based authentication with PostgreSQL session storage
+- User profile management with automatic user creation
+- Secure session handling with HTTP-only cookies
+
+### Pet Management
+- Pet registration with category-based classification (dog, cat, bird, rabbit, other)
+- Pet profile management with photos and detailed information
+- Breed tracking and microchip ID storage
+- Birthmark and physical characteristic documentation
+
+### Medical Records System
+- Comprehensive medical record tracking with multiple types:
+  - Vaccinations with batch numbers and due dates
+  - Deworming treatments
+  - General treatments and medications
+  - Surgical procedures
+  - Regular checkups
+- Veterinarian and clinic information storage
+- Cost tracking for all medical procedures
+- Photo documentation for medical records
+
+### Reminder System
+- Automated reminder creation for medical procedures
+- Overdue reminder tracking
+- SMS notification support (configurable)
+- Reminder completion tracking
+
+### Mobile-First Design
+- Responsive design optimized for mobile devices
+- Touch-friendly interface with intuitive navigation
+- Bottom navigation for easy mobile access
+- Card-based layout for better mobile readability
+
+## Data Flow
+
+### Authentication Flow
+1. User accesses the application
+2. If not authenticated, redirects to Replit Auth login
+3. OIDC authentication flow with token exchange
+4. Session creation and user profile synchronization
+5. Redirect to dashboard with authenticated session
+
+### Pet Management Flow
+1. User creates pet profile with basic information
+2. Pet data validation using Zod schemas
+3. Database storage with user association
+4. Real-time UI updates via React Query cache invalidation
+
+### Medical Records Flow
+1. User selects pet and medical record type
+2. Form validation with type-specific fields
+3. Optional reminder creation with configurable settings
+4. Database storage with pet relationship
+5. Automatic reminder scheduling for future dates
+
+### Reminder Processing
+1. System checks for due/overdue reminders
+2. Reminder status calculation based on dates
+3. Notification badge updates in real-time
+4. User can mark reminders as completed
+
+## External Dependencies
+
+### Core Dependencies
+- **@neondatabase/serverless**: PostgreSQL database connection
+- **drizzle-orm**: Type-safe database ORM
+- **express**: Web application framework
+- **react**: Frontend library
+- **@tanstack/react-query**: Server state management
+- **wouter**: Lightweight routing
+- **react-hook-form**: Form state management
+- **zod**: Schema validation
+
+### UI Dependencies
+- **@radix-ui/***: Accessible UI primitives
+- **tailwindcss**: Utility-first CSS framework
+- **lucide-react**: Icon library
+- **class-variance-authority**: Component variant management
+
+### Authentication Dependencies
+- **openid-client**: OIDC authentication
+- **passport**: Authentication middleware
+- **express-session**: Session management
+- **connect-pg-simple**: PostgreSQL session store
+
+## Deployment Strategy
+
+### Development Environment
+- Replit development environment with hot reloading
+- Vite dev server for frontend development
+- TSX for TypeScript execution in development
+- Automatic database migrations during development
+
+### Production Build
+- Vite production build for optimized client bundle
+- ESBuild for server-side TypeScript compilation
+- Static asset serving through Express
+- Environment-based configuration management
+
+### Database Management
+- Drizzle migrations for schema changes
+- Environment variable configuration for database connections
+- Session table management for authentication state
+- Automatic table creation for new deployments
+
+### Hosting Configuration
+- Replit hosting with autoscale deployment
+- Port 5000 for development, port 80 for production
+- Node.js 20 runtime environment
+- PostgreSQL 16 database provisioning
+
+## Changelog
+
+```
+Changelog:
+- June 13, 2025. Initial setup
+```
+
+## User Preferences
+
+```
+Preferred communication style: Simple, everyday language.
+```
