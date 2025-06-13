@@ -1,0 +1,358 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Calendar, 
+  Clock, 
+  CheckCircle, 
+  AlertTriangle, 
+  Bell,
+  Syringe,
+  PillBottle,
+  Heart as MedicalKit,
+  UserCog,
+  Stethoscope
+} from "lucide-react";
+import { format, isToday, isTomorrow, isThisWeek, differenceInDays } from "date-fns";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import BottomNavigation from "@/components/bottom-navigation";
+import type { Reminder, Pet as PetType } from "@shared/schema";
+
+export default function Schedule() {
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
+    queryKey: ["/api/reminders"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: pets = [] } = useQuery<PetType[]>({
+    queryKey: ["/api/pets"],
+    enabled: isAuthenticated,
+  });
+
+  const completeReminderMutation = useMutation({
+    mutationFn: async (reminderId: number) => {
+      await apiRequest("PUT", `/api/reminders/${reminderId}/complete`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders/overdue"] });
+      toast({
+        title: "Reminder completed",
+        description: "The reminder has been marked as completed.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const getActivityIcon = (type: string) => {
+    const iconProps = { className: "w-4 h-4" };
+    switch (type) {
+      case 'vaccine': return <Syringe {...iconProps} />;
+      case 'deworming': return <PillBottle {...iconProps} />;
+      case 'treatment': return <MedicalKit {...iconProps} />;
+      case 'surgery': return <UserCog {...iconProps} />;
+      case 'checkup': return <Stethoscope {...iconProps} />;
+      default: return <Bell {...iconProps} />;
+    }
+  };
+
+  const getPetName = (petId: number) => {
+    const pet = pets.find(p => p.id === petId);
+    return pet?.name || 'Unknown Pet';
+  };
+
+  const getDateCategory = (dueDate: string) => {
+    const date = new Date(dueDate);
+    const now = new Date();
+    const daysDiff = differenceInDays(date, now);
+
+    if (daysDiff < 0) return 'overdue';
+    if (isToday(date)) return 'today';
+    if (isTomorrow(date)) return 'tomorrow';
+    if (isThisWeek(date)) return 'this-week';
+    if (daysDiff <= 30) return 'this-month';
+    return 'later';
+  };
+
+  const formatDateDisplay = (dueDate: string, category: string) => {
+    const date = new Date(dueDate);
+    switch (category) {
+      case 'overdue':
+        const daysOverdue = Math.abs(differenceInDays(date, new Date()));
+        return `${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue`;
+      case 'today':
+        return 'Today';
+      case 'tomorrow':
+        return 'Tomorrow';
+      case 'this-week':
+        return format(date, 'EEEE');
+      default:
+        return format(date, 'MMM d, yyyy');
+    }
+  };
+
+  const getBadgeVariant = (category: string) => {
+    switch (category) {
+      case 'overdue': return 'destructive';
+      case 'today': return 'destructive';
+      case 'tomorrow': return 'default';
+      case 'this-week': return 'secondary';
+      default: return 'outline';
+    }
+  };
+
+  const categorizeReminders = (reminderList: Reminder[]) => {
+    const categories = {
+      overdue: [] as Reminder[],
+      today: [] as Reminder[],
+      tomorrow: [] as Reminder[],
+      'this-week': [] as Reminder[],
+      'this-month': [] as Reminder[],
+      later: [] as Reminder[]
+    };
+
+    reminderList
+      .filter(reminder => !reminder.isCompleted && reminder.dueDate)
+      .forEach(reminder => {
+        const category = getDateCategory(reminder.dueDate!);
+        categories[category].push(reminder);
+      });
+
+    return categories;
+  };
+
+  const activeReminders = reminders.filter(r => !r.isCompleted);
+  const completedReminders = reminders.filter(r => r.isCompleted);
+  const categorizedReminders = categorizeReminders(activeReminders);
+
+  const handleCompleteReminder = (reminderId: number) => {
+    completeReminderMutation.mutate(reminderId);
+  };
+
+  if (remindersLoading) {
+    return (
+      <div className="mobile-container">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading schedule...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mobile-container pb-20">
+      {/* Header */}
+      <div className="bg-primary text-white p-4">
+        <div className="flex items-center">
+          <Calendar className="w-6 h-6 mr-3" />
+          <div>
+            <h1 className="text-xl font-bold">Schedule</h1>
+            <p className="text-green-100 text-sm">
+              {activeReminders.length} active reminder{activeReminders.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <Tabs defaultValue="upcoming" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upcoming" className="space-y-4 mt-6">
+            {/* Critical Alerts */}
+            {categorizedReminders.overdue.length > 0 && (
+              <Card className="border-destructive bg-red-50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-destructive">
+                    <AlertTriangle className="w-5 h-5 mr-2" />
+                    Overdue ({categorizedReminders.overdue.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {categorizedReminders.overdue.map((reminder) => (
+                    <div key={reminder.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                          {getActivityIcon(reminder.type)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{reminder.title}</p>
+                          <p className="text-sm text-gray-600">{getPetName(reminder.petId)}</p>
+                          <p className="text-xs text-destructive font-medium">
+                            {formatDateDisplay(reminder.dueDate!, 'overdue')}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => handleCompleteReminder(reminder.id)}
+                        disabled={completeReminderMutation.isPending}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Done
+                      </Button>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Today's Reminders */}
+            {categorizedReminders.today.length > 0 && (
+              <Card className="border-amber-200 bg-amber-50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-amber-800">
+                    <Clock className="w-5 h-5 mr-2" />
+                    Today ({categorizedReminders.today.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {categorizedReminders.today.map((reminder) => (
+                    <div key={reminder.id} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                          {getActivityIcon(reminder.type)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{reminder.title}</p>
+                          <p className="text-sm text-gray-600">{getPetName(reminder.petId)}</p>
+                          <Badge variant="destructive" className="text-xs">Today</Badge>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => handleCompleteReminder(reminder.id)}
+                        disabled={completeReminderMutation.isPending}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Done
+                      </Button>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Upcoming Reminders */}
+            {['tomorrow', 'this-week', 'this-month', 'later'].map(category => {
+              const categoryReminders = categorizedReminders[category as keyof typeof categorizedReminders];
+              if (categoryReminders.length === 0) return null;
+
+              const categoryTitles = {
+                tomorrow: 'Tomorrow',
+                'this-week': 'This Week',
+                'this-month': 'This Month',
+                later: 'Later'
+              };
+
+              return (
+                <Card key={category}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center text-gray-900">
+                      <Bell className="w-5 h-5 mr-2" />
+                      {categoryTitles[category as keyof typeof categoryTitles]} ({categoryReminders.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {categoryReminders.map((reminder) => (
+                      <div key={reminder.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            {getActivityIcon(reminder.type)}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{reminder.title}</p>
+                            <p className="text-sm text-gray-600">{getPetName(reminder.petId)}</p>
+                            <Badge variant={getBadgeVariant(category)} className="text-xs">
+                              {formatDateDisplay(reminder.dueDate!, category)}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleCompleteReminder(reminder.id)}
+                          disabled={completeReminderMutation.isPending}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Done
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
+
+            {activeReminders.length === 0 && (
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h3 className="font-medium text-gray-900 mb-2">No upcoming reminders</h3>
+                  <p className="text-gray-500 text-sm">
+                    All caught up! Add medical records to create new reminders.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="completed" className="space-y-4 mt-6">
+            {completedReminders.length > 0 ? (
+              <div className="space-y-3">
+                {completedReminders.map((reminder) => (
+                  <Card key={reminder.id}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-success" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{reminder.title}</p>
+                          <p className="text-sm text-gray-600">{getPetName(reminder.petId)}</p>
+                          <Badge className="text-xs bg-success text-success-foreground">Completed</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h3 className="font-medium text-gray-900 mb-2">No completed reminders</h3>
+                  <p className="text-gray-500 text-sm">
+                    Completed reminders will appear here.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <BottomNavigation activeTab="schedule" />
+    </div>
+  );
+}

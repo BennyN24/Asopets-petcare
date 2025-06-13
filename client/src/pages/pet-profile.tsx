@@ -4,7 +4,10 @@ import { useLocation, useParams } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Syringe, PillBottle, Heart as MedicalKit, UserCog, Stethoscope } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Syringe, PillBottle, Heart as MedicalKit, UserCog, Stethoscope, User, Calendar } from "lucide-react";
+import HealthSummaryCard from "@/components/health-summary-card";
+import MedicalTimeline from "@/components/medical-timeline";
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
 
 export default function PetProfile() {
@@ -112,128 +115,154 @@ export default function PetProfile() {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Quick Actions Menu */}
-        <div className="grid grid-cols-2 gap-3">
-          <button 
-            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-            onClick={() => setLocation(`/pet/${petId}/vaccine`)}
-          >
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Syringe className="text-primary w-5 h-5" />
-              </div>
-              <p className="font-semibold text-gray-900 text-sm">Vaccines</p>
-            </div>
-          </button>
-
-          <button 
-            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-            onClick={() => setLocation(`/pet/${petId}/deworming`)}
-          >
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <PillBottle className="text-secondary w-5 h-5" />
-              </div>
-              <p className="font-semibold text-gray-900 text-sm">Deworming</p>
-            </div>
-          </button>
-
-          <button 
-            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-            onClick={() => setLocation(`/pet/${petId}/treatment`)}
-          >
-            <div className="text-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <MedicalKit className="text-accent w-5 h-5" />
-              </div>
-              <p className="font-semibold text-gray-900 text-sm">Treatment</p>
-            </div>
-          </button>
-
-          <button 
-            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-            onClick={() => setLocation(`/pet/${petId}/surgery`)}
-          >
-            <div className="text-center">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <UserCog className="text-destructive w-5 h-5" />
-              </div>
-              <p className="font-semibold text-gray-900 text-sm">Surgery</p>
-            </div>
-          </button>
-
-          <button 
-            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow col-span-2"
-            onClick={() => setLocation(`/pet/${petId}/checkup`)}
-          >
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Stethoscope className="text-purple-600 w-5 h-5" />
-              </div>
-              <p className="font-semibold text-gray-900 text-sm">Check Up</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Recent Activities */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-4">Recent Activities</h3>
-            {medicalRecords.length > 0 ? (
-              <div className="space-y-4">
-                {medicalRecords.slice(0, 5).map((record) => (
-                  <div key={record.id} className="flex items-start space-x-3">
-                    <div className={`activity-icon ${record.type}`}>
-                      {getActivityIcon(record.type)}
+      <div className="p-4">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="records">Records</TabsTrigger>
+            <TabsTrigger value="info">Pet Info</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            {/* Health Summary */}
+            <HealthSummaryCard medicalRecords={medicalRecords} reminders={reminders} />
+            
+            {/* Quick Actions Menu */}
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-4">Add New Record</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
+                    onClick={() => setLocation(`/pet/${petId}/vaccine`)}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Syringe className="text-primary w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Vaccines</p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{record.title}</p>
-                      <p className="text-xs text-gray-500">
-                        Completed on {formatDate(record.dateAdministered)}
-                      </p>
-                      {record.nextDueDate && (
-                        <p className="text-xs text-accent font-medium">
-                          Next due: {formatDate(record.nextDueDate)}
-                        </p>
-                      )}
+                  </button>
+
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
+                    onClick={() => setLocation(`/pet/${petId}/deworming`)}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <PillBottle className="text-secondary w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Deworming</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
+                    onClick={() => setLocation(`/pet/${petId}/treatment`)}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <MedicalKit className="text-accent w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Treatment</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
+                    onClick={() => setLocation(`/pet/${petId}/surgery`)}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <UserCog className="text-destructive w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Surgery</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all col-span-2"
+                    onClick={() => setLocation(`/pet/${petId}/checkup`)}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Stethoscope className="text-purple-600 w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Check Up</p>
+                    </div>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="records" className="mt-6">
+            <MedicalTimeline petId={petId} medicalRecords={medicalRecords} />
+          </TabsContent>
+          
+          <TabsContent value="info" className="mt-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <User className="w-5 h-5 mr-2 text-primary" />
+                  <h3 className="font-semibold text-gray-900">Pet Information</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Name</label>
+                      <p className="text-gray-900">{pet.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Category</label>
+                      <p className="text-gray-900 capitalize">{pet.category}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">No medical records yet. Add your first record using the buttons above.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Reminders */}
-        {(overdueReminders.length > 0 || upcomingReminders.length > 0) && (
-          <Card className={overdueReminders.length > 0 ? "border-destructive bg-red-50" : "border-amber-200 bg-amber-50"}>
-            <CardContent className="p-4">
-              <div className="flex items-center mb-3">
-                <MedicalKit className={`${overdueReminders.length > 0 ? 'text-destructive' : 'text-accent'} mr-2 w-5 h-5`} />
-                <h3 className="font-semibold text-gray-900">
-                  {overdueReminders.length > 0 ? 'Overdue Reminders' : 'Upcoming Reminders'}
-                </h3>
-              </div>
-              <div className="space-y-2">
-                {overdueReminders.map((reminder) => (
-                  <div key={reminder.id} className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">{reminder.title}</span>
-                    <span className="status-badge overdue">Overdue</span>
-                  </div>
-                ))}
-                {upcomingReminders.slice(0, 3).map((reminder) => (
-                  <div key={reminder.id} className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">{reminder.title}</span>
-                    <span className="status-badge due-soon">Due Soon</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                  
+                  {pet.breed && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Breed</label>
+                      <p className="text-gray-900">{pet.breed}</p>
+                    </div>
+                  )}
+                  
+                  {pet.dateOfBirth && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Date of Birth</label>
+                      <p className="text-gray-900">{formatDate(pet.dateOfBirth)}</p>
+                    </div>
+                  )}
+                  
+                  {pet.microchipId && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Microchip ID</label>
+                      <p className="text-gray-900 font-mono text-sm">{pet.microchipId}</p>
+                    </div>
+                  )}
+                  
+                  {pet.birthmarks && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Identifying Marks</label>
+                      <p className="text-gray-900">{pet.birthmarks}</p>
+                    </div>
+                  )}
+                  
+                  {pet.imageUrl && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 mb-2 block">Photo</label>
+                      <img 
+                        src={pet.imageUrl} 
+                        alt={pet.name}
+                        className="w-32 h-32 rounded-lg object-cover border"
+                      />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
