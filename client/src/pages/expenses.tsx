@@ -406,7 +406,7 @@ export default function Expenses() {
         </Tabs>
       </div>
 
-      <BottomNavigation activeTab="alerts" />
+      <BottomNavigation activeTab="expenses" />
     </div>
   );
 }

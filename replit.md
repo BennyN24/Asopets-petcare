@@ -148,7 +148,16 @@ VetBB is a comprehensive pet care management application built as a full-stack w
 
 ```
 Changelog:
-- June 13, 2025. Initial setup
+- June 13, 2025. Initial setup with authentication, pet management, and basic medical records
+- June 13, 2025. Enhanced with comprehensive features:
+  * Health summary dashboard with scoring system
+  * Medical timeline with detailed record management
+  * Schedule page with reminder categorization and completion tracking
+  * Expense tracking with budget monitoring and analytics
+  * User profile with statistics and data export
+  * Photo upload capability for medical records
+  * Improved navigation with bottom tab system
+  * Database error handling for date validation
 ```
 
 ## User Preferences
