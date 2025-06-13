@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
+import Schedule from "@/pages/schedule";
 import AddPet from "@/pages/add-pet";
 import PetProfile from "@/pages/pet-profile";
 import VaccineForm from "@/pages/vaccine-form";
@@ -25,6 +26,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Dashboard} />
+          <Route path="/schedule" component={Schedule} />
           <Route path="/add-pet" component={AddPet} />
           <Route path="/pet/:id" component={PetProfile} />
           <Route path="/pet/:id/vaccine" component={VaccineForm} />
