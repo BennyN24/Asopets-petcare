@@ -58,6 +58,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
       case 'treatment': return <MedicalKit {...iconProps} />;
       case 'surgery': return <UserCog {...iconProps} />;
       case 'checkup': return <Stethoscope {...iconProps} />;
+      case 'lab-test': return <FileText {...iconProps} />;
       default: return <Stethoscope {...iconProps} />;
     }
   };

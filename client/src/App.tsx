@@ -17,6 +17,7 @@ import DewormingForm from "@/pages/deworming-form";
 import TreatmentForm from "@/pages/treatment-form";
 import SurgeryForm from "@/pages/surgery-form";
 import CheckupForm from "@/pages/checkup-form";
+import LabTestForm from "@/pages/lab-test-form";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -38,6 +39,7 @@ function Router() {
           <Route path="/pet/:id/treatment" component={TreatmentForm} />
           <Route path="/pet/:id/surgery" component={SurgeryForm} />
           <Route path="/pet/:id/checkup" component={CheckupForm} />
+          <Route path="/pet/:id/lab-test" component={LabTestForm} />
         </>
       )}
       <Route component={NotFound} />

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, Plus, Calendar, Syringe, BarChart3 } from "lucide-react";
 import PetCard from "@/components/pet-card";
 import DashboardInsights from "@/components/dashboard-insights";
+import OfflineSyncIndicator from "@/components/offline-sync-indicator";
 import BottomNavigation from "@/components/bottom-navigation";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
@@ -107,6 +108,9 @@ export default function Dashboard() {
 
       {/* Content */}
       <div className="p-4 pb-20">
+        {/* Offline Sync Indicator */}
+        <OfflineSyncIndicator />
+        
         <Tabs defaultValue="pets" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="pets">My Pets</TabsTrigger>

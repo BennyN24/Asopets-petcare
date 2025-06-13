@@ -214,6 +214,19 @@ export default function PetProfile() {
             <MedicalTimeline petId={petId} medicalRecords={medicalRecords} />
           </TabsContent>
           
+          <TabsContent value="qr" className="mt-6 space-y-4">
+            <QRCodeGenerator 
+              pet={pet} 
+              medicalRecords={medicalRecords} 
+              type="profile" 
+            />
+            <QRCodeGenerator 
+              pet={pet} 
+              medicalRecords={medicalRecords} 
+              type="records" 
+            />
+          </TabsContent>
+          
           <TabsContent value="info" className="mt-6">
             <Card>
               <CardContent className="p-6">
