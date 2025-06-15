@@ -172,8 +172,8 @@ export default function SMSOTPLogin({ onSuccess, onBackToRegular }: SMSOTPLoginP
             </CardTitle>
             <p className="text-gray-600 mt-2">
               {step === "phone" 
-                ? "Enter your phone number to receive a verification code (Development: OTP will be shown in notification)"
-                : `We sent a 6-digit code to ${phoneNumber} (Check the notification above for your code)`
+                ? "Enter your phone number to receive a verification code"
+                : `We sent a 6-digit code to ${phoneNumber}`
               }
             </p>
           </div>
