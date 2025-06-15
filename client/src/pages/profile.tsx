@@ -235,7 +235,7 @@ export default function Profile() {
     }));
   };
 
-  const handleNotificationChange = (type: keyof UserProfile['notificationPreferences'], value: boolean) => {
+  const handleNotificationChange = (type: string, value: boolean) => {
     setProfileData(prev => ({
       ...prev,
       notificationPreferences: {
@@ -477,7 +477,7 @@ export default function Profile() {
                             <Switch
                               id="email-notifications"
                               checked={profileData.notificationPreferences?.email || false}
-                              onCheckedChange={(checked) => handleNotificationChange('email', checked)}
+                              onCheckedChange={(checked: boolean) => handleNotificationChange('email', checked)}
                             />
                           </div>
                           
@@ -486,7 +486,7 @@ export default function Profile() {
                             <Switch
                               id="sms-notifications"
                               checked={profileData.notificationPreferences?.sms || false}
-                              onCheckedChange={(checked) => handleNotificationChange('sms', checked)}
+                              onCheckedChange={(checked: boolean) => handleNotificationChange('sms', checked)}
                             />
                           </div>
                           
@@ -495,7 +495,7 @@ export default function Profile() {
                             <Switch
                               id="push-notifications"
                               checked={profileData.notificationPreferences?.push || false}
-                              onCheckedChange={(checked) => handleNotificationChange('push', checked)}
+                              onCheckedChange={(checked: boolean) => handleNotificationChange('push', checked)}
                             />
                           </div>
                           
@@ -504,7 +504,7 @@ export default function Profile() {
                             <Switch
                               id="reminder-notifications"
                               checked={profileData.notificationPreferences?.reminders || false}
-                              onCheckedChange={(checked) => handleNotificationChange('reminders', checked)}
+                              onCheckedChange={(checked: boolean) => handleNotificationChange('reminders', checked)}
                             />
                           </div>
                         </div>
