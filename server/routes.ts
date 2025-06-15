@@ -13,6 +13,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // SMS OTP Storage (in production, use Redis or database)
+  const otpStore = new Map<string, { otp: string; expires: number; verified: boolean }>();
+
+  // SMS OTP Authentication routes
+  app.post('/api/auth/send-otp', async (req, res) => {
+    try {
+      const { phoneNumber } = req.body;
+      
+      if (!phoneNumber) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+
+      // Generate 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const expires = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+      // Store OTP (in production, use proper storage and send actual SMS)
+      otpStore.set(phoneNumber, { otp, expires, verified: false });
+
+      // In production, integrate with SMS service like Twilio
+      console.log(`SMS OTP for ${phoneNumber}: ${otp}`);
+      
+      res.json({ message: "OTP sent successfully" });
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      res.status(500).json({ message: "Failed to send OTP" });
+    }
+  });
+
+  app.post('/api/auth/verify-otp', async (req, res) => {
+    try {
+      const { phoneNumber, otp } = req.body;
+      
+      if (!phoneNumber || !otp) {
+        return res.status(400).json({ message: "Phone number and OTP are required" });
+      }
+
+      const storedOtp = otpStore.get(phoneNumber);
+      
+      if (!storedOtp) {
+        return res.status(400).json({ message: "OTP not found or expired" });
+      }
+
+      if (Date.now() > storedOtp.expires) {
+        otpStore.delete(phoneNumber);
+        return res.status(400).json({ message: "OTP expired" });
+      }
+
+      if (storedOtp.otp !== otp) {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
+
+      // Mark as verified and create/update user
+      storedOtp.verified = true;
+      
+      // Create or get user by phone number
+      const userId = `sms_${phoneNumber.replace(/\D/g, '')}`;
+      const user = await storage.upsertUser({
+        id: userId,
+        email: `${phoneNumber}@sms.vetbb.com`,
+        firstName: phoneNumber,
+      });
+
+      res.json({ message: "OTP verified successfully", user });
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      res.status(500).json({ message: "Failed to verify OTP" });
+    }
+  });
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {

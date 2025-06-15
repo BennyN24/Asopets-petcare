@@ -1,11 +1,32 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Shield, Calendar, Bell } from "lucide-react";
+import { Heart, Shield, Calendar, Bell, Smartphone, Lock } from "lucide-react";
+import SMSOTPLogin from "@/components/sms-otp-login";
 
 export default function Landing() {
+  const [showSMSLogin, setShowSMSLogin] = useState(false);
+
   const handleLogin = () => {
     window.location.href = "/api/login";
   };
+
+  const handleSMSLogin = () => {
+    setShowSMSLogin(true);
+  };
+
+  const handleSMSSuccess = () => {
+    window.location.reload();
+  };
+
+  if (showSMSLogin) {
+    return (
+      <SMSOTPLogin 
+        onSuccess={handleSMSSuccess}
+        onBackToRegular={() => setShowSMSLogin(false)}
+      />
+    );
+  }
 
   return (
     <div className="mobile-container bg-gray-50">
@@ -64,17 +85,30 @@ export default function Landing() {
           </Card>
         </div>
 
-        {/* Login Button */}
-        <Button 
-          onClick={handleLogin}
-          className="w-full bg-primary text-white py-3 text-lg font-semibold hover:bg-green-600"
-          size="lg"
-        >
-          Get Started
-        </Button>
+        {/* Login Options */}
+        <div className="space-y-3">
+          <Button 
+            onClick={handleLogin}
+            className="w-full bg-primary text-white py-3 text-lg font-semibold hover:bg-green-600"
+            size="lg"
+          >
+            <Lock className="w-5 h-5 mr-2" />
+            Continue with Replit
+          </Button>
+
+          <Button 
+            onClick={handleSMSLogin}
+            variant="outline"
+            className="w-full py-3 text-lg font-semibold border-2"
+            size="lg"
+          >
+            <Smartphone className="w-5 h-5 mr-2" />
+            Login with SMS
+          </Button>
+        </div>
 
         <p className="text-center text-sm text-gray-500 mt-4">
-          Secure login powered by Replit
+          Choose your preferred secure login method
         </p>
       </div>
     </div>

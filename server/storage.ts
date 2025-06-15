@@ -148,24 +148,35 @@ export class DatabaseStorage implements IStorage {
     // Update associated reminders if next due date changed
     if (record.nextDueDate !== undefined) {
       if (record.nextDueDate && updatedRecord.reminderEnabled) {
-        // Update or create reminder
-        const existingReminders = await db
-          .select()
-          .from(reminders)
-          .where(eq(reminders.medicalRecordId, id));
+        // Remove existing reminders for this record
+        await db.delete(reminders).where(eq(reminders.medicalRecordId, id));
 
-        if (existingReminders.length > 0) {
-          await db
-            .update(reminders)
-            .set({ dueDate: record.nextDueDate })
-            .where(eq(reminders.medicalRecordId, id));
-        } else {
+        // Create 1-day reminder
+        const oneDayBefore = new Date(record.nextDueDate);
+        oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+        
+        await this.createReminder({
+          petId: updatedRecord.petId,
+          medicalRecordId: updatedRecord.id,
+          type: updatedRecord.type,
+          title: `${updatedRecord.title} Due Tomorrow`,
+          dueDate: oneDayBefore.toISOString().split('T')[0],
+          isOverdue: false,
+          isCompleted: false,
+          notificationSent: false,
+        });
+
+        // Create 1-hour SMS reminder if enabled
+        if (updatedRecord.reminderSms) {
+          const oneHourBefore = new Date(record.nextDueDate);
+          oneHourBefore.setHours(oneHourBefore.getHours() - 1);
+          
           await this.createReminder({
             petId: updatedRecord.petId,
             medicalRecordId: updatedRecord.id,
             type: updatedRecord.type,
-            title: `${updatedRecord.title} Due`,
-            dueDate: record.nextDueDate,
+            title: `${updatedRecord.title} Due in 1 Hour (SMS)`,
+            dueDate: oneHourBefore.toISOString().split('T')[0],
             isOverdue: false,
             isCompleted: false,
             notificationSent: false,

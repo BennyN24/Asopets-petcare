@@ -226,14 +226,14 @@ export default function MedicalRecordForm({
                           <Textarea 
                             placeholder={extraField.placeholder}
                             {...field}
-                            value={field.value || ""}
+                            value={String(field.value || "")}
                           />
                         ) : (
                           <Input 
                             type={extraField.type}
                             placeholder={extraField.placeholder}
                             {...field}
-                            value={field.value || ""}
+                            value={String(field.value || "")}
                           />
                         )}
                       </FormControl>

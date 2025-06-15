@@ -158,6 +158,15 @@ Changelog:
   * Photo upload capability for medical records
   * Improved navigation with bottom tab system
   * Database error handling for date validation
+- June 13, 2025. Major system optimization and feature enhancements:
+  * Refactored medical record forms with photo upload repositioned below record type
+  * Updated reminder settings to 1 day and 1 hour before due date
+  * Implemented SMS OTP login system with secure authentication
+  * Enhanced offline storage capabilities with automatic sync
+  * Added comprehensive QR code generation for pet profiles and records
+  * Optimized mobile-responsive design across all components
+  * Fixed TypeScript errors and improved form validation
+  * Created dual reminder system (1-day notification + 1-hour SMS)
 ```
 
 ## User Preferences
