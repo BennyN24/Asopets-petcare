@@ -5,6 +5,7 @@ import {
   reminders,
   type User,
   type UpsertUser,
+  type UpdateUser,
   type Pet,
   type InsertPet,
   type MedicalRecord,
@@ -19,6 +20,7 @@ export interface IStorage {
   // User operations (mandatory for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUser(id: string, user: UpdateUser): Promise<User>;
   
   // Pet operations
   getPetsByUserId(userId: string): Promise<Pet[]>;
@@ -62,6 +64,18 @@ export class DatabaseStorage implements IStorage {
           updatedAt: new Date(),
         },
       })
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: string, userData: UpdateUser): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...userData,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
       .returning();
     return user;
   }
