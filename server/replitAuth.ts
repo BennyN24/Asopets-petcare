@@ -123,18 +123,19 @@ export async function setupAuth(app: Express) {
     const isLocal = domain === 'localhost' || domain === '127.0.0.1';
     const protocol = isLocal ? 'http' : 'https';
     const port = isLocal ? ':5000' : '';
+    const callbackURL = `${protocol}://${domain}${port}/api/callback`;
     
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
         config,
         scope: "openid email profile offline_access",
-        callbackURL: `${protocol}://${domain}${port}/api/callback`,
+        callbackURL: callbackURL,
       },
       verify,
     );
     passport.use(strategy);
-    console.log(`[AUTH] Registered strategy for domain: ${domain}`);
+    console.log(`[AUTH] Registered strategy for domain: ${domain} with callback: ${callbackURL}`);
   }
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
