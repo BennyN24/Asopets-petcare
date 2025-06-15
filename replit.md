@@ -195,6 +195,13 @@ Changelog:
   * Integrated notification preferences with toggle switches for email, SMS, push, and reminder settings
   * Added data export functionality and account management features
   * Updated all profile-related components to use PHP currency formatting
+- June 15, 2025. Dedicated login page with dual authentication methods:
+  * Created comprehensive login page with tabbed interface for email and SMS authentication
+  * Integrated existing SMS OTP authentication system with new login flow
+  * Enhanced user experience with clear authentication method selection
+  * Added back navigation and improved visual design with gradient backgrounds
+  * Updated routing to show dedicated login page instead of landing page for unauthenticated users
+  * Maintained existing Replit Auth email authentication alongside SMS option
 ```
 
 ## User Preferences
