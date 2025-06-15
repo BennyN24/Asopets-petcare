@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import MedicationReminderManager from "@/components/medication-reminder-manager";
 import NotFound from "@/pages/not-found";
+import Login from "@/pages/login";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Schedule from "@/pages/schedule";
@@ -26,7 +27,10 @@ function Router() {
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <>
+          <Route path="/" component={Login} />
+          <Route path="/landing" component={Landing} />
+        </>
       ) : (
         <>
           <Route path="/" component={Dashboard} />
