@@ -51,7 +51,7 @@ export default function SMSOTPLogin({ onSuccess, onBackToRegular }: SMSOTPLoginP
   const sendOTP = async (data: PhoneFormData) => {
     setIsLoading(true);
     try {
-      await apiRequest("POST", "/api/auth/send-otp", {
+      const response = await apiRequest("POST", "/api/auth/send-otp", {
         phoneNumber: data.phoneNumber,
       });
       
@@ -70,10 +70,20 @@ export default function SMSOTPLogin({ onSuccess, onBackToRegular }: SMSOTPLoginP
         });
       }, 1000);
 
-      toast({
-        title: "OTP Sent",
-        description: `Verification code sent to ${data.phoneNumber}`,
-      });
+      // Handle development mode - show OTP to user
+      const apiResponse = response as any;
+      if (apiResponse.developmentMode && apiResponse.otp) {
+        toast({
+          title: "OTP Sent (Development Mode)",
+          description: `Your verification code is: ${apiResponse.otp}`,
+          duration: 10000, // Show for 10 seconds
+        });
+      } else {
+        toast({
+          title: "OTP Sent",
+          description: `Verification code sent to ${data.phoneNumber}`,
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Failed to send OTP",
@@ -162,8 +172,8 @@ export default function SMSOTPLogin({ onSuccess, onBackToRegular }: SMSOTPLoginP
             </CardTitle>
             <p className="text-gray-600 mt-2">
               {step === "phone" 
-                ? "Enter your phone number to receive a verification code"
-                : `We sent a 6-digit code to ${phoneNumber}`
+                ? "Enter your phone number to receive a verification code (Development: OTP will be shown in notification)"
+                : `We sent a 6-digit code to ${phoneNumber} (Check the notification above for your code)`
               }
             </p>
           </div>

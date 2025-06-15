@@ -30,13 +30,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const expires = Date.now() + 5 * 60 * 1000; // 5 minutes
 
-      // Store OTP (in production, use proper storage and send actual SMS)
+      // Store OTP
       otpStore.set(phoneNumber, { otp, expires, verified: false });
 
-      // In production, integrate with SMS service like Twilio
-      console.log(`SMS OTP for ${phoneNumber}: ${otp}`);
+      console.log(`[SMS] Generated OTP for ${phoneNumber}: ${otp}`);
       
-      res.json({ message: "OTP sent successfully" });
+      // For development: return OTP in response (in production, send actual SMS)
+      if (process.env.NODE_ENV === 'development') {
+        res.json({ 
+          message: "OTP sent successfully (development mode)", 
+          otp: otp,
+          developmentMode: true 
+        });
+      } else {
+        // In production, integrate with SMS service like Twilio
+        res.json({ message: "OTP sent successfully" });
+      }
     } catch (error) {
       console.error("Error sending OTP:", error);
       res.status(500).json({ message: "Failed to send OTP" });
