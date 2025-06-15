@@ -182,6 +182,11 @@ Changelog:
   * Created smart search and sorting for transaction history
   * Added visual spending alerts and budget progress indicators
   * Integrated advanced analytics with category and pet spending breakdowns
+- June 15, 2025. Currency localization and medical records fixes:
+  * Changed currency from USD to PHP (₱) throughout the application
+  * Made total records count clickable in health summary to navigate to pet profile
+  * Fixed medical history panel API query keys to properly fetch and display records
+  * Updated all cost displays to show Philippine Peso symbol (₱)
 ```
 
 ## User Preferences

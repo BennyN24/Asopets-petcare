@@ -22,13 +22,15 @@ export default function PetProfile() {
     enabled: !!petId,
   });
 
-  const { data: medicalRecords = [] } = useQuery<MedicalRecord[]>({
-    queryKey: ["/api/pets", petId, "medical-records"],
+  const { data: medicalRecords = [], isLoading: recordsLoading, error: recordsError } = useQuery<MedicalRecord[]>({
+    queryKey: [`/api/pets/${petId}/medical-records`],
     enabled: !!petId,
   });
 
+
+
   const { data: reminders = [] } = useQuery<Reminder[]>({
-    queryKey: ["/api/pets", petId, "reminders"],
+    queryKey: [`/api/pets/${petId}/reminders`],
     enabled: !!petId,
   });
 

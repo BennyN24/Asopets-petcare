@@ -29,6 +29,7 @@ interface MedicalTimelineProps {
 }
 
 export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimelineProps) {
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
