@@ -155,7 +155,7 @@ export default function Profile() {
                 </h2>
                 <div className="flex items-center text-gray-600 mt-1">
                   <Mail className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{user?.email || 'Not available'}</span>
+                  <span className="text-sm">{(user as any)?.email || 'Not available'}</span>
                 </div>
                 <div className="flex items-center text-gray-600 mt-1">
                   <Calendar className="w-4 h-4 mr-2" />

@@ -197,6 +197,7 @@ export default function AddPet() {
                         placeholder="Enter any distinctive marks or remarks"
                         className="h-24 resize-none"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
