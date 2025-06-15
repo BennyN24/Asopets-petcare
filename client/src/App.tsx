@@ -54,6 +54,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <MedicationReminderManager />
       </TooltipProvider>
     </QueryClientProvider>
   );

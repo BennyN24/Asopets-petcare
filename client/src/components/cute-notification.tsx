@@ -14,6 +14,7 @@ import {
   PawPrint
 } from "lucide-react";
 import { format, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
+import { notificationSounds } from "@/lib/notification-sounds";
 import type { Reminder, Pet } from "@shared/schema";
 
 interface CuteNotificationProps {
@@ -52,27 +53,6 @@ export default function CuteNotification({
   const [isAnimating, setIsAnimating] = useState(false);
   const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
 
-  useEffect(() => {
-    // Cute bounce animation on mount
-    const timer = setTimeout(() => setIsAnimating(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleComplete = () => {
-    setIsVisible(false);
-    setTimeout(() => onComplete(reminder.id), 300);
-  };
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-    setTimeout(() => onDismiss(reminder.id), 300);
-  };
-
-  const handleSnooze = (minutes: number) => {
-    setIsVisible(false);
-    setTimeout(() => onSnooze(reminder.id, minutes), 300);
-  };
-
   const getUrgencyLevel = () => {
     if (!reminder.dueDate) return "normal";
     const dueDate = new Date(reminder.dueDate);
@@ -83,6 +63,40 @@ export default function CuteNotification({
     if (hoursUntilDue < 2) return "urgent";
     if (hoursUntilDue < 24) return "soon";
     return "normal";
+  };
+
+  useEffect(() => {
+    // Cute bounce animation on mount
+    const timer = setTimeout(() => setIsAnimating(true), 100);
+    
+    // Play appropriate sound based on urgency
+    const urgency = getUrgencyLevel();
+    setTimeout(() => {
+      if (urgency === "urgent" || urgency === "overdue") {
+        notificationSounds.playUrgentAlert();
+      } else {
+        notificationSounds.playGentleChime();
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleComplete = () => {
+    notificationSounds.playCompletionSound();
+    setIsVisible(false);
+    setTimeout(() => onComplete(reminder.id), 300);
+  };
+
+  const handleDismiss = () => {
+    setIsVisible(false);
+    setTimeout(() => onDismiss(reminder.id), 300);
+  };
+
+  const handleSnooze = (minutes: number) => {
+    notificationSounds.playSnoozeSound();
+    setIsVisible(false);
+    setTimeout(() => onSnooze(reminder.id, minutes), 300);
   };
 
   const urgency = getUrgencyLevel();
