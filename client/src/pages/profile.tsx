@@ -1,9 +1,19 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
 import { 
   User, 
   Settings, 
@@ -18,17 +28,80 @@ import {
   LogOut,
   Trash2,
   Download,
-  Upload
+  Upload,
+  Save,
+  X,
+  Globe,
+  UserCircle,
+  ContactRound
 } from "lucide-react";
 import { format } from "date-fns";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
-import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { updateUserSchema, type UpdateUser } from "@shared/schema";
+import type { Pet, MedicalRecord, Reminder, User as UserType } from "@shared/schema";
 
 export default function Profile() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  // Profile form
+  const form = useForm<UpdateUser>({
+    resolver: zodResolver(updateUserSchema),
+    defaultValues: {
+      firstName: (user as UserType)?.firstName || "",
+      lastName: (user as UserType)?.lastName || "",
+      phone: (user as UserType)?.phone || "",
+      address: (user as UserType)?.address || "",
+      city: (user as UserType)?.city || "",
+      country: (user as UserType)?.country || "Philippines",
+      dateOfBirth: (user as UserType)?.dateOfBirth || "",
+      emergencyContact: (user as UserType)?.emergencyContact || "",
+      emergencyPhone: (user as UserType)?.emergencyPhone || "",
+      preferredLanguage: (user as UserType)?.preferredLanguage || "en",
+      notificationPreferences: (user as UserType)?.notificationPreferences || {
+        email: true,
+        sms: false,
+        push: true,
+        reminders: true
+      }
+    }
+  });
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: UpdateUser) => {
+      const response = await fetch("/api/auth/user", {
+        method: "PUT",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+      if (!response.ok) throw new Error("Failed to update profile");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setIsEditingProfile(false);
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been saved successfully."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update failed",
+        description: "Failed to update your profile. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const onSubmitProfile = (data: UpdateUser) => {
+    updateProfileMutation.mutate(data);
+  };
 
   const { data: pets = [] } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],
@@ -110,9 +183,9 @@ export default function Profile() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-PH', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'PHP'
     }).format(amount);
   };
 
@@ -151,21 +224,310 @@ export default function Profile() {
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-gray-900">
-                  Pet Owner
+                  {user?.firstName && user?.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user?.firstName || "Pet Owner"}
                 </h2>
                 <div className="flex items-center text-gray-600 mt-1">
                   <Mail className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{(user as any)?.email || 'Not available'}</span>
+                  <span className="text-sm">{user?.email || 'Not available'}</span>
                 </div>
+                {user?.phone && (
+                  <div className="flex items-center text-gray-600 mt-1">
+                    <Phone className="w-4 h-4 mr-2" />
+                    <span className="text-sm">{user.phone}</span>
+                  </div>
+                )}
+                {user?.city && (
+                  <div className="flex items-center text-gray-600 mt-1">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    <span className="text-sm">{user.city}, {user.country || 'Philippines'}</span>
+                  </div>
+                )}
                 <div className="flex items-center text-gray-600 mt-1">
                   <Calendar className="w-4 h-4 mr-2" />
                   <span className="text-sm">Member since {accountAge}</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
+              <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center">
+                      <UserCircle className="w-5 h-5 mr-2" />
+                      Edit Profile
+                    </DialogTitle>
+                  </DialogHeader>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmitProfile)} className="space-y-6">
+                      {/* Personal Information */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="Enter your first name" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="Enter your last name" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="dateOfBirth"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Date of Birth</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Contact Information */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
+                        
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone Number</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="+63 912 345 6789" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Address</FormLabel>
+                              <FormControl>
+                                <Textarea {...field} placeholder="Enter your complete address" className="min-h-[80px]" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="Enter your city" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="country"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Country</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select country" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Philippines">Philippines</SelectItem>
+                                    <SelectItem value="United States">United States</SelectItem>
+                                    <SelectItem value="Canada">Canada</SelectItem>
+                                    <SelectItem value="Australia">Australia</SelectItem>
+                                    <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                                    <SelectItem value="Singapore">Singapore</SelectItem>
+                                    <SelectItem value="Malaysia">Malaysia</SelectItem>
+                                    <SelectItem value="Thailand">Thailand</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Emergency Contact */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Emergency Contact</h3>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="emergencyContact"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Emergency Contact Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="Enter emergency contact name" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="emergencyPhone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Emergency Phone Number</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="+63 912 345 6789" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Preferences */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Preferences</h3>
+                        
+                        <FormField
+                          control={form.control}
+                          name="preferredLanguage"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Preferred Language</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select language" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="en">English</SelectItem>
+                                  <SelectItem value="tl">Filipino</SelectItem>
+                                  <SelectItem value="es">Spanish</SelectItem>
+                                  <SelectItem value="zh">Chinese</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Notification Preferences */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Notification Preferences</Label>
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="email-notifications" className="text-sm">Email Notifications</Label>
+                              <Switch
+                                id="email-notifications"
+                                checked={form.watch("notificationPreferences.email")}
+                                onCheckedChange={(checked) => 
+                                  form.setValue("notificationPreferences.email", checked)
+                                }
+                              />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="sms-notifications" className="text-sm">SMS Notifications</Label>
+                              <Switch
+                                id="sms-notifications"
+                                checked={form.watch("notificationPreferences.sms")}
+                                onCheckedChange={(checked) => 
+                                  form.setValue("notificationPreferences.sms", checked)
+                                }
+                              />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="push-notifications" className="text-sm">Push Notifications</Label>
+                              <Switch
+                                id="push-notifications"
+                                checked={form.watch("notificationPreferences.push")}
+                                onCheckedChange={(checked) => 
+                                  form.setValue("notificationPreferences.push", checked)
+                                }
+                              />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="reminder-notifications" className="text-sm">Medical Reminders</Label>
+                              <Switch
+                                id="reminder-notifications"
+                                checked={form.watch("notificationPreferences.reminders")}
+                                onCheckedChange={(checked) => 
+                                  form.setValue("notificationPreferences.reminders", checked)
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setIsEditingProfile(false)}
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Cancel
+                        </Button>
+                        <Button 
+                          type="submit" 
+                          disabled={updateProfileMutation.isPending}
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardContent>
         </Card>

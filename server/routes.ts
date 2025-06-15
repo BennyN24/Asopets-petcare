@@ -6,6 +6,7 @@ import {
   insertPetSchema,
   insertMedicalRecordSchema,
   insertReminderSchema,
+  updateUserSchema,
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -92,6 +93,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // User profile update route
+  app.put('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const userData = updateUserSchema.parse(req.body);
+      const updatedUser = await storage.updateUser(userId, userData);
+      res.json(updatedUser);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid user data", errors: error.errors });
+      }
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Failed to update user" });
     }
   });
 
