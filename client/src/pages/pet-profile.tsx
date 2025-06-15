@@ -18,9 +18,32 @@ export default function PetProfile() {
   const petId = parseInt(id || "0");
   
   // Get URL parameters to determine initial tab
-  const urlParams = new URLSearchParams(window.location.search);
-  const initialTab = urlParams.get('tab') || 'overview';
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Handle URL parameters for tab switching
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam && ['overview', 'records', 'qr', 'info'].includes(tabParam)) {
+      setActiveTab(tabParam);
+      // Clear the URL parameter after setting the tab
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+  
+  // Also check for URL changes (in case user navigates back/forward)
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      if (tabParam && ['overview', 'records', 'qr', 'info'].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const { data: pet, isLoading: petLoading, error: petError } = useQuery<Pet>({
     queryKey: ["/api/pets", petId],
@@ -134,7 +157,12 @@ export default function PetProfile() {
           
           <TabsContent value="overview" className="space-y-6 mt-6">
             {/* Health Summary */}
-            <HealthSummaryCard medicalRecords={medicalRecords} reminders={reminders} petId={petId} />
+            <HealthSummaryCard 
+              medicalRecords={medicalRecords} 
+              reminders={reminders} 
+              petId={petId}
+              onRecordsClick={() => setActiveTab('records')}
+            />
             
             {/* Quick Actions Menu */}
             <Card>
