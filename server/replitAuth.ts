@@ -28,7 +28,7 @@ export function getSession() {
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: false,
-    ttl: sessionTtl,
+    ttl: sessionTtl / 1000, // Convert to seconds for pg-simple
     tableName: "sessions",
   });
   return session({
@@ -36,9 +36,11 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    name: 'vetbb.sid',
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false, // Set to false for development in Replit
+      sameSite: 'lax',
       maxAge: sessionTtl,
     },
   });
@@ -78,10 +80,17 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    try {
+      console.log('[AUTH] Verifying tokens for user:', tokens.claims()?.sub);
+      const user = {};
+      updateUserSession(user, tokens);
+      await upsertUser(tokens.claims());
+      console.log('[AUTH] User verified successfully:', tokens.claims()?.sub);
+      verified(null, user);
+    } catch (error) {
+      console.error('[AUTH] Verification error:', error);
+      verified(error, null);
+    }
   };
 
   for (const domain of process.env
@@ -102,17 +111,26 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    console.log(`[AUTH] Login attempt for hostname: ${req.hostname}`);
     passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
+      failureRedirect: "/login?error=auth_failed",
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
+    console.log(`[AUTH] Callback received for hostname: ${req.hostname}`);
     passport.authenticate(`replitauth:${req.hostname}`, {
       successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
-    })(req, res, next);
+      failureRedirect: "/login?error=callback_failed",
+    })(req, res, (err: any) => {
+      if (err) {
+        console.error("[AUTH] Callback error:", err);
+        return res.redirect("/login?error=callback_error");
+      }
+      next();
+    });
   });
 
   app.get("/api/logout", (req, res) => {
