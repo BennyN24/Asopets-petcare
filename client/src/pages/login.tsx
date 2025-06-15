@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Mail, 
@@ -10,73 +11,81 @@ import {
   Smartphone,
   Shield,
   CheckCircle,
-  ArrowLeft,
+  AlertCircle,
   PawPrint
 } from "lucide-react";
 import SMSOTPLogin from "@/components/sms-otp-login";
 
 export default function Login() {
-  const [showSMSOTP, setShowSMSOTP] = useState(false);
+  const [, setLocation] = useLocation();
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
-  const handleEmailLogin = () => {
-    window.location.href = "/api/login";
+  // Check for error parameters in URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get('error');
+    if (errorParam) {
+      switch (errorParam) {
+        case 'auth_failed':
+          setError('Authentication failed. Please try again.');
+          break;
+        case 'callback_failed':
+          setError('Login callback failed. Please try again.');
+          break;
+        case 'callback_error':
+          setError('Authentication error occurred. Please try again.');
+          break;
+        default:
+          setError('An error occurred during login. Please try again.');
+      }
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  const handleEmailLogin = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      window.location.href = "/api/login";
+    } catch (err) {
+      setError("Failed to initiate login. Please try again.");
+      setLoading(false);
+    }
   };
 
   const handleSMSSuccess = () => {
-    window.location.reload();
+    setLocation("/");
   };
-
-  const handleBackToRegular = () => {
-    setShowSMSOTP(false);
-  };
-
-  if (showSMSOTP) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-4">
-          <Button 
-            variant="ghost" 
-            onClick={handleBackToRegular}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to login options
-          </Button>
-          <SMSOTPLogin onSuccess={handleSMSSuccess} onBackToRegular={handleBackToRegular} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto shadow-lg">
-            <PawPrint className="w-10 h-10 text-white" />
+        {/* Logo and Title */}
+        <div className="text-center space-y-2">
+          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+            <PawPrint className="w-8 h-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">VetBB</h1>
-            <p className="text-gray-600 mt-2">
-              Your comprehensive pet care management platform
-            </p>
-            <p className="text-sm text-gray-500">
-              Track medical records, set reminders, and manage expenses
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome to VetBB</h1>
+          <p className="text-gray-600">Your pet's health companion</p>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Login Options */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">Welcome Back</CardTitle>
-            <p className="text-center text-sm text-gray-600">
-              Choose your preferred login method
-            </p>
+            <CardTitle className="text-center">Sign In</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Tabs defaultValue="email" className="w-full">
+          <CardContent>
+            <Tabs defaultValue="email" className="space-y-4">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="email" className="flex items-center space-x-2">
                   <Mail className="w-4 h-4" />
@@ -88,107 +97,74 @@ export default function Login() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="email" className="space-y-4 mt-6">
+              <TabsContent value="email" className="space-y-4">
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">Email Authentication</h3>
-                  <p className="text-sm text-gray-600">
-                    Sign in securely with your email account through our trusted authentication provider.
-                  </p>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Secure OAuth authentication
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      No password required
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Quick and easy access
-                    </div>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Shield className="w-4 h-4" />
+                    <span>Secure authentication via Replit</span>
                   </div>
+                  <Button 
+                    onClick={handleEmailLogin}
+                    disabled={loading}
+                    className="w-full flex items-center justify-center space-x-2"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Connecting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-4 h-4" />
+                        <span>Continue with Email</span>
+                      </>
+                    )}
+                  </Button>
                 </div>
-
-                <Button 
-                  onClick={handleEmailLogin} 
-                  className="w-full"
-                  size="lg"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Continue with Email
-                </Button>
               </TabsContent>
 
-              <TabsContent value="sms" className="space-y-4 mt-6">
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-900">SMS Authentication</h3>
-                  <p className="text-sm text-gray-600">
-                    Get instant access with a verification code sent to your phone number.
-                  </p>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Instant verification code
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Works with any phone
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                      Fast and secure
-                    </div>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={() => setShowSMSOTP(true)} 
-                  className="w-full"
-                  size="lg"
-                  variant="outline"
-                >
-                  <Smartphone className="w-4 h-4 mr-2" />
-                  Continue with SMS
-                </Button>
+              <TabsContent value="sms" className="space-y-4">
+                <SMSOTPLogin 
+                  onSuccess={handleSMSSuccess} 
+                  onBackToRegular={() => {}} 
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
 
         {/* Features Preview */}
-        <Card className="bg-white/50 backdrop-blur-sm">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">What you can do with VetBB:</h3>
-            <div className="space-y-2 text-sm text-gray-600">
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4 space-y-3">
+            <h3 className="font-semibold text-green-800 flex items-center">
+              <Heart className="w-4 h-4 mr-2" />
+              What you can do with VetBB
+            </h3>
+            <div className="space-y-2 text-sm text-green-700">
               <div className="flex items-center">
-                <Heart className="w-4 h-4 text-primary mr-2" />
-                Manage multiple pet profiles
+                <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                <span>Track medical records and vaccinations</span>
               </div>
               <div className="flex items-center">
-                <Shield className="w-4 h-4 text-primary mr-2" />
-                Track medical records and vaccinations
+                <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                <span>Set medication reminders</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-primary mr-2" />
-                Set up medication reminders
+                <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                <span>Monitor expenses and health insights</span>
               </div>
               <div className="flex items-center">
-                <Mail className="w-4 h-4 text-primary mr-2" />
-                Monitor expenses and budgets
+                <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
+                <span>Generate QR codes for emergency contacts</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Security Notice */}
-        <div className="text-center text-xs text-gray-500">
-          <div className="flex items-center justify-center space-x-1">
-            <Shield className="w-3 h-3" />
-            <span>Your data is protected with enterprise-grade security</span>
-          </div>
+        {/* Footer */}
+        <div className="text-center text-xs text-gray-500 space-y-1">
+          <p>By signing in, you agree to our terms of service</p>
+          <p>Your pet data is securely encrypted and protected</p>
         </div>
       </div>
     </div>
