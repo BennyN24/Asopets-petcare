@@ -174,6 +174,14 @@ Changelog:
   * Completed full deployment readiness scan with successful production build
   * Verified all core features and database integrity
   * Created cute pet medication reminder system with sound effects and animations
+- June 15, 2025. Comprehensive schedule and expenses management enhancements:
+  * Fixed schedule page to properly display completed reminders in dedicated tab
+  * Enhanced expenses with advanced transaction history and filtering capabilities
+  * Added CSV export functionality for expense reporting
+  * Implemented comprehensive budget management with per-pet tracking
+  * Created smart search and sorting for transaction history
+  * Added visual spending alerts and budget progress indicators
+  * Integrated advanced analytics with category and pet spending breakdowns
 ```
 
 ## User Preferences

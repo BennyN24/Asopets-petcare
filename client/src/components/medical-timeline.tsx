@@ -243,105 +243,106 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
 
       {/* Detailed Record Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby="record-details">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedRecord && getActivityIcon(selectedRecord.type)}
               {selectedRecord?.title}
             </DialogTitle>
           </DialogHeader>
-          
-          {selectedRecord && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={getTypeColor(selectedRecord.type)}>
-                  {formatType(selectedRecord.type)}
-                </Badge>
-                <span className="text-sm text-gray-500">
-                  {formatDate(selectedRecord.dateAdministered)}
-                </span>
+          <div id="record-details">
+            {selectedRecord && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={getTypeColor(selectedRecord.type)}>
+                    {formatType(selectedRecord.type)}
+                  </Badge>
+                  <span className="text-sm text-gray-500">
+                    {formatDate(selectedRecord.dateAdministered)}
+                  </span>
+                </div>
+
+                {selectedRecord.description && (
+                  <div>
+                    <h4 className="font-medium text-sm text-gray-900 mb-1">Description</h4>
+                    <p className="text-sm text-gray-600">{selectedRecord.description}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 gap-3">
+                  {selectedRecord.veterinarian && (
+                    <div>
+                      <h4 className="font-medium text-sm text-gray-900 mb-1">Veterinarian</h4>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Stethoscope className="w-4 h-4 mr-2" />
+                        Dr. {selectedRecord.veterinarian}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedRecord.clinic && (
+                    <div>
+                      <h4 className="font-medium text-sm text-gray-900 mb-1">Clinic</h4>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        {selectedRecord.clinic}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedRecord.cost && (
+                    <div>
+                      <h4 className="font-medium text-sm text-gray-900 mb-1">Cost</h4>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <DollarSign className="w-4 h-4 mr-2" />
+                        ${selectedRecord.cost}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedRecord.batchNumber && (
+                    <div>
+                      <h4 className="font-medium text-sm text-gray-900 mb-1">Batch Number</h4>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FileText className="w-4 h-4 mr-2" />
+                        {selectedRecord.batchNumber}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {selectedRecord.nextDueDate && (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded">
+                    <h4 className="font-medium text-sm text-amber-800 mb-1">Next Due Date</h4>
+                    <div className="flex items-center text-sm text-amber-700">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      {formatDate(selectedRecord.nextDueDate)}
+                    </div>
+                  </div>
+                )}
+
+                {selectedRecord.notes && (
+                  <div>
+                    <h4 className="font-medium text-sm text-gray-900 mb-1">Notes</h4>
+                    <div className="p-3 bg-gray-50 rounded text-sm text-gray-600">
+                      {selectedRecord.notes}
+                    </div>
+                  </div>
+                )}
+
+                {selectedRecord.imageUrl && (
+                  <div>
+                    <h4 className="font-medium text-sm text-gray-900 mb-2">Attached Document</h4>
+                    <img 
+                      src={selectedRecord.imageUrl} 
+                      alt="Medical record document"
+                      className="w-full h-auto rounded border max-h-48 object-contain"
+                    />
+                  </div>
+                )}
               </div>
-
-              {selectedRecord.description && (
-                <div>
-                  <h4 className="font-medium text-sm text-gray-900 mb-1">Description</h4>
-                  <p className="text-sm text-gray-600">{selectedRecord.description}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 gap-3">
-                {selectedRecord.veterinarian && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">Veterinarian</h4>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Stethoscope className="w-4 h-4 mr-2" />
-                      Dr. {selectedRecord.veterinarian}
-                    </div>
-                  </div>
-                )}
-                
-                {selectedRecord.clinic && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">Clinic</h4>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      {selectedRecord.clinic}
-                    </div>
-                  </div>
-                )}
-                
-                {selectedRecord.cost && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">Cost</h4>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <DollarSign className="w-4 h-4 mr-2" />
-                      ${selectedRecord.cost}
-                    </div>
-                  </div>
-                )}
-                
-                {selectedRecord.batchNumber && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">Batch Number</h4>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FileText className="w-4 h-4 mr-2" />
-                      {selectedRecord.batchNumber}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {selectedRecord.nextDueDate && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded">
-                  <h4 className="font-medium text-sm text-amber-800 mb-1">Next Due Date</h4>
-                  <div className="flex items-center text-sm text-amber-700">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {formatDate(selectedRecord.nextDueDate)}
-                  </div>
-                </div>
-              )}
-
-              {selectedRecord.notes && (
-                <div>
-                  <h4 className="font-medium text-sm text-gray-900 mb-1">Notes</h4>
-                  <div className="p-3 bg-gray-50 rounded text-sm text-gray-600">
-                    {selectedRecord.notes}
-                  </div>
-                </div>
-              )}
-
-              {selectedRecord.imageUrl && (
-                <div>
-                  <h4 className="font-medium text-sm text-gray-900 mb-2">Attached Document</h4>
-                  <img 
-                    src={selectedRecord.imageUrl} 
-                    alt="Medical record document"
-                    className="w-full h-auto rounded border max-h-48 object-contain"
-                  />
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
