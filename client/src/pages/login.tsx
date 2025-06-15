@@ -39,6 +39,9 @@ export default function Login() {
         case 'auth_not_configured':
           setError('Authentication service is not properly configured. Please use SMS login instead.');
           break;
+        case 'login_failed':
+          setError('Login session could not be established. Please try again.');
+          break;
         default:
           setError('An error occurred during login. Please try again.');
       }
