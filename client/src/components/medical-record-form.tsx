@@ -141,6 +141,23 @@ export default function MedicalRecordForm({
                 )}
               />
 
+              {/* Photo Upload - Moved below record type */}
+              <div>
+                <Label className="block text-sm font-medium text-gray-700 mb-3">
+                  Upload Certificate/Record Photo
+                </Label>         
+                <div className="grid grid-cols-2 gap-3">
+                  <button type="button" className="photo-upload-btn">
+                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-500">Take Photo</span>
+                  </button>
+                  <button type="button" className="photo-upload-btn">
+                    <Upload className="w-6 h-6 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-500">Upload File</span>
+                  </button>
+                </div>
+              </div>
+
               <FormField
                 control={form.control}
                 name="dateAdministered"
@@ -148,7 +165,11 @@ export default function MedicalRecordForm({
                   <FormItem>
                     <FormLabel>Date Administered</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input 
+                        type="date" 
+                        {...field} 
+                        value={field.value || ""} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -162,7 +183,11 @@ export default function MedicalRecordForm({
                   <FormItem>
                     <FormLabel>Next Due Date (Optional)</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input 
+                        type="date" 
+                        {...field} 
+                        value={field.value || ""} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -176,7 +201,11 @@ export default function MedicalRecordForm({
                   <FormItem>
                     <FormLabel>Veterinarian/Clinic</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter vet name or clinic" {...field} />
+                      <Input 
+                        placeholder="Enter vet name or clinic" 
+                        {...field} 
+                        value={field.value || ""} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -197,12 +226,14 @@ export default function MedicalRecordForm({
                           <Textarea 
                             placeholder={extraField.placeholder}
                             {...field}
+                            value={field.value || ""}
                           />
                         ) : (
                           <Input 
                             type={extraField.type}
                             placeholder={extraField.placeholder}
                             {...field}
+                            value={field.value || ""}
                           />
                         )}
                       </FormControl>
@@ -212,22 +243,7 @@ export default function MedicalRecordForm({
                 />
               ))}
 
-              {/* Upload Certificate/Record */}
-              <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-3">
-                  Upload Certificate/Record
-                </Label>
-                <div className="flex space-x-3">
-                  <button type="button" className="photo-upload-btn">
-                    <Camera className="w-6 h-6 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-500">Take Photo</span>
-                  </button>
-                  <button type="button" className="photo-upload-btn">
-                    <Upload className="w-6 h-6 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-500">Upload File</span>
-                  </button>
-                </div>
-              </div>
+
 
               <FormField
                 control={form.control}
@@ -240,6 +256,7 @@ export default function MedicalRecordForm({
                         placeholder="Any additional notes or reactions"
                         className="h-24 resize-none"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -261,13 +278,13 @@ export default function MedicalRecordForm({
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                           <FormControl>
                             <Checkbox
-                              checked={field.value}
+                              checked={field.value || false}
                               onCheckedChange={field.onChange}
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel className="text-sm">
-                              Send reminder 2 weeks before due date
+                              Send reminder 1 day before due date
                             </FormLabel>
                           </div>
                         </FormItem>
@@ -281,13 +298,13 @@ export default function MedicalRecordForm({
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                           <FormControl>
                             <Checkbox
-                              checked={field.value}
+                              checked={field.value || false}
                               onCheckedChange={field.onChange}
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel className="text-sm">
-                              Send SMS reminder
+                              Send SMS reminder 1 hour before due date
                             </FormLabel>
                           </div>
                         </FormItem>
