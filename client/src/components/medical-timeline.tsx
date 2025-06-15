@@ -179,7 +179,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                         {record.cost && (
                           <div className="flex items-center">
                             <DollarSign className="w-3 h-3 mr-1" />
-                            <span>${record.cost}</span>
+                            <span>₱{record.cost}</span>
                           </div>
                         )}
                         
@@ -295,7 +295,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                       <h4 className="font-medium text-sm text-gray-900 mb-1">Cost</h4>
                       <div className="flex items-center text-sm text-gray-600">
                         <DollarSign className="w-4 h-4 mr-2" />
-                        ${selectedRecord.cost}
+                        ₱{selectedRecord.cost}
                       </div>
                     </div>
                   )}
