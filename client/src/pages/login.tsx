@@ -36,6 +36,9 @@ export default function Login() {
         case 'callback_error':
           setError('Authentication error occurred. Please try again.');
           break;
+        case 'auth_not_configured':
+          setError('Authentication service is not properly configured. Please use SMS login instead.');
+          break;
         default:
           setError('An error occurred during login. Please try again.');
       }

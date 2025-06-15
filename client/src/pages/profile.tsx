@@ -86,20 +86,21 @@ export default function Profile() {
   // Initialize profile data when user loads
   useEffect(() => {
     if (user) {
+      const userData = user as Record<string, any>;
       setProfileData({
-        id: user.id || "",
-        email: user.email || "",
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        phone: user.phone || "",
-        address: user.address || "",
-        city: user.city || "",
-        country: user.country || "Philippines",
-        dateOfBirth: user.dateOfBirth || "",
-        emergencyContact: user.emergencyContact || "",
-        emergencyPhone: user.emergencyPhone || "",
-        preferredLanguage: user.preferredLanguage || "en",
-        notificationPreferences: user.notificationPreferences || {
+        id: userData?.id || "",
+        email: userData?.email || "",
+        firstName: userData?.firstName || "",
+        lastName: userData?.lastName || "",
+        phone: userData?.phone || "",
+        address: userData?.address || "",
+        city: userData?.city || "",
+        country: userData?.country || "Philippines",
+        dateOfBirth: userData?.dateOfBirth || "",
+        emergencyContact: userData?.emergencyContact || "",
+        emergencyPhone: userData?.emergencyPhone || "",
+        preferredLanguage: userData?.preferredLanguage || "en",
+        notificationPreferences: userData?.notificationPreferences || {
           email: true,
           sms: false,
           push: true,
