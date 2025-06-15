@@ -107,7 +107,7 @@ export default function HealthSummaryCard({ medicalRecords, reminders, petId }: 
           <Button
             variant="ghost"
             className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 h-auto flex flex-col items-center justify-center"
-            onClick={() => petId && setLocation(`/pet/${petId}`)}
+            onClick={() => petId && setLocation(`/pet/${petId}?tab=records`)}
           >
             <div className="text-2xl font-bold text-primary">{totalRecords}</div>
             <div className="text-xs text-gray-600 flex items-center">

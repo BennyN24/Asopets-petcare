@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,11 @@ export default function PetProfile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const petId = parseInt(id || "0");
+  
+  // Get URL parameters to determine initial tab
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') || 'overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   const { data: pet, isLoading: petLoading, error: petError } = useQuery<Pet>({
     queryKey: ["/api/pets", petId],
@@ -119,7 +124,7 @@ export default function PetProfile() {
       </div>
 
       <div className="p-4">
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="records">Records</TabsTrigger>
