@@ -54,7 +54,7 @@ export function getSession() {
     name: 'vetbb.sid',
     cookie: {
       httpOnly: true,
-      secure: false, // Set to false for development in Replit
+      secure: process.env.NODE_ENV === "production",
       sameSite: 'lax',
       maxAge: sessionTtl,
     },
@@ -115,8 +115,11 @@ export async function setupAuth(app: Express) {
     }
   };
 
-  // Add development domains
-  const domains = process.env.REPLIT_DOMAINS!.split(",").concat(['localhost', '127.0.0.1']);
+  // Configure domains based on environment
+  const baseDomains = process.env.REPLIT_DOMAINS!.split(",");
+  const domains = process.env.NODE_ENV === 'development' 
+    ? baseDomains.concat(['localhost', '127.0.0.1'])
+    : baseDomains;
   console.log('[AUTH] Registering strategies for domains:', domains);
   
   for (const domain of domains) {
@@ -162,9 +165,11 @@ export async function setupAuth(app: Express) {
       return res.redirect("/login?error=auth_not_configured");
     }
     
-    console.log(`[AUTH] Callback received for hostname: ${req.hostname}`);
-    console.log(`[AUTH] Callback query params:`, req.query);
-    console.log(`[AUTH] Session ID:`, req.sessionID);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[AUTH] Callback received for hostname: ${req.hostname}`);
+      console.log(`[AUTH] Callback query params:`, req.query);
+      console.log(`[AUTH] Session ID:`, req.sessionID);
+    }
     
     passport.authenticate(`replitauth:${req.hostname}`, (err: any, user: any, info: any) => {
       if (err) {
@@ -209,40 +214,58 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  console.log('[AUTH] Checking authentication for:', req.url);
-  console.log('[AUTH] Session ID:', req.sessionID);
-  console.log('[AUTH] Is authenticated:', req.isAuthenticated());
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[AUTH] Checking authentication for:', req.url);
+    console.log('[AUTH] Session ID:', req.sessionID);
+    console.log('[AUTH] Is authenticated:', req.isAuthenticated());
+  }
   
   const user = req.user as any;
-  console.log('[AUTH] User object:', user ? 'exists' : 'null');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[AUTH] User object:', user ? 'exists' : 'null');
+  }
 
   if (!req.isAuthenticated()) {
-    console.log('[AUTH] User not authenticated');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] User not authenticated');
+    }
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   if (!user) {
-    console.log('[AUTH] No user object in session');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] No user object in session');
+    }
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   if (!user.expires_at) {
-    console.log('[AUTH] No expiration time in user session');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] No expiration time in user session');
+    }
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   const now = Math.floor(Date.now() / 1000);
-  console.log('[AUTH] Token expires at:', user.expires_at, 'Current time:', now);
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[AUTH] Token expires at:', user.expires_at, 'Current time:', now);
+  }
   
   if (now <= user.expires_at) {
-    console.log('[AUTH] Token still valid');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] Token still valid');
+    }
     return next();
   }
 
-  console.log('[AUTH] Token expired, attempting refresh');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[AUTH] Token expired, attempting refresh');
+  }
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
-    console.log('[AUTH] No refresh token available');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] No refresh token available');
+    }
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
@@ -251,7 +274,9 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     const config = await getOidcConfig();
     const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
     updateUserSession(user, tokenResponse);
-    console.log('[AUTH] Token refreshed successfully');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] Token refreshed successfully');
+    }
     return next();
   } catch (error) {
     console.error('[AUTH] Token refresh failed:', error);
