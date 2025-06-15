@@ -127,7 +127,7 @@ export default function PetProfile() {
           
           <TabsContent value="overview" className="space-y-6 mt-6">
             {/* Health Summary */}
-            <HealthSummaryCard medicalRecords={medicalRecords} reminders={reminders} />
+            <HealthSummaryCard medicalRecords={medicalRecords} reminders={reminders} petId={petId} />
             
             {/* Quick Actions Menu */}
             <Card>

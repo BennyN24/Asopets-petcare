@@ -1,15 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, AlertTriangle, CheckCircle, Clock, FileText } from "lucide-react";
 import { format, differenceInDays, isAfter, isBefore, addDays } from "date-fns";
+import { useLocation } from "wouter";
 import type { MedicalRecord, Reminder } from "@shared/schema";
 
 interface HealthSummaryCardProps {
   medicalRecords: MedicalRecord[];
   reminders: Reminder[];
+  petId?: number;
 }
 
-export default function HealthSummaryCard({ medicalRecords, reminders }: HealthSummaryCardProps) {
+export default function HealthSummaryCard({ medicalRecords, reminders, petId }: HealthSummaryCardProps) {
+  const [, setLocation] = useLocation();
   const now = new Date();
   
   // Calculate health metrics
@@ -100,10 +104,17 @@ export default function HealthSummaryCard({ medicalRecords, reminders }: HealthS
       <CardContent className="space-y-4">
         {/* Quick Status Overview */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-3 bg-gray-50 rounded-lg">
+          <Button
+            variant="ghost"
+            className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 h-auto flex flex-col items-center justify-center"
+            onClick={() => petId && setLocation(`/pet/${petId}`)}
+          >
             <div className="text-2xl font-bold text-primary">{totalRecords}</div>
-            <div className="text-xs text-gray-600">Total Records</div>
-          </div>
+            <div className="text-xs text-gray-600 flex items-center">
+              <FileText className="w-3 h-3 mr-1" />
+              Total Records
+            </div>
+          </Button>
           <div className="text-center p-3 bg-gray-50 rounded-lg">
             <div className="text-2xl font-bold text-destructive">{overdueReminders.length}</div>
             <div className="text-xs text-gray-600">Overdue Items</div>
