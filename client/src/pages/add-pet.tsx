@@ -151,7 +151,7 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Breed</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter breed" {...field} />
+                      <Input placeholder="Enter breed" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -165,7 +165,7 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Date of Birth</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,7 +179,7 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Microchip ID (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter microchip ID" {...field} />
+                      <Input placeholder="Enter microchip ID" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
