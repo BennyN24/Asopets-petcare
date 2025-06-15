@@ -302,6 +302,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/reminders/with-pets", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const [reminders, pets] = await Promise.all([
+        storage.getRemindersByUserId(userId),
+        storage.getPetsByUserId(userId)
+      ]);
+      
+      // Combine reminders with pet information
+      const remindersWithPets = reminders.map(reminder => {
+        const pet = pets.find(p => p.id === reminder.petId);
+        return { ...reminder, pet };
+      }).filter(r => r.pet); // Only include reminders with valid pets
+      
+      res.json(remindersWithPets);
+    } catch (error) {
+      console.error("Error fetching reminders with pets:", error);
+      res.status(500).json({ message: "Failed to fetch reminders with pets" });
+    }
+  });
+
   app.get("/api/reminders/overdue", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
