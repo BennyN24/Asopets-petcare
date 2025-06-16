@@ -10,7 +10,6 @@ import type { Pet, MedicalRecord } from "@shared/schema";
 interface QRCodeGeneratorProps {
   pet: Pet;
   medicalRecords?: MedicalRecord[];
-  type: "profile";
 }
 
 export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGeneratorProps) {
@@ -111,19 +110,17 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
       // Convert data URL to blob
       const response = await fetch(qrCodeUrl);
       const blob = await response.blob();
-      const file = new File([blob], `${pet.name}-${type}-qr.png`, { type: 'image/png' });
+      const file = new File([blob], `${pet.name}-complete-qr.png`, { type: 'image/png' });
 
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `${pet.name} - ${type === 'profile' ? 'Pet Profile' : 'Medical Records'}`,
-          text: `QR code for ${pet.name}'s ${type === 'profile' ? 'profile' : 'medical records'}`,
+          title: `${pet.name} - Complete Profile & Medical Records`,
+          text: `QR code for ${pet.name}'s complete profile and medical records`,
           files: [file],
         });
       } else {
         // Fallback to copying the share URL
-        const shareUrl = type === 'profile' 
-          ? `${window.location.origin}/shared/pet/${pet.id}`
-          : `${window.location.origin}/shared/records/${pet.id}`;
+        const shareUrl = `${window.location.origin}/shared/pet/${pet.id}`;
         
         await navigator.clipboard.writeText(shareUrl);
         toast({
@@ -142,7 +139,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
 
   useEffect(() => {
     generateQRCode();
-  }, [pet, medicalRecords, type]);
+  }, [pet, medicalRecords]);
 
   return (
     <Card>
@@ -214,7 +211,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
         </div>
 
         <div className="text-xs text-gray-500 text-center">
-          <p>QR code contains {type === 'profile' ? 'pet profile information' : 'medical record summaries'}</p>
+          <p>QR code contains complete pet profile and medical record information</p>
           <p>Generated on {new Date().toLocaleDateString()}</p>
         </div>
       </CardContent>
