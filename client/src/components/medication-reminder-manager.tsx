@@ -42,9 +42,7 @@ export default function MedicationReminderManager() {
   // Complete reminder mutation
   const completeReminderMutation = useMutation({
     mutationFn: async (reminderId: number) => {
-      await apiRequest("PUT", `/api/reminders/${reminderId}`, {
-        isCompleted: true
-      });
+      await apiRequest("PUT", `/api/reminders/${reminderId}/complete`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reminders"] });

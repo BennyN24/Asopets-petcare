@@ -52,6 +52,7 @@ export default function CuteNotification({
   const [isVisible, setIsVisible] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   const getUrgencyLevel = () => {
     if (!reminder.dueDate) return "normal";
@@ -66,21 +67,24 @@ export default function CuteNotification({
   };
 
   useEffect(() => {
-    // Cute bounce animation on mount
-    const timer = setTimeout(() => setIsAnimating(true), 100);
-    
-    // Play appropriate sound based on urgency
-    const urgency = getUrgencyLevel();
-    setTimeout(() => {
-      if (urgency === "urgent" || urgency === "overdue") {
-        notificationSounds.playUrgentAlert();
-      } else {
-        notificationSounds.playGentleChime();
-      }
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    if (!hasPlayed) {
+      // Cute bounce animation on mount
+      const timer = setTimeout(() => setIsAnimating(true), 100);
+      
+      // Play appropriate sound based on urgency
+      const urgency = getUrgencyLevel();
+      setTimeout(() => {
+        if (urgency === "urgent" || urgency === "overdue") {
+          notificationSounds.playUrgentAlert();
+        } else {
+          notificationSounds.playGentleChime();
+        }
+        setHasPlayed(true);
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasPlayed]);
 
   const handleComplete = () => {
     notificationSounds.playCompletionSound();

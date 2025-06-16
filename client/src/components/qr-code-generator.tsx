@@ -76,7 +76,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     
     const link = document.createElement('a');
     link.href = qrCodeUrl;
-    link.download = `${pet.name}-${type}-qr-code.png`;
+    link.download = `${pet.name}-complete-qr-code.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -153,7 +153,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
             <span>QR Code</span>
           </div>
           <Badge variant="outline">
-            {type === 'profile' ? 'Profile' : 'Records'}
+            Complete Profile & Records
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -177,8 +177,8 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
         </div>
 
         <div className="text-center text-sm text-gray-600">
-          <p className="font-medium">{pet.name}'s {type === 'profile' ? 'Profile' : 'Medical Records'}</p>
-          <p>Scan to view {type === 'profile' ? 'pet information' : `${medicalRecords.length} medical record${medicalRecords.length !== 1 ? 's' : ''}`}</p>
+          <p className="font-medium">{pet.name}'s Complete Profile & Medical Records</p>
+          <p>Scan to view pet information and {medicalRecords.length} medical record{medicalRecords.length !== 1 ? 's' : ''}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
