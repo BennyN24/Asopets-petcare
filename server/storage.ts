@@ -3,6 +3,8 @@ import {
   pets,
   medicalRecords,
   reminders,
+  vetClinics,
+  clinicRatings,
   type User,
   type UpsertUser,
   type UpdateUser,
@@ -12,6 +14,10 @@ import {
   type InsertMedicalRecord,
   type Reminder,
   type InsertReminder,
+  type VetClinic,
+  type InsertVetClinic,
+  type ClinicRating,
+  type InsertClinicRating,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, lt, isNull, or } from "drizzle-orm";
@@ -44,6 +50,19 @@ export interface IStorage {
   updateReminder(id: number, reminder: Partial<InsertReminder>): Promise<Reminder>;
   deleteReminder(id: number): Promise<void>;
   markReminderCompleted(id: number): Promise<void>;
+  
+  // Vet clinic operations
+  getVetClinicsByLocation(latitude: number, longitude: number, radiusKm?: number): Promise<VetClinic[]>;
+  getVetClinicById(id: number): Promise<VetClinic | undefined>;
+  createVetClinic(clinic: InsertVetClinic): Promise<VetClinic>;
+  updateVetClinic(id: number, clinic: Partial<InsertVetClinic>): Promise<VetClinic>;
+  
+  // Clinic rating operations
+  getClinicRatingsByClinicId(clinicId: number): Promise<ClinicRating[]>;
+  getClinicRatingsByUserId(userId: string): Promise<ClinicRating[]>;
+  createClinicRating(rating: InsertClinicRating): Promise<ClinicRating>;
+  updateClinicRating(id: number, rating: Partial<InsertClinicRating>): Promise<ClinicRating>;
+  deleteClinicRating(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {

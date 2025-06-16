@@ -168,11 +168,32 @@ export const remindersRelations = relations(reminders, ({ one }) => ({
   }),
 }));
 
+export const vetClinicsRelations = relations(vetClinics, ({ many }) => ({
+  ratings: many(clinicRatings),
+}));
+
+export const clinicRatingsRelations = relations(clinicRatings, ({ one }) => ({
+  user: one(users, {
+    fields: [clinicRatings.userId],
+    references: [users.id],
+  }),
+  clinic: one(vetClinics, {
+    fields: [clinicRatings.clinicId],
+    references: [vetClinics.id],
+  }),
+  medicalRecord: one(medicalRecords, {
+    fields: [clinicRatings.medicalRecordId],
+    references: [medicalRecords.id],
+  }),
+}));
+
 // Insert schemas
 export const insertPetSchema = createInsertSchema(pets).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  age: z.number().optional(),
 });
 
 export const insertMedicalRecordSchema = createInsertSchema(medicalRecords).omit({
@@ -192,6 +213,20 @@ export const updateUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 }).partial();
 
+export const insertVetClinicSchema = createInsertSchema(vetClinics).omit({
+  id: true,
+  averageRating: true,
+  totalRatings: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertClinicRatingSchema = createInsertSchema(clinicRatings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -202,5 +237,9 @@ export type MedicalRecord = typeof medicalRecords.$inferSelect;
 export type InsertMedicalRecord = z.infer<typeof insertMedicalRecordSchema>;
 export type Reminder = typeof reminders.$inferSelect;
 export type InsertReminder = z.infer<typeof insertReminderSchema>;
+export type VetClinic = typeof vetClinics.$inferSelect;
+export type InsertVetClinic = z.infer<typeof insertVetClinicSchema>;
+export type ClinicRating = typeof clinicRatings.$inferSelect;
+export type InsertClinicRating = z.infer<typeof insertClinicRatingSchema>;
 export type PetCategory = typeof petCategories[number];
 export type MedicalRecordType = typeof medicalRecordTypes[number];
