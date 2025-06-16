@@ -23,10 +23,13 @@ import { db } from "./db";
 import { eq, and, desc, lt, isNull, or } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations (mandatory for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: UpsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, user: UpdateUser): Promise<User>;
+  confirmUserEmail(token: string): Promise<User | null>;
   
   // Pet operations
   getPetsByUserId(userId: string): Promise<Pet[]>;
@@ -71,6 +74,39 @@ export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .returning();
+    return user;
+  }
+
+  async confirmUserEmail(token: string): Promise<User | null> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        isEmailConfirmed: true,
+        emailConfirmationToken: null,
+        emailConfirmationExpires: null,
+        updatedAt: new Date()
+      })
+      .where(and(
+        eq(users.emailConfirmationToken, token),
+        or(
+          isNull(users.emailConfirmationExpires),
+          lt(users.emailConfirmationExpires, new Date())
+        )
+      ))
+      .returning();
+    return user || null;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
