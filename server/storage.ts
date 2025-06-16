@@ -342,7 +342,23 @@ export class DatabaseStorage implements IStorage {
 
   // Clinic rating operations
   async getClinicRatingsByClinicId(clinicId: number): Promise<ClinicRating[]> {
-    return await db.select().from(clinicRatings).where(eq(clinicRatings.clinicId, clinicId));
+    return await db
+      .select({
+        id: clinicRatings.id,
+        userId: clinicRatings.userId,
+        clinicId: clinicRatings.clinicId,
+        rating: clinicRatings.rating,
+        review: clinicRatings.review,
+        medicalRecordId: clinicRatings.medicalRecordId,
+        createdAt: clinicRatings.createdAt,
+        updatedAt: clinicRatings.updatedAt,
+        userName: users.firstName,
+        userLastName: users.lastName,
+      })
+      .from(clinicRatings)
+      .leftJoin(users, eq(clinicRatings.userId, users.id))
+      .where(eq(clinicRatings.clinicId, clinicId))
+      .orderBy(desc(clinicRatings.createdAt));
   }
 
   async getClinicRatingsByUserId(userId: string): Promise<ClinicRating[]> {

@@ -23,6 +23,7 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
   const [isOpen, setIsOpen] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
   const [showRatingForm, setShowRatingForm] = useState(false);
+  const [showReviews, setShowReviews] = useState<{ [key: number]: boolean }>({});
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -59,6 +60,18 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
       return await response.json() as VetClinic[];
     },
   });
+
+  // Function to fetch reviews for a specific clinic
+  const useClinicReviews = (clinicId: number) => {
+    return useQuery({
+      queryKey: ["/api/vet-clinics", clinicId, "ratings"],
+      queryFn: async () => {
+        const response = await apiRequest("GET", `/api/vet-clinics/${clinicId}/ratings`);
+        return await response.json();
+      },
+      enabled: showReviews[clinicId] || false,
+    });
+  };
 
   const ratingForm = useForm<InsertClinicRating>({
     resolver: zodResolver(insertClinicRatingSchema.omit({ userId: true })),
@@ -100,6 +113,13 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
     setSelectedClinic(clinic);
     ratingForm.setValue("clinicId", clinic.id);
     setShowRatingForm(true);
+  };
+
+  const toggleReviews = (clinicId: number) => {
+    setShowReviews(prev => ({
+      ...prev,
+      [clinicId]: !prev[clinicId]
+    }));
   };
 
   const onSubmitRating = (data: InsertClinicRating) => {
