@@ -120,15 +120,8 @@ export default function Dashboard() {
           </TabsList>
 
           <TabsContent value="pets" className="space-y-6 mt-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <h2 className="text-lg font-semibold text-gray-900">Your Pets</h2>
-              <Button
-                onClick={() => setLocation("/add-pet")}
-                className="bg-primary text-white px-4 py-2 text-sm font-medium"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Pet
-              </Button>
             </div>
             {/* Pet Grid */}
             <div className="grid grid-cols-2 gap-4">
