@@ -55,7 +55,8 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
         params.append("lng", userLocation.lng.toString());
         params.append("radius", "25"); // 25km radius
       }
-      return await apiRequest("GET", `/api/vet-clinics?${params.toString()}`) as VetClinic[];
+      const response = await apiRequest("GET", `/api/vet-clinics?${params.toString()}`);
+      return await response.json() as VetClinic[];
     },
   });
 

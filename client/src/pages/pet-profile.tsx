@@ -150,9 +150,10 @@ export default function PetProfile() {
 
       <div className="p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="records">Records</TabsTrigger>
+            <TabsTrigger value="vet-clinics">Vets</TabsTrigger>
             <TabsTrigger value="qr">QR Code</TabsTrigger>
             <TabsTrigger value="info">Pet Info</TabsTrigger>
           </TabsList>
@@ -273,6 +274,10 @@ export default function PetProfile() {
           
           <TabsContent value="records" className="mt-6">
             <MedicalTimeline petId={petId} medicalRecords={medicalRecords} />
+          </TabsContent>
+          
+          <TabsContent value="vet-clinics" className="mt-6">
+            <VetClinics />
           </TabsContent>
           
           <TabsContent value="qr" className="mt-6 space-y-4">
