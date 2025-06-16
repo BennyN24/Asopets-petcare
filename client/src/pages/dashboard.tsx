@@ -105,7 +105,6 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
-
       {/* Content */}
       <div className="p-4 pb-20">
         {/* Offline Sync Indicator */}
@@ -171,7 +170,7 @@ export default function Dashboard() {
                       <Syringe className="text-white w-5 h-5" />
                     </div>
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">Add Vaccination</p>
+                      <p className="font-medium text-gray-900">Find Vet Clinics</p>
                       <p className="text-sm text-gray-500">Record vaccine details</p>
                     </div>
                   </button>
@@ -214,7 +213,6 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
-
       <BottomNavigation activeTab="home" />
     </div>
   );
