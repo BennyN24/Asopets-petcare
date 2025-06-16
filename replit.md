@@ -256,6 +256,7 @@ Changelog:
   * Added comprehensive vet clinic review system displaying user reviews with ratings, names, comments, and dates
   * Fixed bouncing notifications to only bounce once when first appearing, preventing repetitive animation behavior
   * Fixed Schedule page data display issue by restoring active reminders and ensuring proper data flow from database to UI
+  * Fixed completed reminders tab to properly display completed reminders with data integrity filtering for current user's pets
 ```
 
 ## User Preferences

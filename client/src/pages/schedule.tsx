@@ -137,7 +137,7 @@ export default function Schedule() {
   };
 
   const activeReminders = reminders.filter(r => !r.isCompleted);
-  const completedReminders = reminders.filter(r => r.isCompleted);
+  const completedReminders = reminders.filter(r => r.isCompleted && pets.some(pet => pet.id === r.petId));
   const categorizedReminders = categorizeReminders(activeReminders);
 
   const handleCompleteReminder = (reminderId: number) => {
