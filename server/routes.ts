@@ -219,10 +219,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auth routes
+  // Auth routes - Updated for email/password authentication
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -234,7 +237,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User profile update route
   app.put('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const userData = updateUserSchema.parse(req.body);
       const updatedUser = await storage.updateUser(userId, userData);
       res.json(updatedUser);
@@ -250,7 +256,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pet routes
   app.get("/api/pets", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const pets = await storage.getPetsByUserId(userId);
       res.json(pets);
     } catch (error) {
@@ -269,7 +278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify ownership
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
       if (pet.userId !== userId) {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -283,7 +292,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pets", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const petData = insertPetSchema.parse({ ...req.body, userId });
       const pet = await storage.createPet(petData);
       res.status(201).json(pet);
@@ -299,7 +311,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pets/:id", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify ownership
       const existingPet = await storage.getPetById(petId);
@@ -322,7 +337,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/pets/:id", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify ownership
       const existingPet = await storage.getPetById(petId);
@@ -342,7 +360,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/:petId/medical-records", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify pet ownership
       const pet = await storage.getPetById(petId);
@@ -361,7 +382,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/pets/:petId/medical-records", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify pet ownership
       const pet = await storage.getPetById(petId);
@@ -393,7 +417,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/medical-records/:id", isAuthenticated, async (req: any, res) => {
     try {
       const recordId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify ownership through pet
       const existingRecord = await storage.getMedicalRecordById(recordId);

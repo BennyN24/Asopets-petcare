@@ -28,10 +28,17 @@ export function getSession() {
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  if (!req.session || !req.session.userId) {
-    return res.status(401).json({ message: "Unauthorized" });
+  // Check for session-based authentication (email/password)
+  if (req.session && req.session.userId) {
+    return next();
   }
-  next();
+  
+  // Check for Replit Auth (fallback for existing users)
+  if (req.isAuthenticated && req.isAuthenticated() && req.user && req.user.claims && req.user.claims.sub) {
+    return next();
+  }
+  
+  return res.status(401).json({ message: "Unauthorized" });
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
