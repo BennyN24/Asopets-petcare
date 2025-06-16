@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -36,22 +36,43 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
   const form = useForm<InsertPet>({
     resolver: zodResolver(insertPetSchema.omit({ userId: true })),
     defaultValues: {
-      name: pet.name,
-      category: pet.category,
-      breed: pet.breed || "",
-      dateOfBirth: pet.dateOfBirth || "",
-      age: pet.age || 0,
-      microchipId: pet.microchipId || "",
-      birthmarks: pet.birthmarks || "",
-      imageUrl: pet.imageUrl || "",
+      name: pet?.name || "",
+      category: pet?.category || "dog",
+      breed: pet?.breed || "",
+      dateOfBirth: pet?.dateOfBirth || "",
+      age: pet?.age || 0,
+      microchipId: pet?.microchipId || "",
+      birthmarks: pet?.birthmarks || "",
+      imageUrl: pet?.imageUrl || "",
     },
   });
 
+  // Reset form when pet data changes
+  useEffect(() => {
+    if (pet && pet.id) {
+      console.log("Resetting form with pet data:", pet);
+      form.reset({
+        name: pet.name || "",
+        category: pet.category || "dog",
+        breed: pet.breed || "",
+        dateOfBirth: pet.dateOfBirth || "",
+        age: pet.age || 0,
+        microchipId: pet.microchipId || "",
+        birthmarks: pet.birthmarks || "",
+        imageUrl: pet.imageUrl || "",
+      });
+    }
+  }, [pet, form]);
+
   const updatePetMutation = useMutation({
     mutationFn: async (data: Omit<InsertPet, 'userId'>) => {
+      console.log("Updating pet:", pet);
+      console.log("Pet ID:", pet?.id);
       if (!pet?.id) {
+        console.error("Pet ID is missing:", pet);
         throw new Error("Pet ID is required");
       }
+      console.log("Making API call to:", `/api/pets/${pet.id}`);
       await apiRequest("PUT", `/api/pets/${pet.id}`, data);
     },
     onSuccess: () => {

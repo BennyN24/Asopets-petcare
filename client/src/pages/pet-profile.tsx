@@ -295,7 +295,7 @@ export default function PetProfile() {
                     <User className="w-5 h-5 mr-2 text-primary" />
                     <h3 className="font-semibold text-gray-900">Pet Information</h3>
                   </div>
-                  <PetEditForm pet={pet} />
+                  {pet && <PetEditForm pet={pet} />}
                 </div>
                 
                 <div className="space-y-4">
