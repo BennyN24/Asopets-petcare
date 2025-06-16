@@ -258,6 +258,7 @@ Changelog:
   * Fixed Schedule page data display issue by restoring active reminders and ensuring proper data flow from database to UI
   * Fixed completed reminders tab to properly display completed reminders with data integrity filtering for current user's pets
   * Removed bouncing animation from notifications and implemented native push notifications for mobile devices with pet emojis and urgency-based behavior
+  * Removed Replit branding and authentication from login page, simplified to SMS-only authentication for cleaner user experience
 ```
 
 ## User Preferences
