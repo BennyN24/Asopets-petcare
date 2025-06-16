@@ -170,17 +170,17 @@ export default function PetProfile() {
             {/* Quick Actions Menu */}
             <Card>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">Add New Record</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <button 
                     className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
-                    onClick={() => setActiveTab('vet-clinics')}
+                    onClick={() => setLocation(`/pet/${petId}/vaccine`)}
                   >
                     <div className="text-center">
                       <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Stethoscope className="text-primary w-4 h-4" />
+                        <Syringe className="text-primary w-4 h-4" />
                       </div>
-                      <p className="font-medium text-gray-900 text-sm">Find Clinics</p>
+                      <p className="font-medium text-gray-900 text-sm">Vaccines</p>
                     </div>
                   </button>
 

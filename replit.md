@@ -243,8 +243,10 @@ Changelog:
   * Added "Vet Clinics Near you" quick action with automatic location-based search
   * Enhanced pet profile with new Vets tab for easy veterinary clinic access
   * Added weight field (kg) to vaccine form for tracking pet weight during vaccinations
-  * Replaced vaccination quick action with "Find Clinics" feature for better user flow
+  * Restored vaccination quick action while keeping "Find Clinics" feature for comprehensive medical actions
   * Fixed budget settings per pet save functionality with proper state management and confirmation toast
+  * Enhanced photo upload on add pet page with camera capture and file upload functionality
+  * Implemented proper image preview with remove option for better user experience
 ```
 
 ## User Preferences
