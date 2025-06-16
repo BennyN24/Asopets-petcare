@@ -53,6 +53,7 @@ export default function CuteNotification({
   const [isAnimating, setIsAnimating] = useState(false);
   const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [hasBounced, setHasBounced] = useState(false);
 
   const getUrgencyLevel = () => {
     if (!reminder.dueDate) return "normal";
@@ -67,13 +68,22 @@ export default function CuteNotification({
   };
 
   useEffect(() => {
-    if (!hasPlayed) {
-      // Cute bounce animation on mount
-      const timer = setTimeout(() => setIsAnimating(true), 100);
+    if (!hasBounced) {
+      // Cute bounce animation on mount - only once
+      const timer = setTimeout(() => {
+        setIsAnimating(true);
+        setHasBounced(true);
+      }, 100);
       
-      // Play appropriate sound based on urgency
+      return () => clearTimeout(timer);
+    }
+  }, [hasBounced]);
+
+  useEffect(() => {
+    if (!hasPlayed) {
+      // Play appropriate sound based on urgency - only once
       const urgency = getUrgencyLevel();
-      setTimeout(() => {
+      const soundTimer = setTimeout(() => {
         if (urgency === "urgent" || urgency === "overdue") {
           notificationSounds.playUrgentAlert();
         } else {
@@ -82,7 +92,7 @@ export default function CuteNotification({
         setHasPlayed(true);
       }, 300);
       
-      return () => clearTimeout(timer);
+      return () => clearTimeout(soundTimer);
     }
   }, [hasPlayed]);
 
