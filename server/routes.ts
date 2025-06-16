@@ -135,6 +135,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  app.post('/api/auth/forgot-password', async (req: any, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // For security, don't reveal if email exists
+        return res.json({ message: "If the email exists, a reset link has been sent" });
+      }
+
+      const resetToken = generateToken();
+      const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await storage.updateUser(user.id, {
+        passwordResetToken: resetToken,
+        passwordResetExpires: resetExpires,
+      });
+
+      // Send reset email (will be implemented)
+      const resetLink = `${process.env.BASE_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}`;
+      console.log(`Password reset link for ${email}: ${resetLink}`);
+
+      res.json({ message: "If the email exists, a reset link has been sent" });
+    } catch (error) {
+      console.error("Password reset error:", error);
+      res.status(500).json({ message: "Failed to process password reset" });
+    }
+  });
+
+  app.post('/api/auth/reset-password', async (req: any, res) => {
+    try {
+      const { token, password } = req.body;
+      if (!token || !password) {
+        return res.status(400).json({ message: "Token and password are required" });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+
+      // Find user by reset token
+      const users = await storage.getUserByResetToken(token);
+      if (!users || users.passwordResetExpires < new Date()) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      const passwordHash = await hashPassword(password);
+      await storage.updateUser(users.id, {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      });
+
+      res.json({ message: "Password reset successful. You can now log in with your new password." });
+    } catch (error) {
+      console.error("Password reset error:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
   // SMS OTP Storage (in production, use Redis or database)
   const otpStore = new Map<string, { otp: string; expires: number; verified: boolean }>();
 

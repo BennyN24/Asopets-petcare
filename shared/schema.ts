@@ -51,6 +51,8 @@ export const users = pgTable("users", {
   isEmailConfirmed: boolean("is_email_confirmed").default(false),
   emailConfirmationToken: varchar("email_confirmation_token"),
   emailConfirmationExpires: timestamp("email_confirmation_expires"),
+  passwordResetToken: varchar("password_reset_token"),
+  passwordResetExpires: timestamp("password_reset_expires"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

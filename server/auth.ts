@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 import { storage } from "./storage";
 import type { Express, RequestHandler } from "express";
 import session from "express-session";
@@ -62,17 +63,77 @@ export async function setupAuth(app: Express) {
   app.use(getSession());
 }
 
-// Email sending would be configured here in production
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  // In development, just log the confirmation link
   const confirmationLink = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/confirm-email?token=${token}`;
-  console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
   
-  // In production, you would send an actual email using nodemailer
-  // const transporter = nodemailer.createTransporter(...);
-  // await transporter.sendMail({
-  //   to: email,
-  //   subject: 'Confirm Your VetBB Account',
-  //   html: `Click <a href="${confirmationLink}">here</a> to confirm your account.`
-  // });
+  try {
+    // Check if email service is configured
+    if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT || '587'),
+        secure: process.env.EMAIL_SECURE === 'true',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Confirm Your My PetBB Account</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; padding: 20px 0; }
+            .logo { background: #3b82f6; color: white; width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+            .button { background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0; }
+            .footer { text-align: center; color: #666; font-size: 14px; margin-top: 30px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">🐾</div>
+              <h1>Welcome to My PetBB!</h1>
+            </div>
+            <p>Thank you for signing up for My PetBB - your comprehensive pet care management companion.</p>
+            <p>To complete your account setup and start managing your pet's health records, please confirm your email address by clicking the button below:</p>
+            <div style="text-align: center;">
+              <a href="${confirmationLink}" class="button">Confirm Email Address</a>
+            </div>
+            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #666;">${confirmationLink}</p>
+            <p>This confirmation link will expire in 24 hours for security purposes.</p>
+            <div class="footer">
+              <p>If you didn't create a My PetBB account, you can safely ignore this email.</p>
+              <p>© 2024 My PetBB. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      await transporter.sendMail({
+        from: `"My PetBB" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Confirm Your My PetBB Account',
+        html: emailHtml,
+        text: `Welcome to My PetBB! Please confirm your email address by visiting: ${confirmationLink}`
+      });
+
+      console.log(`Confirmation email sent to ${email}`);
+    } else {
+      // Development mode - log the link
+      console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+      console.log('Note: Configure EMAIL_HOST, EMAIL_USER, EMAIL_PASS environment variables to send actual emails');
+    }
+  } catch (error) {
+    console.error('Failed to send confirmation email:', error);
+    // Still log the link as fallback
+    console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+  }
 };
