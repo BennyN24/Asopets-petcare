@@ -255,6 +255,7 @@ Changelog:
   * Fixed monthly budget per pet persistence using localStorage for proper saving and loading across sessions
   * Added comprehensive vet clinic review system displaying user reviews with ratings, names, comments, and dates
   * Fixed bouncing notifications to only bounce once when first appearing, preventing repetitive animation behavior
+  * Fixed Schedule page data display issue by restoring active reminders and ensuring proper data flow from database to UI
 ```
 
 ## User Preferences
