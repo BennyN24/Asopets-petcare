@@ -279,14 +279,13 @@ export default function Expenses() {
           </div>
         </div>
       </div>
-
       <div className="p-4">
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="transactions">History</TabsTrigger>
             <TabsTrigger value="breakdown">Analytics</TabsTrigger>
-            <TabsTrigger value="budget">Budget</TabsTrigger>
+            <TabsTrigger value="budget">Add Budget</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4 mt-6">
@@ -761,7 +760,6 @@ export default function Expenses() {
           </TabsContent>
         </Tabs>
       </div>
-
       <BottomNavigation activeTab="expenses" />
     </div>
   );
