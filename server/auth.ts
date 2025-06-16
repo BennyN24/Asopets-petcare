@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import sgMail from '@sendgrid/mail';
 import { storage } from "./storage";
 import type { Express, RequestHandler } from "express";
 import session from "express-session";
@@ -63,21 +63,17 @@ export async function setupAuth(app: Express) {
   app.use(getSession());
 }
 
+// Configure SendGrid
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
+
 export const sendConfirmationEmail = async (email: string, token: string) => {
   const confirmationLink = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/confirm-email?token=${token}`;
   
   try {
-    // Check if email service is configured
-    if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-      const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: parseInt(process.env.EMAIL_PORT || '587'),
-        secure: process.env.EMAIL_SECURE === 'true',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+    // Check if SendGrid is configured
+    if (process.env.SENDGRID_API_KEY) {
 
       const emailHtml = `
         <!DOCTYPE html>
@@ -117,23 +113,90 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         </html>
       `;
 
-      await transporter.sendMail({
-        from: `"My PetBB" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+      const msg = {
         to: email,
+        from: 'noreply@mypetbb.app',
         subject: 'Confirm Your My PetBB Account',
         html: emailHtml,
         text: `Welcome to My PetBB! Please confirm your email address by visiting: ${confirmationLink}`
-      });
+      };
 
+      await sgMail.send(msg);
       console.log(`Confirmation email sent to ${email}`);
     } else {
       // Development mode - log the link
       console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
-      console.log('Note: Configure EMAIL_HOST, EMAIL_USER, EMAIL_PASS environment variables to send actual emails');
+      console.log('Note: Configure SENDGRID_API_KEY environment variable to send actual emails');
     }
   } catch (error) {
     console.error('Failed to send confirmation email:', error);
     // Still log the link as fallback
     console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+  }
+};
+
+export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
+  const resetLink = `${process.env.BASE_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}`;
+  
+  try {
+    if (process.env.SENDGRID_API_KEY) {
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Reset Your My PetBB Password</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; padding: 20px 0; }
+            .logo { background: #ef4444; color: white; width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+            .button { background: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0; }
+            .footer { text-align: center; color: #666; font-size: 14px; margin-top: 30px; }
+            .warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 15px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">🔒</div>
+              <h1>Password Reset Request</h1>
+            </div>
+            <p>We received a request to reset your My PetBB account password.</p>
+            <p>If you made this request, click the button below to reset your password:</p>
+            <div style="text-align: center;">
+              <a href="${resetLink}" class="button">Reset Password</a>
+            </div>
+            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #666;">${resetLink}</p>
+            <div class="warning">
+              <p><strong>Important:</strong> This password reset link will expire in 1 hour for security purposes.</p>
+            </div>
+            <div class="footer">
+              <p>If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
+              <p>© 2024 My PetBB. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const msg = {
+        to: email,
+        from: 'noreply@mypetbb.app',
+        subject: 'Reset Your My PetBB Password',
+        html: emailHtml,
+        text: `Reset your My PetBB password by visiting: ${resetLink} (This link expires in 1 hour)`
+      };
+
+      await sgMail.send(msg);
+      console.log(`Password reset email sent to ${email}`);
+    } else {
+      console.log(`Password reset link for ${email}: ${resetLink}`);
+      console.log('Note: Configure SENDGRID_API_KEY environment variable to send actual emails');
+    }
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
+    console.log(`Password reset link for ${email}: ${resetLink}`);
   }
 };
