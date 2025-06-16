@@ -308,6 +308,114 @@ export class DatabaseStorage implements IStorage {
       .set({ isCompleted: true })
       .where(eq(reminders.id, id));
   }
+
+  // Vet clinic operations
+  async getVetClinicsByLocation(latitude: number, longitude: number, radiusKm: number = 25): Promise<VetClinic[]> {
+    // Simple distance calculation - in production, would use PostGIS or similar
+    const clinics = await db.select().from(vetClinics).orderBy(desc(vetClinics.averageRating));
+    return clinics.filter(clinic => {
+      if (!clinic.latitude || !clinic.longitude) return true; // Include clinics without location
+      const distance = this.calculateDistance(latitude, longitude, 
+        parseFloat(clinic.latitude), parseFloat(clinic.longitude));
+      return distance <= radiusKm;
+    });
+  }
+
+  async getVetClinicById(id: number): Promise<VetClinic | undefined> {
+    const [clinic] = await db.select().from(vetClinics).where(eq(vetClinics.id, id));
+    return clinic;
+  }
+
+  async createVetClinic(clinic: InsertVetClinic): Promise<VetClinic> {
+    const [newClinic] = await db.insert(vetClinics).values(clinic).returning();
+    return newClinic;
+  }
+
+  async updateVetClinic(id: number, clinic: Partial<InsertVetClinic>): Promise<VetClinic> {
+    const [updatedClinic] = await db
+      .update(vetClinics)
+      .set(clinic)
+      .where(eq(vetClinics.id, id))
+      .returning();
+    return updatedClinic;
+  }
+
+  // Clinic rating operations
+  async getClinicRatingsByClinicId(clinicId: number): Promise<ClinicRating[]> {
+    return await db.select().from(clinicRatings).where(eq(clinicRatings.clinicId, clinicId));
+  }
+
+  async getClinicRatingsByUserId(userId: string): Promise<ClinicRating[]> {
+    return await db.select().from(clinicRatings).where(eq(clinicRatings.userId, userId));
+  }
+
+  async createClinicRating(rating: InsertClinicRating): Promise<ClinicRating> {
+    const [newRating] = await db.insert(clinicRatings).values(rating).returning();
+    
+    // Update clinic average rating
+    await this.updateClinicAverageRating(rating.clinicId);
+    
+    return newRating;
+  }
+
+  async updateClinicRating(id: number, rating: Partial<InsertClinicRating>): Promise<ClinicRating> {
+    const [updatedRating] = await db
+      .update(clinicRatings)
+      .set(rating)
+      .where(eq(clinicRatings.id, id))
+      .returning();
+    
+    // Update clinic average rating if rating changed
+    if (rating.rating !== undefined) {
+      await this.updateClinicAverageRating(updatedRating.clinicId);
+    }
+    
+    return updatedRating;
+  }
+
+  async deleteClinicRating(id: number): Promise<void> {
+    const [deletedRating] = await db
+      .delete(clinicRatings)
+      .where(eq(clinicRatings.id, id))
+      .returning();
+    
+    // Update clinic average rating
+    if (deletedRating) {
+      await this.updateClinicAverageRating(deletedRating.clinicId);
+    }
+  }
+
+  // Helper methods
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Earth's radius in km
+    const dLat = this.toRadians(lat2 - lat1);
+    const dLon = this.toRadians(lon2 - lon1);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  private toRadians(degrees: number): number {
+    return degrees * (Math.PI/180);
+  }
+
+  private async updateClinicAverageRating(clinicId: number): Promise<void> {
+    const ratings = await this.getClinicRatingsByClinicId(clinicId);
+    const totalRatings = ratings.length;
+    const averageRating = totalRatings > 0 
+      ? ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings 
+      : 0;
+    
+    await db
+      .update(vetClinics)
+      .set({ 
+        averageRating: averageRating.toFixed(2),
+        totalRatings: totalRatings
+      })
+      .where(eq(vetClinics.id, clinicId));
+  }
 }
 
 export const storage = new DatabaseStorage();

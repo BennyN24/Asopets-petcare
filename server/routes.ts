@@ -398,6 +398,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Vet clinic routes
+  app.get("/api/vet-clinics", isAuthenticated, async (req: any, res) => {
+    try {
+      const { lat, lng, radius } = req.query;
+      let clinics;
+      
+      if (lat && lng) {
+        clinics = await storage.getVetClinicsByLocation(
+          parseFloat(lat), 
+          parseFloat(lng), 
+          radius ? parseFloat(radius) : undefined
+        );
+      } else {
+        // Return all clinics if no location provided
+        clinics = await storage.getVetClinicsByLocation(0, 0, 999999);
+      }
+      
+      res.json(clinics);
+    } catch (error) {
+      console.error("Error fetching vet clinics:", error);
+      res.status(500).json({ message: "Failed to fetch vet clinics" });
+    }
+  });
+
+  app.get("/api/vet-clinics/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const clinic = await storage.getVetClinicById(id);
+      
+      if (!clinic) {
+        return res.status(404).json({ message: "Vet clinic not found" });
+      }
+      
+      res.json(clinic);
+    } catch (error) {
+      console.error("Error fetching vet clinic:", error);
+      res.status(500).json({ message: "Failed to fetch vet clinic" });
+    }
+  });
+
+  app.post("/api/vet-clinics", isAuthenticated, async (req: any, res) => {
+    try {
+      const clinic = await storage.createVetClinic(req.body);
+      res.status(201).json(clinic);
+    } catch (error) {
+      console.error("Error creating vet clinic:", error);
+      res.status(500).json({ message: "Failed to create vet clinic" });
+    }
+  });
+
+  // Clinic rating routes
+  app.get("/api/vet-clinics/:id/ratings", isAuthenticated, async (req: any, res) => {
+    try {
+      const clinicId = parseInt(req.params.id);
+      const ratings = await storage.getClinicRatingsByClinicId(clinicId);
+      res.json(ratings);
+    } catch (error) {
+      console.error("Error fetching clinic ratings:", error);
+      res.status(500).json({ message: "Failed to fetch clinic ratings" });
+    }
+  });
+
+  app.post("/api/clinic-ratings", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const ratingData = {
+        ...req.body,
+        userId: userId,
+      };
+      
+      const rating = await storage.createClinicRating(ratingData);
+      res.status(201).json(rating);
+    } catch (error) {
+      console.error("Error creating clinic rating:", error);
+      res.status(500).json({ message: "Failed to create clinic rating" });
+    }
+  });
+
+  app.get("/api/my-clinic-ratings", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const ratings = await storage.getClinicRatingsByUserId(userId);
+      res.json(ratings);
+    } catch (error) {
+      console.error("Error fetching user ratings:", error);
+      res.status(500).json({ message: "Failed to fetch user ratings" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

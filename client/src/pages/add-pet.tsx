@@ -18,6 +18,8 @@ const petCategories: { value: PetCategory; label: string; icon: any }[] = [
   { value: "cat", label: "Cats", icon: Cat },
   { value: "bird", label: "Birds", icon: Bird },
   { value: "rabbit", label: "Rabbits", icon: Rabbit },
+  { value: "horse", label: "Horses", icon: Heart },
+  { value: "exotic", label: "Exotic", icon: Heart },
   { value: "other", label: "Others", icon: Heart },
 ];
 
@@ -34,6 +36,7 @@ export default function AddPet() {
       category: "",
       breed: "",
       dateOfBirth: "",
+      age: undefined,
       microchipId: "",
       birthmarks: "",
       imageUrl: "",
@@ -166,6 +169,26 @@ export default function AddPet() {
                     <FormLabel>Date of Birth</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Age (in months)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="Enter age in months" 
+                        {...field} 
+                        value={field.value || ""} 
+                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
