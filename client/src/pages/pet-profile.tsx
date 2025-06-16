@@ -48,7 +48,7 @@ export default function PetProfile() {
   }, []);
 
   const { data: pet, isLoading: petLoading, error: petError } = useQuery<Pet>({
-    queryKey: ["/api/pets", petId],
+    queryKey: [`/api/pets/${petId}`],
     enabled: !!petId,
   });
 

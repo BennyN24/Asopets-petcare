@@ -50,7 +50,6 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
   // Reset form when pet data changes
   useEffect(() => {
     if (pet && pet.id) {
-      console.log("Resetting form with pet data:", pet);
       form.reset({
         name: pet.name || "",
         category: pet.category || "dog",
@@ -66,13 +65,9 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
 
   const updatePetMutation = useMutation({
     mutationFn: async (data: Omit<InsertPet, 'userId'>) => {
-      console.log("Updating pet:", pet);
-      console.log("Pet ID:", pet?.id);
       if (!pet?.id) {
-        console.error("Pet ID is missing:", pet);
         throw new Error("Pet ID is required");
       }
-      console.log("Making API call to:", `/api/pets/${pet.id}`);
       await apiRequest("PUT", `/api/pets/${pet.id}`, data);
     },
     onSuccess: () => {

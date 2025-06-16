@@ -239,6 +239,9 @@ Changelog:
   * Updated add pet form to include age input field and new pet categories
   * Populated database with sample veterinary clinics in Metro Manila area
   * Fixed QR code component TypeScript errors and unified QR generation system
+  * Fixed critical pet editing bug by correcting API query to fetch single pet instead of array
+  * Added "Vet Clinics Near you" quick action with automatic location-based search
+  * Enhanced pet profile with new Vets tab for easy veterinary clinic access
 ```
 
 ## User Preferences
