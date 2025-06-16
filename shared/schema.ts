@@ -8,6 +8,8 @@ import {
   serial,
   date,
   boolean,
+  integer,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -50,7 +52,7 @@ export const users = pgTable("users", {
 });
 
 // Pet categories enum
-export const petCategories = ["dog", "cat", "bird", "rabbit", "other"] as const;
+export const petCategories = ["dog", "cat", "bird", "rabbit", "horse", "exotic", "other"] as const;
 
 // Pets table
 export const pets = pgTable("pets", {
@@ -60,6 +62,7 @@ export const pets = pgTable("pets", {
   category: varchar("category").notNull(),
   breed: varchar("breed"),
   dateOfBirth: date("date_of_birth"),
+  age: integer("age"), // Age in months for precise tracking
   microchipId: varchar("microchip_id"),
   birthmarks: text("birthmarks"),
   imageUrl: varchar("image_url"),
@@ -103,6 +106,33 @@ export const reminders = pgTable("reminders", {
   isCompleted: boolean("is_completed").default(false),
   notificationSent: boolean("notification_sent").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Vet clinics table
+export const vetClinics = pgTable("vet_clinics", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(),
+  address: text("address").notNull(),
+  phone: varchar("phone"),
+  email: varchar("email"),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  averageRating: numeric("average_rating", { precision: 3, scale: 2 }).default("0"),
+  totalRatings: integer("total_ratings").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Clinic ratings table
+export const clinicRatings = pgTable("clinic_ratings", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  clinicId: integer("clinic_id").notNull().references(() => vetClinics.id, { onDelete: "cascade" }),
+  medicalRecordId: integer("medical_record_id").references(() => medicalRecords.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(), // 1-5 stars
+  review: text("review"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Relations
