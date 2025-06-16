@@ -448,7 +448,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/medical-records/:id", isAuthenticated, async (req: any, res) => {
     try {
       const recordId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify ownership through pet
       const existingRecord = await storage.getMedicalRecordById(recordId);
@@ -472,7 +475,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reminder routes
   app.get("/api/reminders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const reminders = await storage.getRemindersByUserId(userId);
       res.json(reminders);
     } catch (error) {
@@ -483,7 +489,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reminders/with-pets", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const [reminders, pets] = await Promise.all([
         storage.getActiveRemindersByUserId(userId),
         storage.getPetsByUserId(userId)
@@ -504,7 +513,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reminders/overdue", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const overdueReminders = await storage.getOverdueRemindersByUserId(userId);
       res.json(overdueReminders);
     } catch (error) {
@@ -516,7 +528,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/:petId/reminders", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify pet ownership
       const pet = await storage.getPetById(petId);
@@ -535,7 +550,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/reminders/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
       const reminderId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       
       // Verify ownership through pet (simplified check)
       await storage.markReminderCompleted(reminderId);
@@ -610,7 +628,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/clinic-ratings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const ratingData = {
         ...req.body,
         userId: userId,
@@ -626,7 +647,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/my-clinic-ratings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId || (req.user?.claims?.sub);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const ratings = await storage.getClinicRatingsByUserId(userId);
       res.json(ratings);
     } catch (error) {
