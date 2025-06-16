@@ -28,6 +28,7 @@ import GroomingForm from "@/pages/grooming-form";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
 import Welcome from "@/pages/welcome";
+import ForgotPassword from "@/pages/forgot-password";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -42,6 +43,7 @@ function Router() {
         <>
           <Route path="/" component={Login} />
           <Route path="/signup" component={Signup} />
+          <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/landing" component={Landing} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />

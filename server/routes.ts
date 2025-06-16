@@ -179,13 +179,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Find user by reset token
-      const users = await storage.getUserByResetToken(token);
-      if (!users || users.passwordResetExpires < new Date()) {
+      const user = await storage.getUserByResetToken(token);
+      if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
         return res.status(400).json({ message: "Invalid or expired reset token" });
       }
 
       const passwordHash = await hashPassword(password);
-      await storage.updateUser(users.id, {
+      await storage.updateUser(user.id, {
         passwordHash,
         passwordResetToken: null,
         passwordResetExpires: null,
