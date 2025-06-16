@@ -64,7 +64,7 @@ export default function Login() {
           <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
             <PawPrint className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome to VetBB</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome to My PetBB</h1>
           <p className="text-gray-600">Your pet's health companion</p>
         </div>
 
