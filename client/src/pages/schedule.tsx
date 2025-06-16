@@ -66,6 +66,7 @@ export default function Schedule() {
       case 'treatment': return <MedicalKit {...iconProps} />;
       case 'surgery': return <UserCog {...iconProps} />;
       case 'checkup': return <Stethoscope {...iconProps} />;
+      case 'grooming': return <UserCog {...iconProps} />;
       default: return <Bell {...iconProps} />;
     }
   };

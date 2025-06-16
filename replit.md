@@ -218,6 +218,16 @@ Changelog:
   * Updated client-side interfaces to remove development-specific messaging
   * Implemented environment-based configuration throughout the authentication system
   * Ready for production deployment with secure session management and optimized logging
+- June 16, 2025. Comprehensive feature enhancements and user experience improvements:
+  * Fixed budget settings editability in expenses page with proper dialog handling
+  * Prevented notification dialog bouncing and repeating with hasPlayed state management
+  * Merged QR code functionality into single comprehensive profile and medical records QR code
+  * Added new grooming record type to medical records system with dedicated form and routes
+  * Fixed schedules moving to completed panel when notifications marked as done
+  * Removed all currency labels (₱) from interface for cleaner display
+  * Enhanced photo upload functionality with mobile camera capture support
+  * Updated all components to support grooming record type with proper icons and colors
+  * Completed database schema migration for new grooming medical record type
 ```
 
 ## User Preferences

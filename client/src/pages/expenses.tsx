@@ -232,6 +232,8 @@ export default function Expenses() {
       case 'treatment': return 'bg-amber-100 text-amber-800';
       case 'surgery': return 'bg-red-100 text-red-800';
       case 'checkup': return 'bg-purple-100 text-purple-800';
+      case 'lab-test': return 'bg-cyan-100 text-cyan-800';
+      case 'grooming': return 'bg-pink-100 text-pink-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };

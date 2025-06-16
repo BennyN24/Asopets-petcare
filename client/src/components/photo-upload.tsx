@@ -93,6 +93,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
       />
