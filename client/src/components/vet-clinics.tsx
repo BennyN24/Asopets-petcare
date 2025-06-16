@@ -12,11 +12,102 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertClinicRatingSchema, type VetClinic, type InsertClinicRating } from "@shared/schema";
-import { MapPin, Phone, Mail, Star, Plus, Stethoscope } from "lucide-react";
+import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar } from "lucide-react";
 
 interface VetClinicsProps {
   onRatingAdded?: (clinicId: number, medicalRecordId?: number) => void;
   medicalRecordId?: number;
+}
+
+interface ClinicReviewsProps {
+  clinicId: number;
+}
+
+function ClinicReviews({ clinicId }: ClinicReviewsProps) {
+  const { data: reviews = [], isLoading } = useQuery({
+    queryKey: ["/api/vet-clinics", clinicId, "ratings"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/vet-clinics/${clinicId}/ratings`);
+      return await response.json();
+    },
+  });
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="mt-4 p-4 border-t">
+        <div className="flex justify-center">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (reviews.length === 0) {
+    return (
+      <div className="mt-4 p-4 border-t text-center text-gray-500">
+        <p className="text-sm">No reviews yet. Be the first to share your experience!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 border-t pt-4">
+      <h4 className="font-semibold text-gray-900 mb-3">User Reviews</h4>
+      <div className="space-y-4 max-h-64 overflow-y-auto">
+        {reviews.map((review: any) => (
+          <div key={review.id} className="bg-gray-50 p-3 rounded-lg">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <User className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">
+                    {review.userName || review.userLastName 
+                      ? `${review.userName || ''} ${review.userLastName || ''}`.trim()
+                      : 'Anonymous'
+                    }
+                  </p>
+                  <div className="flex items-center">
+                    {renderStars(review.rating)}
+                    <span className="ml-2 text-xs text-gray-500">
+                      {review.rating}/5
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center text-xs text-gray-500">
+                <Calendar className="w-3 h-3 mr-1" />
+                {formatDate(review.createdAt)}
+              </div>
+            </div>
+            {review.review && (
+              <p className="text-sm text-gray-700 ml-11">{review.review}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinicsProps) {
@@ -61,17 +152,7 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
     },
   });
 
-  // Function to fetch reviews for a specific clinic
-  const useClinicReviews = (clinicId: number) => {
-    return useQuery({
-      queryKey: ["/api/vet-clinics", clinicId, "ratings"],
-      queryFn: async () => {
-        const response = await apiRequest("GET", `/api/vet-clinics/${clinicId}/ratings`);
-        return await response.json();
-      },
-      enabled: showReviews[clinicId] || false,
-    });
-  };
+
 
   const ratingForm = useForm<InsertClinicRating>({
     resolver: zodResolver(insertClinicRatingSchema.omit({ userId: true })),
@@ -239,7 +320,16 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                         </div>
                       )}
                       
-                      <div className="flex justify-end pt-2">
+                      <div className="flex justify-between pt-2 gap-2">
+                        {(clinic.totalRatings || 0) > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleReviews(clinic.id)}
+                          >
+                            {showReviews[clinic.id] ? 'Hide Reviews' : 'View Reviews'}
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"
@@ -249,6 +339,9 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                           Rate Clinic
                         </Button>
                       </div>
+
+                      {/* Reviews Section */}
+                      {showReviews[clinic.id] && <ClinicReviews clinicId={clinic.id} />}
                     </CardContent>
                   </Card>
                 ))
