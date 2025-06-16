@@ -254,6 +254,18 @@ export default function PetProfile() {
                       <p className="font-medium text-gray-900 text-sm">Grooming</p>
                     </div>
                   </button>
+
+                  <button 
+                    className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
+                    onClick={() => setActiveTab('vet-clinics')}
+                  >
+                    <div className="text-center">
+                      <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Stethoscope className="text-teal-600 w-4 h-4" />
+                      </div>
+                      <p className="font-medium text-gray-900 text-sm">Vet Clinics</p>
+                    </div>
+                  </button>
                 </div>
               </CardContent>
             </Card>

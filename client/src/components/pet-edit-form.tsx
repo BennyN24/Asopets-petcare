@@ -40,7 +40,7 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
       category: pet.category,
       breed: pet.breed || "",
       dateOfBirth: pet.dateOfBirth || "",
-      age: pet.age || undefined,
+      age: pet.age || 0,
       microchipId: pet.microchipId || "",
       birthmarks: pet.birthmarks || "",
       imageUrl: pet.imageUrl || "",
@@ -49,6 +49,9 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
 
   const updatePetMutation = useMutation({
     mutationFn: async (data: Omit<InsertPet, 'userId'>) => {
+      if (!pet?.id) {
+        throw new Error("Pet ID is required");
+      }
       await apiRequest("PUT", `/api/pets/${pet.id}`, data);
     },
     onSuccess: () => {
@@ -97,7 +100,7 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
               <label className="text-sm font-medium">Pet Photo</label>
               <PhotoUpload
                 onPhotoUploaded={handlePhotoUploaded}
-                currentPhoto={form.watch("imageUrl")}
+                currentPhoto={form.watch("imageUrl") || ""}
                 className="mx-auto"
               />
             </div>
