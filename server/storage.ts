@@ -44,6 +44,7 @@ export interface IStorage {
   
   // Reminder operations
   getRemindersByUserId(userId: string): Promise<Reminder[]>;
+  getActiveRemindersByUserId(userId: string): Promise<Reminder[]>;
   getRemindersByPetId(petId: number): Promise<Reminder[]>;
   getOverdueRemindersByUserId(userId: string): Promise<Reminder[]>;
   createReminder(reminder: InsertReminder): Promise<Reminder>;
@@ -230,6 +231,26 @@ export class DatabaseStorage implements IStorage {
 
   // Reminder operations
   async getRemindersByUserId(userId: string): Promise<Reminder[]> {
+    return await db
+      .select({
+        id: reminders.id,
+        petId: reminders.petId,
+        medicalRecordId: reminders.medicalRecordId,
+        type: reminders.type,
+        title: reminders.title,
+        dueDate: reminders.dueDate,
+        isOverdue: reminders.isOverdue,
+        isCompleted: reminders.isCompleted,
+        notificationSent: reminders.notificationSent,
+        createdAt: reminders.createdAt,
+      })
+      .from(reminders)
+      .innerJoin(pets, eq(reminders.petId, pets.id))
+      .where(eq(pets.userId, userId))
+      .orderBy(reminders.dueDate);
+  }
+
+  async getActiveRemindersByUserId(userId: string): Promise<Reminder[]> {
     return await db
       .select({
         id: reminders.id,

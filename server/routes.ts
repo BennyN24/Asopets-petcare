@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const [reminders, pets] = await Promise.all([
-        storage.getRemindersByUserId(userId),
+        storage.getActiveRemindersByUserId(userId),
         storage.getPetsByUserId(userId)
       ]);
       
