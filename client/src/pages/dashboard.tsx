@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,11 +7,13 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Plus, Calendar, Syringe, BarChart3 } from "lucide-react";
+import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin } from "lucide-react";
 import PetCard from "@/components/pet-card";
 import DashboardInsights from "@/components/dashboard-insights";
 import OfflineSyncIndicator from "@/components/offline-sync-indicator";
 import BottomNavigation from "@/components/bottom-navigation";
+import QuickActions from "@/components/quick-actions";
+import VetClinics from "@/components/vet-clinics";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
 export default function Dashboard() {
