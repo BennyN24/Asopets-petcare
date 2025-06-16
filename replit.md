@@ -242,6 +242,9 @@ Changelog:
   * Fixed critical pet editing bug by correcting API query to fetch single pet instead of array
   * Added "Vet Clinics Near you" quick action with automatic location-based search
   * Enhanced pet profile with new Vets tab for easy veterinary clinic access
+  * Added weight field (kg) to vaccine form for tracking pet weight during vaccinations
+  * Replaced vaccination quick action with "Find Clinics" feature for better user flow
+  * Fixed budget settings per pet save functionality with proper state management and confirmation toast
 ```
 
 ## User Preferences

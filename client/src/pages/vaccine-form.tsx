@@ -41,6 +41,12 @@ export default function VaccineForm() {
       label: "Batch/Lot Number",
       type: "text" as const,
       placeholder: "Enter batch number",
+    },
+    {
+      name: "weight" as const,
+      label: "Pet Weight (kg)",
+      type: "text" as const,
+      placeholder: "Enter weight in kg",
     }
   ];
 

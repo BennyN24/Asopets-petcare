@@ -85,6 +85,7 @@ export const medicalRecords = pgTable("medical_records", {
   veterinarian: varchar("veterinarian"),
   clinic: varchar("clinic"),
   batchNumber: varchar("batch_number"),
+  weight: varchar("weight"), // pet weight in kg at time of treatment
   cost: varchar("cost"),
   notes: text("notes"),
   imageUrl: varchar("image_url"), // for certificates/records

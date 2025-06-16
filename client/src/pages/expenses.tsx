@@ -622,11 +622,18 @@ export default function Expenses() {
                             Total monthly budget: {formatCurrency(pets.length * budgetGoal)}
                           </p>
                         </div>
-                        <DialogTrigger asChild>
-                          <Button className="w-full">
-                            Save Budget
-                          </Button>
-                        </DialogTrigger>
+                        <Button 
+                          className="w-full"
+                          onClick={() => {
+                            setIsSettingBudget(false);
+                            toast({
+                              title: "Budget Updated",
+                              description: `Monthly budget set to ${formatCurrency(budgetGoal)} per pet`,
+                            });
+                          }}
+                        >
+                          Save Budget
+                        </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
