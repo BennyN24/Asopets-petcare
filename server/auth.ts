@@ -115,7 +115,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
 
       const msg = {
         to: email,
-        from: 'noreply@mypetbb.app',
+        from: 'test@example.com', // Use your verified SendGrid sender email
         subject: 'Confirm Your My PetBB Account',
         html: emailHtml,
         text: `Welcome to My PetBB! Please confirm your email address by visiting: ${confirmationLink}`

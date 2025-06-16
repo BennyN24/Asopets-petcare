@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth as setupReplitAuth, isAuthenticated as replitIsAuthenticated } from "./replitAuth";
-import { setupAuth, isAuthenticated, hashPassword, verifyPassword, generateToken, generateUserId, sendConfirmationEmail } from "./auth";
+import { setupAuth, isAuthenticated, hashPassword, verifyPassword, generateToken, generateUserId, sendConfirmationEmail, sendPasswordResetEmail } from "./auth";
 import { z } from "zod";
 import { 
   insertPetSchema,
@@ -156,9 +156,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordResetExpires: resetExpires,
       });
 
-      // Send reset email (will be implemented)
-      const resetLink = `${process.env.BASE_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}`;
-      console.log(`Password reset link for ${email}: ${resetLink}`);
+      // Send reset email with SendGrid
+      await sendPasswordResetEmail(email, resetToken);
 
       res.json({ message: "If the email exists, a reset link has been sent" });
     } catch (error) {
