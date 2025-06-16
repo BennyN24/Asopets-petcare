@@ -153,39 +153,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Quick Actions</h3>
-                <div className="space-y-3">
-                  <button 
-                    className="w-full flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                    onClick={() => setLocation("/schedule")}
-                  >
-                    <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center mr-3">
-                      <Calendar className="text-white w-5 h-5" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-gray-900">View Schedule</p>
-                      <p className="text-sm text-gray-500">Check upcoming reminders</p>
-                    </div>
-                  </button>
-                  
-                  <button 
-                    className="w-full flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                    onClick={() => pets.length > 0 && setLocation(`/pet/${pets[0].id}/vaccine`)}
-                  >
-                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mr-3">
-                      <Syringe className="text-white w-5 h-5" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-gray-900">Find Vet Clinics</p>
-                      <p className="text-sm text-gray-500">Find vet clinics near you</p>
-                    </div>
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+
 
             {/* Overdue Reminders Alert */}
             {overdueReminders.length > 0 && (
