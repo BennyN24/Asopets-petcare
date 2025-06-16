@@ -20,6 +20,8 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showVetClinics, setShowVetClinics] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -130,6 +132,11 @@ export default function Dashboard() {
               </Button>
             </div>
 
+            {/* Quick Actions */}
+            <QuickActions 
+              onFindClinics={() => setShowVetClinics(true)}
+            />
+
             {/* Pet Grid */}
             <div className="grid grid-cols-2 gap-4">
               {pets.map((pet) => (
@@ -215,6 +222,27 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Find Vet Clinics Modal */}
+      {showVetClinics && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-10">
+          <div className="bg-white rounded-lg m-4 max-w-lg w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-4 border-b flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Find Vet Clinics</h2>
+              <button 
+                onClick={() => setShowVetClinics(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4">
+              <VetClinics />
+            </div>
+          </div>
+        </div>
+      )}
+
       <BottomNavigation activeTab="home" />
     </div>
   );
