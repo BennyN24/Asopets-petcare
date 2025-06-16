@@ -50,10 +50,8 @@ export default function CuteNotification({
   onSnooze 
 }: CuteNotificationProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [hasBounced, setHasBounced] = useState(false);
 
   const getUrgencyLevel = () => {
     if (!reminder.dueDate) return "normal";
@@ -67,23 +65,39 @@ export default function CuteNotification({
     return "normal";
   };
 
-  useEffect(() => {
-    if (!hasBounced) {
-      // Cute bounce animation on mount - only once
-      const timer = setTimeout(() => {
-        setIsAnimating(true);
-        setHasBounced(true);
-      }, 100);
-      
-      return () => clearTimeout(timer);
+  const sendPushNotification = async (reminder: Reminder, pet: Pet, urgency: string) => {
+    if ('serviceWorker' in navigator && 'Notification' in window) {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          const petEmoji = petEmojis[pet.category] || "🐾";
+          const medicationEmoji = medicationEmojis[reminder.type] || "💊";
+          
+          new Notification(`${petEmoji} ${pet.name} - ${reminder.type} reminder`, {
+            body: `${medicationEmoji} ${reminder.title}`,
+            icon: '/favicon.ico',
+            badge: '/favicon.ico',
+            tag: `reminder-${reminder.id}`,
+            requireInteraction: urgency === "urgent" || urgency === "overdue",
+
+          });
+        }
+      } catch (error) {
+        console.log('Push notification error:', error);
+      }
     }
-  }, [hasBounced]);
+  };
 
   useEffect(() => {
     if (!hasPlayed) {
-      // Play appropriate sound based on urgency - only once
+      // Play appropriate sound and send push notification
       const urgency = getUrgencyLevel();
-      const soundTimer = setTimeout(() => {
+      
+      // Send push notification
+      sendPushNotification(reminder, pet, urgency);
+      
+      // Play sound
+      setTimeout(() => {
         if (urgency === "urgent" || urgency === "overdue") {
           notificationSounds.playUrgentAlert();
         } else {
@@ -91,8 +105,6 @@ export default function CuteNotification({
         }
         setHasPlayed(true);
       }, 300);
-      
-      return () => clearTimeout(soundTimer);
     }
   }, [hasPlayed]);
 
@@ -145,8 +157,8 @@ export default function CuteNotification({
   return (
     <Card 
       className={`
+        max-w-sm w-full mx-auto 
         ${urgencyStyles[urgency]} 
-        ${isAnimating ? 'animate-bounce' : ''} 
         transition-all duration-300 transform hover:scale-105 
         shadow-lg border-2 relative overflow-hidden
       `}
