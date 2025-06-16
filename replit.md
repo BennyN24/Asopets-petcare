@@ -228,6 +228,17 @@ Changelog:
   * Enhanced photo upload functionality with mobile camera capture support
   * Updated all components to support grooming record type with proper icons and colors
   * Completed database schema migration for new grooming medical record type
+- June 16, 2025. Major pet management system expansion with new categories and features:
+  * Added new pet categories: horses and exotic animals alongside existing categories
+  * Implemented pet age tracking system with age field in database and forms (tracked in months)
+  * Created comprehensive pet editing functionality with PetEditForm component for all pet data
+  * Built complete vet clinics feature with local clinic discovery and user rating system
+  * Added vet clinic database tables with location-based search and distance calculations
+  * Integrated clinic rating system allowing users to rate clinics after medical records
+  * Enhanced pet profile page with edit functionality and vet clinic quick actions
+  * Updated add pet form to include age input field and new pet categories
+  * Populated database with sample veterinary clinics in Metro Manila area
+  * Fixed QR code component TypeScript errors and unified QR generation system
 ```
 
 ## User Preferences

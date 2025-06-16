@@ -39,7 +39,7 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
       name: pet.name,
       category: pet.category,
       breed: pet.breed || "",
-      dateOfBirth: pet.dateOfBirth || undefined,
+      dateOfBirth: pet.dateOfBirth || "",
       age: pet.age || undefined,
       microchipId: pet.microchipId || "",
       birthmarks: pet.birthmarks || "",
@@ -172,7 +172,7 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
                 <FormItem>
                   <FormLabel>Date of Birth</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} value={field.value || ""} />
+                    <Input type="date" {...field} value={field.value ? field.value.toString() : ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

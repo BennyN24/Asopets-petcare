@@ -48,14 +48,14 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
   // Fetch vet clinics
   const { data: clinics = [], isLoading } = useQuery({
     queryKey: ["/api/vet-clinics", userLocation?.lat, userLocation?.lng],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (userLocation) {
         params.append("lat", userLocation.lat.toString());
         params.append("lng", userLocation.lng.toString());
         params.append("radius", "25"); // 25km radius
       }
-      return apiRequest("GET", `/api/vet-clinics?${params.toString()}`);
+      return await apiRequest("GET", `/api/vet-clinics?${params.toString()}`) as VetClinic[];
     },
   });
 
@@ -183,7 +183,7 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                               {parseFloat(clinic.averageRating || "0").toFixed(1)}
                             </span>
                           </div>
-                          {clinic.totalRatings > 0 && (
+                          {(clinic.totalRatings || 0) > 0 && (
                             <span className="text-xs text-gray-500">
                               {clinic.totalRatings} review{clinic.totalRatings !== 1 ? 's' : ''}
                             </span>
