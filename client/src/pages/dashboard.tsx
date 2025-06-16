@@ -171,7 +171,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-left">
                       <p className="font-medium text-gray-900">Find Vet Clinics</p>
-                      <p className="text-sm text-gray-500">Record vaccine details</p>
+                      <p className="text-sm text-gray-500">Find vet clinics near you</p>
                     </div>
                   </button>
                 </div>
