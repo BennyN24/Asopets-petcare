@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import MedicationReminderManager from "@/components/medication-reminder-manager";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
+import Signup from "@/pages/signup";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Schedule from "@/pages/schedule";
@@ -30,6 +31,7 @@ function Router() {
       {isLoading || !isAuthenticated ? (
         <>
           <Route path="/" component={Login} />
+          <Route path="/signup" component={Signup} />
           <Route path="/landing" component={Landing} />
         </>
       ) : (

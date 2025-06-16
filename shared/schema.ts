@@ -29,7 +29,8 @@ export const sessions = pgTable(
 // User storage table (mandatory for Replit Auth)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
+  email: varchar("email").unique().notNull(),
+  passwordHash: varchar("password_hash"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -47,6 +48,9 @@ export const users = pgTable("users", {
     push: true,
     reminders: true
   }),
+  isEmailConfirmed: boolean("is_email_confirmed").default(false),
+  emailConfirmationToken: varchar("email_confirmation_token"),
+  emailConfirmationExpires: timestamp("email_confirmation_expires"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
