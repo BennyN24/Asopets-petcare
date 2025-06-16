@@ -9,6 +9,8 @@ import { ArrowLeft, Syringe, PillBottle, Heart as MedicalKit, UserCog, Stethosco
 import HealthSummaryCard from "@/components/health-summary-card";
 import MedicalTimeline from "@/components/medical-timeline";
 import QRCodeGenerator from "@/components/qr-code-generator";
+import PetEditForm from "@/components/pet-edit-form";
+import VetClinics from "@/components/vet-clinics";
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
 
 export default function PetProfile() {
@@ -271,9 +273,12 @@ export default function PetProfile() {
           <TabsContent value="info" className="mt-6">
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <User className="w-5 h-5 mr-2 text-primary" />
-                  <h3 className="font-semibold text-gray-900">Pet Information</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <User className="w-5 h-5 mr-2 text-primary" />
+                    <h3 className="font-semibold text-gray-900">Pet Information</h3>
+                  </div>
+                  <PetEditForm pet={pet} />
                 </div>
                 
                 <div className="space-y-4">
