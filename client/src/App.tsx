@@ -27,6 +27,7 @@ import LabTestForm from "@/pages/lab-test-form";
 import GroomingForm from "@/pages/grooming-form";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
+import Welcome from "@/pages/welcome";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -48,6 +49,7 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Dashboard} />
+          <Route path="/welcome" component={Welcome} />
           <Route path="/schedule" component={Schedule} />
           <Route path="/expenses" component={Expenses} />
           <Route path="/profile" component={Profile} />
