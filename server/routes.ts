@@ -1,18 +1,139 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth as setupReplitAuth, isAuthenticated as replitIsAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, hashPassword, verifyPassword, generateToken, generateUserId, sendConfirmationEmail } from "./auth";
+import { z } from "zod";
 import { 
   insertPetSchema,
   insertMedicalRecordSchema,
   insertReminderSchema,
   updateUserSchema,
 } from "@shared/schema";
-import { z } from "zod";
+
+const signupSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+  await setupReplitAuth(app);
+
+  // Email/Password Authentication Routes
+  app.post('/api/auth/signup', async (req: any, res) => {
+    try {
+      const userData = signupSchema.parse(req.body);
+      
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      const passwordHash = await hashPassword(userData.password);
+      const confirmationToken = generateToken();
+      const confirmationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      const newUser = await storage.createUser({
+        id: generateUserId(),
+        email: userData.email,
+        passwordHash,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        emailConfirmationToken: confirmationToken,
+        emailConfirmationExpires: confirmationExpires,
+        isEmailConfirmed: false,
+      });
+
+      await sendConfirmationEmail(userData.email, confirmationToken);
+
+      res.status(201).json({ 
+        message: "Account created successfully. Please check your email to confirm your account.",
+        userId: newUser.id 
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid signup data", errors: error.errors });
+      }
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Failed to create account" });
+    }
+  });
+
+  app.post('/api/auth/login', async (req: any, res) => {
+    try {
+      const loginData = loginSchema.parse(req.body);
+      
+      const user = await storage.getUserByEmail(loginData.email);
+      if (!user || !user.passwordHash) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      const isValidPassword = await verifyPassword(loginData.password, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      if (!user.isEmailConfirmed) {
+        return res.status(401).json({ message: "Please confirm your email before logging in" });
+      }
+
+      req.session.userId = user.id;
+
+      res.json({ 
+        message: "Login successful",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        }
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid login data", errors: error.errors });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Failed to login" });
+    }
+  });
+
+  app.get('/api/auth/confirm-email', async (req: any, res) => {
+    try {
+      const { token } = req.query;
+      if (!token) {
+        return res.status(400).json({ message: "Confirmation token is required" });
+      }
+
+      const user = await storage.confirmUserEmail(token as string);
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired confirmation token" });
+      }
+
+      res.json({ message: "Email confirmed successfully. You can now log in." });
+    } catch (error) {
+      console.error("Email confirmation error:", error);
+      res.status(500).json({ message: "Failed to confirm email" });
+    }
+  });
+
+  app.post('/api/auth/logout', (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+      res.clearCookie('connect.sid');
+      res.json({ message: "Logout successful" });
+    });
+  });
 
   // SMS OTP Storage (in production, use Redis or database)
   const otpStore = new Map<string, { otp: string; expires: number; verified: boolean }>();

@@ -259,6 +259,7 @@ Changelog:
   * Fixed completed reminders tab to properly display completed reminders with data integrity filtering for current user's pets
   * Removed bouncing animation from notifications and implemented native push notifications for mobile devices with pet emojis and urgency-based behavior
   * Removed Replit branding and authentication from login page, simplified to SMS-only authentication for cleaner user experience
+  * Added comprehensive email/password authentication system with signup page, email confirmation, password hashing, and session management, removing SMS authentication for a unified experience
 ```
 
 ## User Preferences

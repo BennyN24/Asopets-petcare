@@ -20,7 +20,7 @@ import {
   type InsertClinicRating,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, lt, isNull, or } from "drizzle-orm";
+import { eq, and, desc, lt, isNull, or, gt } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -102,7 +102,7 @@ export class DatabaseStorage implements IStorage {
         eq(users.emailConfirmationToken, token),
         or(
           isNull(users.emailConfirmationExpires),
-          lt(users.emailConfirmationExpires, new Date())
+          gt(users.emailConfirmationExpires, new Date())
         )
       ))
       .returning();
