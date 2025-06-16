@@ -94,12 +94,11 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Welcome back!</h1>
-            <p className="text-green-100 text-sm">Managing {pets.length} pet{pets.length !== 1 ? 's' : ''}</p>
+            <p className="text-green-100 text-sm">
+              Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
+            </p>
           </div>
-          <button 
-            className="relative"
-            onClick={() => setLocation("/schedule")}
-          >
+          <button className="relative" onClick={() => setLocation("/schedule")}>
             <Bell className="w-6 h-6" />
             {totalNotifications > 0 && (
               <span className="notification-badge warning">
@@ -113,17 +112,17 @@ export default function Dashboard() {
       <div className="p-4 pb-20">
         {/* Offline Sync Indicator */}
         <OfflineSyncIndicator />
-        
+
         <Tabs defaultValue="pets" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="pets">My Pets</TabsTrigger>
             <TabsTrigger value="insights">Health Insights</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="pets" className="space-y-6 mt-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Your Pets</h2>
-              <Button 
+              <Button
                 onClick={() => setLocation("/add-pet")}
                 className="bg-primary text-white px-4 py-2 text-sm font-medium"
               >
@@ -131,20 +130,18 @@ export default function Dashboard() {
                 Add Pet
               </Button>
             </div>
-
-            {/* Quick Actions */}
-            <QuickActions 
-              onFindClinics={() => setShowVetClinics(true)}
-            />
-
             {/* Pet Grid */}
             <div className="grid grid-cols-2 gap-4">
               {pets.map((pet) => (
-                <PetCard key={pet.id} pet={pet} reminders={reminders.filter(r => r.petId === pet.id)} />
+                <PetCard
+                  key={pet.id}
+                  pet={pet}
+                  reminders={reminders.filter((r) => r.petId === pet.id)}
+                />
               ))}
-              
               {/* Add Pet Card */}
-              <div 
+
+              <div
                 className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
                 onClick={() => setLocation("/add-pet")}
               >
@@ -152,8 +149,8 @@ export default function Dashboard() {
                 <p className="text-gray-500 text-sm font-medium">Add Pet</p>
               </div>
             </div>
-
-
+            {/* Quick Actions */}
+            <QuickActions onFindClinics={() => setShowVetClinics(true)} />
 
             {/* Overdue Reminders Alert */}
             {overdueReminders.length > 0 && (
@@ -161,12 +158,19 @@ export default function Dashboard() {
                 <CardContent className="p-4">
                   <div className="flex items-center mb-3">
                     <Bell className="text-destructive mr-2 w-5 h-5" />
-                    <h3 className="font-semibold text-gray-900">Overdue Reminders</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      Overdue Reminders
+                    </h3>
                   </div>
                   <div className="space-y-2">
                     {overdueReminders.slice(0, 3).map((reminder) => (
-                      <div key={reminder.id} className="flex justify-between items-center">
-                        <span className="text-sm text-gray-700">{reminder.title}</span>
+                      <div
+                        key={reminder.id}
+                        className="flex justify-between items-center"
+                      >
+                        <span className="text-sm text-gray-700">
+                          {reminder.title}
+                        </span>
                         <span className="status-badge overdue">Overdue</span>
                       </div>
                     ))}
@@ -180,12 +184,12 @@ export default function Dashboard() {
               </Card>
             )}
           </TabsContent>
-          
+
           <TabsContent value="insights" className="mt-6">
-            <DashboardInsights 
-              pets={pets} 
-              allMedicalRecords={allMedicalRecords} 
-              reminders={reminders} 
+            <DashboardInsights
+              pets={pets}
+              allMedicalRecords={allMedicalRecords}
+              reminders={reminders}
             />
           </TabsContent>
         </Tabs>
@@ -197,7 +201,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-lg m-4 max-w-lg w-full max-h-[80vh] overflow-y-auto">
             <div className="p-4 border-b flex items-center justify-between">
               <h2 className="text-lg font-semibold">Find Vet Clinics</h2>
-              <button 
+              <button
                 onClick={() => setShowVetClinics(false)}
                 className="text-gray-500 hover:text-gray-700"
               >

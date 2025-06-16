@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,8 +46,16 @@ export default function Expenses() {
   const [filterPet, setFilterPet] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [budgetGoal, setBudgetGoal] = useState(100);
+  const [budgetGoal, setBudgetGoal] = useState(() => {
+    const saved = localStorage.getItem('petBudgetGoal');
+    return saved ? Number(saved) : 100;
+  });
   const [isSettingBudget, setIsSettingBudget] = useState(false);
+
+  // Save budget to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('petBudgetGoal', budgetGoal.toString());
+  }, [budgetGoal]);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],

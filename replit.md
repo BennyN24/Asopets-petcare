@@ -252,6 +252,7 @@ Changelog:
   * Implemented Find Vet Clinics modal overlay in dashboard with seamless user experience
   * Enhanced all medical record forms with professional photo upload interface and image preview
   * Removed duplicate Quick Actions section from dashboard for cleaner user interface
+  * Fixed monthly budget per pet persistence using localStorage for proper saving and loading across sessions
 ```
 
 ## User Preferences
