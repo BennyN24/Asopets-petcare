@@ -255,11 +255,6 @@ export default function PetProfile() {
               medicalRecords={medicalRecords} 
               type="profile" 
             />
-            <QRCodeGenerator 
-              pet={pet} 
-              medicalRecords={medicalRecords} 
-              type="records" 
-            />
           </TabsContent>
           
           <TabsContent value="info" className="mt-6">

@@ -33,7 +33,7 @@ export default function GroomingForm() {
       placeholder: "Professional groomer name"
     },
     {
-      name: "notes" as keyof InsertMedicalRecord,
+      name: "description" as keyof InsertMedicalRecord,
       label: "Grooming Details",
       type: "textarea" as const,
       placeholder: "Services provided (bath, nail trim, haircut, ear cleaning, etc.)"

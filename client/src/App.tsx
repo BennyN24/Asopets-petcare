@@ -46,6 +46,7 @@ function Router() {
           <Route path="/pet/:id/surgery" component={SurgeryForm} />
           <Route path="/pet/:id/checkup" component={CheckupForm} />
           <Route path="/pet/:id/lab-test" component={LabTestForm} />
+          <Route path="/pet/:id/grooming" component={GroomingForm} />
         </>
       )}
       <Route component={NotFound} />

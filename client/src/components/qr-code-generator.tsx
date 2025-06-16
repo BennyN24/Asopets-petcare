@@ -10,10 +10,10 @@ import type { Pet, MedicalRecord } from "@shared/schema";
 interface QRCodeGeneratorProps {
   pet: Pet;
   medicalRecords?: MedicalRecord[];
-  type: "profile" | "records";
+  type: "profile";
 }
 
-export default function QRCodeGenerator({ pet, medicalRecords = [], type }: QRCodeGeneratorProps) {
+export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGeneratorProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -21,44 +21,30 @@ export default function QRCodeGenerator({ pet, medicalRecords = [], type }: QRCo
   const generateQRData = () => {
     const baseUrl = window.location.origin;
     
-    if (type === "profile") {
-      // Generate pet profile data
-      const profileData = {
-        type: "pet_profile",
-        pet: {
-          name: pet.name,
-          category: pet.category,
-          breed: pet.breed,
-          dateOfBirth: pet.dateOfBirth,
-          microchipId: pet.microchipId,
-          birthmarks: pet.birthmarks,
-        },
-        generatedAt: new Date().toISOString(),
-        shareUrl: `${baseUrl}/shared/pet/${pet.id}`,
-      };
-      return JSON.stringify(profileData);
-    } else {
-      // Generate medical records data
-      const recordsData = {
-        type: "medical_records",
-        pet: {
-          name: pet.name,
-          category: pet.category,
-        },
-        records: medicalRecords.map(record => ({
-          type: record.type,
-          title: record.title,
-          dateAdministered: record.dateAdministered,
-          veterinarian: record.veterinarian,
-          clinic: record.clinic,
-          nextDueDate: record.nextDueDate,
-        })),
-        recordCount: medicalRecords.length,
-        generatedAt: new Date().toISOString(),
-        shareUrl: `${baseUrl}/shared/records/${pet.id}`,
-      };
-      return JSON.stringify(recordsData);
-    }
+    // Generate comprehensive pet data including profile and medical records
+    const petData = {
+      type: "pet_complete",
+      pet: {
+        name: pet.name,
+        category: pet.category,
+        breed: pet.breed,
+        dateOfBirth: pet.dateOfBirth,
+        microchipId: pet.microchipId,
+        birthmarks: pet.birthmarks,
+      },
+      medicalRecords: medicalRecords.map(record => ({
+        type: record.type,
+        title: record.title,
+        dateAdministered: record.dateAdministered,
+        veterinarian: record.veterinarian,
+        clinic: record.clinic,
+        nextDueDate: record.nextDueDate,
+      })),
+      recordCount: medicalRecords.length,
+      generatedAt: new Date().toISOString(),
+      shareUrl: `${baseUrl}/shared/pet/${pet.id}`,
+    };
+    return JSON.stringify(petData);
   };
 
   const generateQRCode = async () => {
