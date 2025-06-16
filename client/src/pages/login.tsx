@@ -3,13 +3,10 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Mail, 
   Phone, 
   Heart,
   Smartphone,
-  Shield,
   CheckCircle,
   AlertCircle,
   PawPrint
@@ -19,7 +16,6 @@ import SMSOTPLogin from "@/components/sms-otp-login";
 export default function Login() {
   const [, setLocation] = useLocation();
   const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState(false);
 
   // Check for error parameters in URL
   useEffect(() => {
@@ -50,16 +46,7 @@ export default function Login() {
     }
   }, []);
 
-  const handleEmailLogin = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      window.location.href = "/api/login";
-    } catch (err) {
-      setError("Failed to initiate login. Please try again.");
-      setLoading(false);
-    }
-  };
+
 
   const handleSMSSuccess = () => {
     setLocation("/");
@@ -88,54 +75,16 @@ export default function Login() {
         {/* Login Options */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">Sign In</CardTitle>
+            <CardTitle className="text-center flex items-center justify-center space-x-2">
+              <Phone className="w-5 h-5" />
+              <span>Sign In with SMS</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="email" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="email" className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4" />
-                  <span>Email</span>
-                </TabsTrigger>
-                <TabsTrigger value="sms" className="flex items-center space-x-2">
-                  <Phone className="w-4 h-4" />
-                  <span>SMS</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="email" className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Shield className="w-4 h-4" />
-                    <span>Secure authentication via Replit</span>
-                  </div>
-                  <Button 
-                    onClick={handleEmailLogin}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center space-x-2"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Connecting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-4 h-4" />
-                        <span>Continue with Email</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="sms" className="space-y-4">
-                <SMSOTPLogin 
-                  onSuccess={handleSMSSuccess} 
-                  onBackToRegular={() => {}} 
-                />
-              </TabsContent>
-            </Tabs>
+            <SMSOTPLogin 
+              onSuccess={handleSMSSuccess} 
+              onBackToRegular={() => {}} 
+            />
           </CardContent>
         </Card>
 
