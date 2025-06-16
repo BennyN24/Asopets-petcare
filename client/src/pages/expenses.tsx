@@ -220,8 +220,8 @@ export default function Expenses() {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP'
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(amount);
   };
 
@@ -620,9 +620,11 @@ export default function Expenses() {
                             Total monthly budget: {formatCurrency(pets.length * budgetGoal)}
                           </p>
                         </div>
-                        <Button onClick={() => setIsSettingBudget(false)} className="w-full">
-                          Save Budget
-                        </Button>
+                        <DialogTrigger asChild>
+                          <Button className="w-full">
+                            Save Budget
+                          </Button>
+                        </DialogTrigger>
                       </div>
                     </DialogContent>
                   </Dialog>

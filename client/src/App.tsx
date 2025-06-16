@@ -20,6 +20,7 @@ import TreatmentForm from "@/pages/treatment-form";
 import SurgeryForm from "@/pages/surgery-form";
 import CheckupForm from "@/pages/checkup-form";
 import LabTestForm from "@/pages/lab-test-form";
+import GroomingForm from "@/pages/grooming-form";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
