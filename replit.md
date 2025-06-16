@@ -257,6 +257,7 @@ Changelog:
   * Fixed bouncing notifications to only bounce once when first appearing, preventing repetitive animation behavior
   * Fixed Schedule page data display issue by restoring active reminders and ensuring proper data flow from database to UI
   * Fixed completed reminders tab to properly display completed reminders with data integrity filtering for current user's pets
+  * Removed bouncing animation from notifications and implemented native push notifications for mobile devices with pet emojis and urgency-based behavior
 ```
 
 ## User Preferences
