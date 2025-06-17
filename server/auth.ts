@@ -94,9 +94,9 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
           <div class="container">
             <div class="header">
               <div class="logo">🐾</div>
-              <h1>Welcome to My PetBB!</h1>
+              <h1>Welcome to ASOPETS!</h1>
             </div>
-            <p>Thank you for signing up for My PetBB - your comprehensive pet care management companion.</p>
+            <p>Thank you for signing up for ASOPETS - your comprehensive pet care management companion.</p>
             <p>To complete your account setup and start managing your pet's health records, please confirm your email address by clicking the button below:</p>
             <div style="text-align: center;">
               <a href="${confirmationLink}" class="button">Confirm Email Address</a>
@@ -105,8 +105,8 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
             <p style="word-break: break-all; color: #666;">${confirmationLink}</p>
             <p>This confirmation link will expire in 24 hours for security purposes.</p>
             <div class="footer">
-              <p>If you didn't create a My PetBB account, you can safely ignore this email.</p>
-              <p>© 2024 My PetBB. All rights reserved.</p>
+              <p>If you didn't create an ASOPETS account, you can safely ignore this email.</p>
+              <p>© 2024 ASOPETS. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -116,9 +116,9 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
       const msg = {
         to: email,
         from: 'test@example.com', // TODO: Replace with your verified SendGrid sender email
-        subject: 'Confirm Your My PetBB Account',
+        subject: 'Confirm Your ASOPETS Account',
         html: emailHtml,
-        text: `Welcome to My PetBB! Please confirm your email address by visiting: ${confirmationLink}`
+        text: `Welcome to ASOPETS! Please confirm your email address by visiting: ${confirmationLink}`
       };
 
       await sgMail.send(msg);
@@ -145,7 +145,7 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
         <html>
         <head>
           <meta charset="utf-8">
-          <title>Reset Your My PetBB Password</title>
+          <title>Reset Your ASOPETS Password</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -162,7 +162,7 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
               <div class="logo">🔒</div>
               <h1>Password Reset Request</h1>
             </div>
-            <p>We received a request to reset your My PetBB account password.</p>
+            <p>We received a request to reset your ASOPETS account password.</p>
             <p>If you made this request, click the button below to reset your password:</p>
             <div style="text-align: center;">
               <a href="${resetLink}" class="button">Reset Password</a>

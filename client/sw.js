@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-petbb-v1.0.0';
+const CACHE_NAME = 'asopets-v1.0.0';
 const urlsToCache = [
   '/',
   '/src/main.tsx',

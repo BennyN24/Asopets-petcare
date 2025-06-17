@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-lg font-semibold mb-3">How We Use Your Information</h2>
               <p className="mb-3">We use the information we collect to:</p>
               <ul className="list-disc pl-6 mb-3 space-y-1">
-                <li>Provide and maintain the My PetBB service</li>
+                <li>Provide and maintain the ASOPETS service</li>
                 <li>Send reminders for pet medical appointments</li>
                 <li>Help you track your pet's medical history</li>
                 <li>Improve our services and user experience</li>
