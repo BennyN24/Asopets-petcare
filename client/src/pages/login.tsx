@@ -4,18 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { 
+import {
   Mail,
   Lock,
   Heart,
   Smartphone,
   CheckCircle,
   AlertCircle,
-  PawPrint
+  PawPrint,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +55,8 @@ export default function Login() {
     } catch (error: any) {
       toast({
         title: "Login failed",
-        description: error.message || "Invalid email or password. Please try again.",
+        description:
+          error.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -64,18 +72,23 @@ export default function Login() {
           <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
             <PawPrint className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome to ASOPETS</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome to ASOPETS
+          </h1>
           <p className="text-gray-600">Your pet's health companion</p>
         </div>
 
         {/* Login Form */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">Sign In</CardTitle>
+            <CardTitle className="text-center">Login</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -83,10 +96,10 @@ export default function Login() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           type="email"
-                          placeholder="Enter your email" 
-                          {...field} 
+                          placeholder="Enter your email"
+                          {...field}
                           disabled={isLoading}
                         />
                       </FormControl>
@@ -102,10 +115,10 @@ export default function Login() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           type="password"
-                          placeholder="Enter your password" 
-                          {...field} 
+                          placeholder="Enter your password"
+                          {...field}
                           disabled={isLoading}
                         />
                       </FormControl>
@@ -114,11 +127,7 @@ export default function Login() {
                   )}
                 />
 
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
@@ -127,7 +136,7 @@ export default function Login() {
                   ) : (
                     <>
                       <Lock className="w-4 h-4 mr-2" />
-                      Sign In
+                      Login
                     </>
                   )}
                 </Button>
@@ -161,7 +170,7 @@ export default function Login() {
           <CardContent className="p-4 space-y-3">
             <h3 className="font-semibold text-green-800 flex items-center">
               <Heart className="w-4 h-4 mr-2" />
-              What you can do with VetBB
+              What you can do with ASOPETS
             </h3>
             <div className="space-y-2 text-sm text-green-700">
               <div className="flex items-center">
@@ -178,7 +187,9 @@ export default function Login() {
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-3 h-3 mr-2 flex-shrink-0" />
-                <span>Generate QR codes for emergency contacts</span>
+                <span>
+                  Generate QR codes and share your pet medical records
+                </span>
               </div>
             </div>
           </CardContent>
