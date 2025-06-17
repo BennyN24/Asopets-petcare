@@ -292,6 +292,9 @@ Changelog:
   * Enhanced offline sync with proper authentication headers and credentials
   * Confirmed email confirmation and password reset systems working correctly
   * Updated all remaining "My PetBB" branding references to "ASOPETS" in loading screens and legal pages
+  * Added show/hide password toggle with eye icons to login page for better UX
+  * Fixed email link endpoints to ensure proper routing and functionality
+  * Verified complete authentication flow: signup → email confirmation → password reset → login working perfectly
 ```
 
 ## User Preferences
