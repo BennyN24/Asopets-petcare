@@ -28,8 +28,8 @@ import GroomingForm from "@/pages/grooming-form";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
 import Welcome from "@/pages/welcome";
-import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
+import ForgotPassword from "@/pages/forgot-password";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();

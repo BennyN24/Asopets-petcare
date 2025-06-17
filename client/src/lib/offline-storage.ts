@@ -12,8 +12,8 @@ interface OfflinePet extends Omit<Pet, 'id'> {
   synced: boolean;
 }
 
-const OFFLINE_RECORDS_KEY = 'vetbb_offline_records';
-const OFFLINE_PETS_KEY = 'vetbb_offline_pets';
+const OFFLINE_RECORDS_KEY = 'asopets_offline_records';
+const OFFLINE_PETS_KEY = 'asopets_offline_pets';
 
 export class OfflineStorage {
   static saveRecord(record: InsertMedicalRecord): string {
