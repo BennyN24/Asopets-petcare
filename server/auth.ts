@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import sgMail from '@sendgrid/mail';
+import sgMail from "@sendgrid/mail";
 import { storage } from "./storage";
 import type { Express, RequestHandler } from "express";
 import session from "express-session";
@@ -33,12 +33,18 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
   if (req.session && req.session.userId) {
     return next();
   }
-  
+
   // Check for Replit Auth (fallback for existing users)
-  if (req.isAuthenticated && req.isAuthenticated() && req.user && req.user.claims && req.user.claims.sub) {
+  if (
+    req.isAuthenticated &&
+    req.isAuthenticated() &&
+    req.user &&
+    req.user.claims &&
+    req.user.claims.sub
+  ) {
     return next();
   }
-  
+
   return res.status(401).json({ message: "Unauthorized" });
 };
 
@@ -46,7 +52,10 @@ export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, 12);
 };
 
-export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
+export const verifyPassword = async (
+  password: string,
+  hash: string,
+): Promise<boolean> => {
   return await bcrypt.compare(password, hash);
 };
 
@@ -69,12 +78,11 @@ if (process.env.SENDGRID_API_KEY) {
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const confirmationLink = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/confirm-email?token=${token}`;
-  
+  const confirmationLink = `${process.env.BASE_URL || "http://localhost:5000"}/api/auth/confirm-email?token=${token}`;
+
   try {
     // Check if SendGrid is configured
     if (process.env.SENDGRID_API_KEY) {
-
       const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -115,10 +123,10 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
 
       const msg = {
         to: email,
-        from: 'test@example.com', // TODO: Replace with your verified SendGrid sender email
-        subject: 'Confirm Your ASOPETS Account',
+        from: "your-email@gmail.com", // Replace with your actual verified email from SendGrid
+        subject: "Confirm Your ASOPETS Account",
         html: emailHtml,
-        text: `Welcome to ASOPETS! Please confirm your email address by visiting: ${confirmationLink}`
+        text: `Welcome to ASOPETS! Please confirm your email address by visiting: ${confirmationLink}`,
       };
 
       await sgMail.send(msg);
@@ -126,18 +134,23 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
     } else {
       // Development mode - log the link
       console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
-      console.log('Note: Configure SENDGRID_API_KEY environment variable to send actual emails');
+      console.log(
+        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
+      );
     }
   } catch (error) {
-    console.error('Failed to send confirmation email:', error);
+    console.error("Failed to send confirmation email:", error);
     // Still log the link as fallback
     console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
   }
 };
 
-export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
-  const resetLink = `${process.env.BASE_URL || 'http://localhost:5000'}/reset-password?token=${resetToken}`;
-  
+export const sendPasswordResetEmail = async (
+  email: string,
+  resetToken: string,
+) => {
+  const resetLink = `${process.env.BASE_URL || "http://localhost:5000"}/reset-password?token=${resetToken}`;
+
   try {
     if (process.env.SENDGRID_API_KEY) {
       const emailHtml = `
@@ -174,7 +187,7 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
             </div>
             <div class="footer">
               <p>If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
-              <p>© 2024 My PetBB. All rights reserved.</p>
+              <p>© 2024 ASOPETS. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -183,20 +196,22 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
 
       const msg = {
         to: email,
-        from: 'noreply@mypetbb.app',
-        subject: 'Reset Your ASOPETS Password',
+        from: "noreply@gmail.com", // Use your verified email address from SendGrid
+        subject: "Reset Your ASOPETS Password",
         html: emailHtml,
-        text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`
+        text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`,
       };
 
       await sgMail.send(msg);
       console.log(`Password reset email sent to ${email}`);
     } else {
       console.log(`Password reset link for ${email}: ${resetLink}`);
-      console.log('Note: Configure SENDGRID_API_KEY environment variable to send actual emails');
+      console.log(
+        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
+      );
     }
   } catch (error) {
-    console.error('Failed to send password reset email:', error);
+    console.error("Failed to send password reset email:", error);
     console.log(`Password reset link for ${email}: ${resetLink}`);
   }
 };
