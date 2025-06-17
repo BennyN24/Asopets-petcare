@@ -23,14 +23,14 @@ export default function TermsOfService() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl text-center">Terms of Service</CardTitle>
-            <p className="text-center text-gray-600">My PetBB - Pet Care Management</p>
+            <p className="text-center text-gray-600">ASOPETS - Pet Care Management</p>
             <p className="text-center text-sm text-gray-500">Last updated: December 2024</p>
           </CardHeader>
           <CardContent className="prose prose-sm max-w-none">
             <section className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Acceptance of Terms</h2>
               <p className="mb-3">
-                By accessing and using My PetBB, you accept and agree to be bound by the terms and provision of this agreement.
+                By accessing and using ASOPETS, you accept and agree to be bound by the terms and provision of this agreement.
               </p>
             </section>
 
@@ -63,7 +63,7 @@ export default function TermsOfService() {
             <section className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Medical Disclaimer</h2>
               <p className="mb-3">
-                <strong>Important:</strong> My PetBB is a pet care management tool and does not provide medical advice. 
+                <strong>Important:</strong> ASOPETS is a pet care management tool and does not provide medical advice. 
                 The information stored and managed through this app should not replace professional veterinary care. 
                 Always consult with qualified veterinarians for medical decisions regarding your pets.
               </p>
@@ -72,7 +72,7 @@ export default function TermsOfService() {
             <section className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Data Ownership</h2>
               <p className="mb-3">
-                You retain ownership of all data you input into My PetBB, including pet information, medical records, 
+                You retain ownership of all data you input into ASOPETS, including pet information, medical records, 
                 and photos. We provide tools to export your data at any time.
               </p>
             </section>
@@ -88,7 +88,7 @@ export default function TermsOfService() {
             <section className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Limitation of Liability</h2>
               <p className="mb-3">
-                My PetBB shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
+                ASOPETS shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
                 resulting from your use of the service.
               </p>
             </section>

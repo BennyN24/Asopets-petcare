@@ -1,6 +1,6 @@
 {
-  "name": "My PetBB - Pet Care Management",
-  "short_name": "My PetBB",
+  "name": "ASOPETS - Pet Care Management",
+  "short_name": "ASOPETS",
   "description": "Comprehensive pet care management application for tracking medical records, schedules, expenses, and finding veterinary clinics",
   "start_url": "/",
   "display": "standalone",

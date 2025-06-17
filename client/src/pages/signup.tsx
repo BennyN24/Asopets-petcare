@@ -113,7 +113,7 @@ export default function Signup() {
           <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
             <PawPrint className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Join My PetBB</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Join ASOPETS</h1>
           <p className="text-gray-600">Create your pet care account</p>
         </div>
 
