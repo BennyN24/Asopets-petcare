@@ -113,11 +113,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Confirmation token is required" });
       }
 
-      // Decode the token to handle URL encoding from email clients
-      const decodedToken = decodeURIComponent(token as string);
-      console.log(`Attempting email confirmation with token: ${decodedToken.substring(0, 20)}...`);
+      // Handle both URL encoded and plain tokens
+      let cleanToken = token as string;
+      try {
+        // Try to decode in case it's URL encoded
+        const decoded = decodeURIComponent(cleanToken);
+        if (decoded !== cleanToken) {
+          cleanToken = decoded;
+        }
+      } catch (e) {
+        // If decoding fails, use the original token
+      }
       
-      const user = await storage.confirmUserEmail(decodedToken);
+      console.log(`Attempting email confirmation with token: ${cleanToken.substring(0, 20)}...`);
+      
+      const user = await storage.confirmUserEmail(cleanToken);
       if (!user) {
         return res.status(400).json({ message: "Invalid or expired confirmation token" });
       }
