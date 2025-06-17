@@ -138,8 +138,14 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
       );
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to send confirmation email:", error);
+    if (error.response?.body?.errors) {
+      console.error("SendGrid detailed errors:", JSON.stringify(error.response.body.errors, null, 2));
+    }
+    if (error.code) {
+      console.error("SendGrid error code:", error.code);
+    }
     // Still log the link as fallback
     console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
   }
@@ -210,8 +216,14 @@ export const sendPasswordResetEmail = async (
         "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
       );
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to send password reset email:", error);
+    if (error.response?.body?.errors) {
+      console.error("SendGrid detailed errors:", JSON.stringify(error.response.body.errors, null, 2));
+    }
+    if (error.code) {
+      console.error("SendGrid error code:", error.code);
+    }
     console.log(`Password reset link for ${email}: ${resetLink}`);
   }
 };
