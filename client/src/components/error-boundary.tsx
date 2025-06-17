@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
               <CardTitle className="text-xl">Something went wrong</CardTitle>
               <p className="text-gray-600">
-                My PetBB encountered an unexpected error. We apologize for the inconvenience.
+                ASOPETS encountered an unexpected error. We apologize for the inconvenience.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
