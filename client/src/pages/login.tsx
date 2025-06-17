@@ -54,8 +54,13 @@ export default function Login() {
     setIsLoading(true);
     setShowResendConfirmation(false);
     try {
-      await apiRequest("POST", "/api/auth/login", data);
-      setLocation("/");
+      const response = await apiRequest("POST", "/api/auth/login", data);
+      // Force query invalidation to update auth state
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Small delay to ensure auth state updates before redirect
+      setTimeout(() => {
+        setLocation("/");
+      }, 100);
     } catch (error: any) {
       if (error.message?.includes("confirm your email")) {
         setShowResendConfirmation(true);

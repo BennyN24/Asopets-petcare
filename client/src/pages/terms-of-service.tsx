@@ -37,7 +37,7 @@ export default function TermsOfService() {
             <section className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Description of Service</h2>
               <p className="mb-3">
-                My PetBB is a pet care management application that helps users:
+                ASOPETS is a pet care management application that helps users:
               </p>
               <ul className="list-disc pl-6 mb-3 space-y-1">
                 <li>Track pet medical records and vaccinations</li>

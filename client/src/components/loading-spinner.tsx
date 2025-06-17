@@ -41,7 +41,7 @@ export function LoadingSpinner({ size = "md", className, text }: LoadingSpinnerP
 export function PageLoader() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <LoadingSpinner size="lg" text="Loading My PetBB..." />
+      <LoadingSpinner size="lg" text="Loading ASOPETS..." />
     </div>
   );
 }
