@@ -78,7 +78,8 @@ if (process.env.SENDGRID_API_KEY) {
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const confirmationLink = `${process.env.BASE_URL || "http://localhost:5000"}/api/auth/confirm-email?token=${token}`;
+  const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+  const confirmationLink = `${baseUrl}/api/auth/confirm-email?token=${encodeURIComponent(token)}`;
 
   // Always log the confirmation link for testing
   console.log(`\n=== EMAIL CONFIRMATION LINK ===`);
@@ -94,7 +95,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         <html>
         <head>
           <meta charset="utf-8">
-          <title>Confirm Your My PetBB Account</title>
+          <title>Confirm Your ASOPETS Account</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -162,7 +163,8 @@ export const sendPasswordResetEmail = async (
   email: string,
   resetToken: string,
 ) => {
-  const resetLink = `${process.env.BASE_URL || "http://localhost:5000"}/reset-password?token=${resetToken}`;
+  const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+  const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
   // Always log the password reset link for testing
   console.log(`\n=== PASSWORD RESET LINK ===`);
