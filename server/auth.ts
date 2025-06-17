@@ -123,7 +123,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
 
       const msg = {
         to: email,
-        from: "your-email@gmail.com", // Replace with your actual verified email from SendGrid
+        from: "support@asopets.com",
         subject: "Confirm Your ASOPETS Account",
         html: emailHtml,
         text: `Welcome to ASOPETS! Please confirm your email address by visiting: ${confirmationLink}`,
@@ -196,7 +196,7 @@ export const sendPasswordResetEmail = async (
 
       const msg = {
         to: email,
-        from: "your-email@gmail.com", // Replace with your actual verified email from SendGrid
+        from: "support@asopets.com",
         subject: "Reset Your ASOPETS Password",
         html: emailHtml,
         text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`,
