@@ -80,6 +80,12 @@ if (process.env.SENDGRID_API_KEY) {
 export const sendConfirmationEmail = async (email: string, token: string) => {
   const confirmationLink = `${process.env.BASE_URL || "http://localhost:5000"}/api/auth/confirm-email?token=${token}`;
 
+  // Always log the confirmation link for testing
+  console.log(`\n=== EMAIL CONFIRMATION LINK ===`);
+  console.log(`Email: ${email}`);
+  console.log(`Link: ${confirmationLink}`);
+  console.log(`================================\n`);
+
   try {
     // Check if SendGrid is configured
     if (process.env.SENDGRID_API_KEY) {
@@ -157,6 +163,12 @@ export const sendPasswordResetEmail = async (
   resetToken: string,
 ) => {
   const resetLink = `${process.env.BASE_URL || "http://localhost:5000"}/reset-password?token=${resetToken}`;
+
+  // Always log the password reset link for testing
+  console.log(`\n=== PASSWORD RESET LINK ===`);
+  console.log(`Email: ${email}`);
+  console.log(`Link: ${resetLink}`);
+  console.log(`===========================\n`);
 
   try {
     if (process.env.SENDGRID_API_KEY) {
