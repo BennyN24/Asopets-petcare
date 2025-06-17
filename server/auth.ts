@@ -129,8 +129,9 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         text: `Welcome to ASOPETS! Please confirm your email address by visiting: ${confirmationLink}`,
       };
 
-      await sgMail.send(msg);
+      const result = await sgMail.send(msg);
       console.log(`Confirmation email sent to ${email}`);
+      console.log('SendGrid response:', result[0].statusCode, result[0].body);
     } else {
       // Development mode - log the link
       console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
@@ -208,8 +209,9 @@ export const sendPasswordResetEmail = async (
         text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`,
       };
 
-      await sgMail.send(msg);
+      const result = await sgMail.send(msg);
       console.log(`Password reset email sent to ${email}`);
+      console.log('SendGrid response:', result[0].statusCode, result[0].body);
     } else {
       console.log(`Password reset link for ${email}: ${resetLink}`);
       console.log(
