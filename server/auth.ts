@@ -129,7 +129,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         </html>
       `;
 
-      const msg = {
+      const msg: any = {
         to: email,
         from: "support@asopets.com",
         subject: "Confirm Your ASOPETS Account",
@@ -222,7 +222,7 @@ export const sendPasswordResetEmail = async (
         </html>
       `;
 
-      const msg = {
+      const msg: any = {
         to: email,
         from: "support@asopets.com",
         subject: "Reset Your ASOPETS Password",
