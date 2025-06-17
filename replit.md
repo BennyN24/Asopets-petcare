@@ -287,6 +287,11 @@ Changelog:
   * Fixed email confirmation link issues with proper URL encoding and token handling
   * Disabled SendGrid click tracking to prevent URL corruption in production emails
   * Enhanced email templates with improved styling and security messaging
+  * Created comprehensive password reset page with React form and validation
+  * Fixed offline data sync storage keys from old "vetbb" branding to "asopets"
+  * Enhanced offline sync with proper authentication headers and credentials
+  * Confirmed email confirmation and password reset systems working correctly
+  * Updated all remaining "My PetBB" branding references to "ASOPETS" in loading screens and legal pages
 ```
 
 ## User Preferences

@@ -118,12 +118,17 @@ export class OfflineStorage {
       try {
         const response = await fetch('/api/pets', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'credentials': 'include'
+          },
+          credentials: 'include',
           body: JSON.stringify({
             name: pet.name,
             category: pet.category,
             breed: pet.breed,
             dateOfBirth: pet.dateOfBirth,
+            age: pet.age,
             microchipId: pet.microchipId,
             birthmarks: pet.birthmarks,
             imageUrl: pet.imageUrl,
@@ -144,7 +149,11 @@ export class OfflineStorage {
       try {
         const response = await fetch(`/api/pets/${record.petId}/medical-records`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'credentials': 'include'
+          },
+          credentials: 'include',
           body: JSON.stringify({
             type: record.type,
             title: record.title,
