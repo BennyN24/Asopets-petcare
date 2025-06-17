@@ -196,7 +196,7 @@ export const sendPasswordResetEmail = async (
 
       const msg = {
         to: email,
-        from: "noreply@gmail.com", // Use your verified email address from SendGrid
+        from: "your-email@gmail.com", // Replace with your actual verified email from SendGrid
         subject: "Reset Your ASOPETS Password",
         html: emailHtml,
         text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`,
