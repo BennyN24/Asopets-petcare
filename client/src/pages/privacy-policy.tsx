@@ -23,14 +23,14 @@ export default function PrivacyPolicy() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl text-center">Privacy Policy</CardTitle>
-            <p className="text-center text-gray-600">My PetBB - Pet Care Management</p>
+            <p className="text-center text-gray-600">ASOPETS - Pet Care Management</p>
             <p className="text-center text-sm text-gray-500">Last updated: December 2024</p>
           </CardHeader>
           <CardContent className="prose prose-sm max-w-none">
             <section className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Information We Collect</h2>
               <p className="mb-3">
-                My PetBB collects information you provide directly to us, including:
+                ASOPETS collects information you provide directly to us, including:
               </p>
               <ul className="list-disc pl-6 mb-3 space-y-1">
                 <li>Account information (name, email address)</li>

@@ -184,9 +184,9 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
       const msg = {
         to: email,
         from: 'noreply@mypetbb.app',
-        subject: 'Reset Your My PetBB Password',
+        subject: 'Reset Your ASOPETS Password',
         html: emailHtml,
-        text: `Reset your My PetBB password by visiting: ${resetLink} (This link expires in 1 hour)`
+        text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`
       };
 
       await sgMail.send(msg);

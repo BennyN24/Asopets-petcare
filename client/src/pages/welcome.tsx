@@ -33,7 +33,7 @@ export default function Welcome() {
 
   const steps = [
     {
-      title: "Welcome to My PetBB",
+      title: "Welcome to ASOPETS",
       content: (
         <div className="text-center space-y-6">
           <div className="mx-auto w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center">

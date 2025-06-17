@@ -1,8 +1,8 @@
-# VetBB - Pet Care Management System
+# ASOPETS - Pet Care Management System
 
 ## Overview
 
-VetBB is a comprehensive pet care management application built as a full-stack web application with a mobile-first design. The system allows pet owners to manage their pets' medical records, track vaccinations, schedule reminders, and maintain complete health histories. The application uses modern web technologies with a focus on simplicity and user experience.
+ASOPETS is a comprehensive pet care management application built as a full-stack web application with a mobile-first design. The system allows pet owners to manage their pets' medical records, track vaccinations, schedule reminders, and maintain complete health histories. The application uses modern web technologies with a focus on simplicity and user experience.
 
 ## System Architecture
 
@@ -262,6 +262,13 @@ Changelog:
   * Added comprehensive email/password authentication system with signup page, email confirmation, password hashing, and session management, removing SMS authentication for a unified experience
 - June 16, 2025. Comprehensive pre-launch optimization and app store preparation:
   * Renamed application to "My PetBB" with updated branding throughout
+- June 17, 2025. Complete application rebranding to ASOPETS:
+  * Updated all branding from "My PetBB" to "ASOPETS" throughout application
+  * Modified PWA manifest, HTML metadata, and app titles
+  * Updated email templates for confirmation and password reset
+  * Changed service worker cache names and all user-facing text
+  * Updated Terms of Service and Privacy Policy documentation
+  * Completed comprehensive rebrand across all components and files
   * Implemented PWA functionality with service worker, manifest, and app icons
   * Created comprehensive error boundaries and loading states for crash prevention
   * Added Privacy Policy and Terms of Service pages for app store compliance
