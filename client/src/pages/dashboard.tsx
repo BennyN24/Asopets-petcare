@@ -7,13 +7,15 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin } from "lucide-react";
+import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode } from "lucide-react";
 import PetCard from "@/components/pet-card";
 import DashboardInsights from "@/components/dashboard-insights";
 import OfflineSyncIndicator from "@/components/offline-sync-indicator";
 import BottomNavigation from "@/components/bottom-navigation";
 import QuickActions from "@/components/quick-actions";
 import VetClinics from "@/components/vet-clinics";
+import QRScanner from "@/components/qr-scanner";
+import ScannedPetViewer from "@/components/scanned-pet-viewer";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
 export default function Dashboard() {
@@ -22,6 +24,8 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
   const [showVetClinics, setShowVetClinics] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scannedPetData, setScannedPetData] = useState<any>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -98,14 +102,22 @@ export default function Dashboard() {
               Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
             </p>
           </div>
-          <button className="relative" onClick={() => setLocation("/schedule")}>
-            <Bell className="w-6 h-6" />
-            {totalNotifications > 0 && (
-              <span className="notification-badge warning">
-                {totalNotifications}
-              </span>
-            )}
-          </button>
+          <div className="flex items-center space-x-3">
+            <button 
+              className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+              onClick={() => setShowQRScanner(true)}
+            >
+              <QrCode className="w-5 h-5" />
+            </button>
+            <button className="relative" onClick={() => setLocation("/schedule")}>
+              <Bell className="w-6 h-6" />
+              {totalNotifications > 0 && (
+                <span className="notification-badge warning">
+                  {totalNotifications}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
       {/* Content */}

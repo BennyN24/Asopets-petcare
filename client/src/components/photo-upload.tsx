@@ -30,11 +30,11 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
       return;
     }
 
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (2MB limit for mobile compatibility)
+    if (file.size > 2 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "Please select an image smaller than 5MB.",
+        description: "Please select an image smaller than 2MB.",
         variant: "destructive",
       });
       return;
@@ -43,26 +43,47 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
     setIsUploading(true);
 
     try {
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setPreview(result);
-      };
-      reader.readAsDataURL(file);
-
-      // For now, we'll use the data URL as the image URL
-      // In production, you'd upload to a cloud service like AWS S3, Cloudinary, etc.
-      const reader2 = new FileReader();
-      reader2.onload = (e) => {
-        const result = e.target?.result as string;
-        onPhotoUploaded(result);
+      // Create compressed preview for mobile
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate dimensions to maintain aspect ratio with max 800px width
+        const maxWidth = 800;
+        const maxHeight = 600;
+        let { width, height } = img;
+        
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Convert to base64 with compression
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        setPreview(compressedDataUrl);
+        onPhotoUploaded(compressedDataUrl);
+        
         toast({
           title: "Photo uploaded",
           description: "Your photo has been uploaded successfully.",
         });
       };
-      reader2.readAsDataURL(file);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
 
     } catch (error) {
       toast({
