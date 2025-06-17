@@ -78,7 +78,7 @@ if (process.env.SENDGRID_API_KEY) {
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+  const baseUrl = process.env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/api/auth/confirm-email?token=${encodeURIComponent(token)}`;
 
   // Always log the confirmation link for testing
@@ -95,7 +95,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         <html>
         <head>
           <meta charset="utf-8">
-          <title>Confirm Your ASOPETS Account</title>
+          <title>Confirm Your ASOPets Account</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -109,9 +109,9 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
           <div class="container">
             <div class="header">
               <div class="logo">🐾</div>
-              <h1>Welcome to ASOPETS!</h1>
+              <h1>Welcome to ASOPets!</h1>
             </div>
-            <p>Thank you for signing up for ASOPETS - your comprehensive pet care management companion.</p>
+            <p>Thank you for signing up for ASOPets - your comprehensive pet care management companion.</p>
             <p>To complete your account setup and start managing your pet's health records, please confirm your email address by clicking the button below:</p>
             <div style="text-align: center;">
               <a href="${confirmationLink}" class="button" style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0;">Confirm Email Address</a>
@@ -121,8 +121,8 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
             <p><strong>Important:</strong> This link is unique to your account and should not be shared with others.</p>
             <p>This confirmation link will expire in 24 hours for security purposes.</p>
             <div class="footer">
-              <p>If you didn't create an ASOPETS account, you can safely ignore this email.</p>
-              <p>© 2024 ASOPETS. All rights reserved.</p>
+              <p>If you didn't create an ASOPets account, you can safely ignore this email.</p>
+              <p>© 2024 ASOPets. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -132,19 +132,19 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
       const msg: any = {
         to: email,
         from: "support@asopets.com",
-        subject: "Confirm Your ASOPETS Account",
+        subject: "Confirm Your ASOPets Account",
         html: emailHtml,
-        text: `Welcome to ASOPETS! Please confirm your email address by visiting: ${confirmationLink}`,
+        text: `Welcome to ASOPets! Please confirm your email address by visiting: ${confirmationLink}`,
         trackingSettings: {
           clickTracking: {
-            enable: false
-          }
-        }
+            enable: false,
+          },
+        },
       };
-      
+
       const result = await sgMail.send(msg);
       console.log(`Confirmation email sent to ${email}`);
-      console.log('SendGrid response:', result[0].statusCode, result[0].body);
+      console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
       // Development mode - log the link
       console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
@@ -155,7 +155,10 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
   } catch (error: any) {
     console.error("Failed to send confirmation email:", error);
     if (error.response?.body?.errors) {
-      console.error("SendGrid detailed errors:", JSON.stringify(error.response.body.errors, null, 2));
+      console.error(
+        "SendGrid detailed errors:",
+        JSON.stringify(error.response.body.errors, null, 2),
+      );
     }
     if (error.code) {
       console.error("SendGrid error code:", error.code);
@@ -185,7 +188,7 @@ export const sendPasswordResetEmail = async (
         <html>
         <head>
           <meta charset="utf-8">
-          <title>Reset Your ASOPETS Password</title>
+          <title>Reset Your ASOPets Password</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -202,7 +205,7 @@ export const sendPasswordResetEmail = async (
               <div class="logo">🔒</div>
               <h1>Password Reset Request</h1>
             </div>
-            <p>We received a request to reset your ASOPETS account password.</p>
+            <p>We received a request to reset your ASOPets account password.</p>
             <p>If you made this request, click the button below to reset your password:</p>
             <div style="text-align: center;">
               <a href="${resetLink}" class="button" style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0;">Reset Password</a>
@@ -215,7 +218,7 @@ export const sendPasswordResetEmail = async (
             </div>
             <div class="footer">
               <p>If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
-              <p>© 2024 ASOPETS. All rights reserved.</p>
+              <p>© 2025 ASOPets. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -225,19 +228,19 @@ export const sendPasswordResetEmail = async (
       const msg: any = {
         to: email,
         from: "support@asopets.com",
-        subject: "Reset Your ASOPETS Password",
+        subject: "Reset Your ASOPets Password",
         html: emailHtml,
-        text: `Reset your ASOPETS password by visiting: ${resetLink} (This link expires in 1 hour)`,
+        text: `Reset your ASOPets password by visiting: ${resetLink} (This link expires in 1 hour)`,
         trackingSettings: {
           clickTracking: {
-            enable: false
-          }
-        }
+            enable: false,
+          },
+        },
       };
-      
+
       const result = await sgMail.send(msg);
       console.log(`Password reset email sent to ${email}`);
-      console.log('SendGrid response:', result[0].statusCode, result[0].body);
+      console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
       console.log(`Password reset link for ${email}: ${resetLink}`);
       console.log(
@@ -247,7 +250,10 @@ export const sendPasswordResetEmail = async (
   } catch (error: any) {
     console.error("Failed to send password reset email:", error);
     if (error.response?.body?.errors) {
-      console.error("SendGrid detailed errors:", JSON.stringify(error.response.body.errors, null, 2));
+      console.error(
+        "SendGrid detailed errors:",
+        JSON.stringify(error.response.body.errors, null, 2),
+      );
     }
     if (error.code) {
       console.error("SendGrid error code:", error.code);
