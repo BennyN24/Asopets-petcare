@@ -30,6 +30,7 @@ import TermsOfService from "@/pages/terms-of-service";
 import Welcome from "@/pages/welcome";
 import ResetPassword from "@/pages/reset-password";
 import ForgotPassword from "@/pages/forgot-password";
+import EmailConfirmed from "@/pages/email-confirmed";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -46,6 +47,7 @@ function Router() {
           <Route path="/signup" component={Signup} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/email-confirmed" component={EmailConfirmed} />
           <Route path="/landing" component={Landing} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />

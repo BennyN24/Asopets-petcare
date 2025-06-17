@@ -7,7 +7,7 @@ interface PetCardProps {
   reminders: Reminder[];
 }
 
-export default function PetCard({ pet, reminders }: PetCardProps) {
+export default memo(function PetCard({ pet, reminders }: PetCardProps) {
   const [, setLocation] = useLocation();
   
   const getCategoryIcon = (category: string) => {
