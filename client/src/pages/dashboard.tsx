@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode } from "lucide-react";
+import { PageLoader } from "@/components/loading-spinner";
 import PetCard from "@/components/pet-card";
 import DashboardInsights from "@/components/dashboard-insights";
 import OfflineSyncIndicator from "@/components/offline-sync-indicator";
