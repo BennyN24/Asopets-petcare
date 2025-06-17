@@ -295,6 +295,11 @@ Changelog:
   * Added show/hide password toggle with eye icons to login page for better UX
   * Fixed email link endpoints to ensure proper routing and functionality
   * Verified complete authentication flow: signup → email confirmation → password reset → login working perfectly
+  * Fixed Entity Too Large error for mobile pet uploads by increasing server payload limits to 10MB
+  * Enhanced photo upload with automatic compression (800x600 max, 70% quality) for mobile compatibility
+  * Added QR code scanner feature to dashboard for exchanging pet profile data
+  * Created comprehensive scanned pet viewer with owner contact information display
+  * Implemented mobile-optimized QR scanning with camera access and demo functionality
 ```
 
 ## User Preferences

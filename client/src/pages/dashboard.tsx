@@ -220,6 +220,29 @@ export default function Dashboard() {
         </div>
       )}
 
+      {showQRScanner && (
+        <QRScanner 
+          onClose={() => setShowQRScanner(false)}
+          onScanSuccess={(data) => {
+            setShowQRScanner(false);
+            if (data.type === "pet_profile") {
+              setScannedPetData(data);
+              toast({
+                title: "Pet Profile Scanned",
+                description: `Found ${data.name} - ${data.breed}`,
+              });
+            }
+          }}
+        />
+      )}
+
+      {scannedPetData && (
+        <ScannedPetViewer 
+          data={scannedPetData}
+          onClose={() => setScannedPetData(null)}
+        />
+      )}
+
       <BottomNavigation activeTab="home" />
     </div>
   );
