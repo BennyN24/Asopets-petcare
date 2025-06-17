@@ -125,6 +125,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/auth/resend-confirmation', async (req: any, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists for security
+        return res.json({ message: "If the email exists and is unconfirmed, a new confirmation email has been sent." });
+      }
+
+      if (user.isEmailConfirmed) {
+        return res.status(400).json({ message: "This email is already confirmed. You can log in now." });
+      }
+
+      // Generate new confirmation token
+      const newToken = generateToken();
+      await storage.updateUser(user.id, {
+        emailConfirmationToken: newToken,
+        emailConfirmationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      });
+
+      // Send new confirmation email
+      await sendConfirmationEmail(email, newToken);
+
+      res.json({ message: "A new confirmation email has been sent. Please check your inbox." });
+    } catch (error) {
+      console.error("Resend confirmation error:", error);
+      res.status(500).json({ message: "Failed to resend confirmation email" });
+    }
+  });
+
   app.post('/api/auth/logout', (req: any, res) => {
     req.session.destroy((err: any) => {
       if (err) {

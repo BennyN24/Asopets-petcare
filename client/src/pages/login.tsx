@@ -38,6 +38,9 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [lastEmailAttempt, setLastEmailAttempt] = useState("");
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -49,18 +52,63 @@ export default function Login() {
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
+    setShowResendConfirmation(false);
     try {
       await apiRequest("POST", "/api/auth/login", data);
       setLocation("/");
     } catch (error: any) {
-      toast({
-        title: "Login failed",
-        description:
-          error.message || "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
+      if (error.message?.includes("confirm your email")) {
+        setShowResendConfirmation(true);
+        setLastEmailAttempt(data.email);
+        toast({
+          title: "Email confirmation required",
+          description: "Please confirm your email before logging in. Click 'Resend Confirmation' if you didn't receive the email.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Login failed",
+          description:
+            error.message || "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!lastEmailAttempt) return;
+    
+    setIsResending(true);
+    try {
+      await apiRequest("POST", "/api/auth/resend-confirmation", { 
+        email: lastEmailAttempt 
+      });
+      toast({
+        title: "Confirmation email sent",
+        description: "Please check your inbox and spam folder for the confirmation email.",
+        variant: "default",
+      });
+      setShowResendConfirmation(false);
+    } catch (error: any) {
+      if (error.message?.includes("already confirmed")) {
+        toast({
+          title: "Email already confirmed",
+          description: "Your email is already confirmed. You can log in now.",
+          variant: "default",
+        });
+        setShowResendConfirmation(false);
+      } else {
+        toast({
+          title: "Failed to resend",
+          description: error.message || "Failed to resend confirmation email. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -142,6 +190,39 @@ export default function Login() {
                 </Button>
               </form>
             </Form>
+
+            {/* Resend Confirmation Email Section */}
+            {showResendConfirmation && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm text-blue-800 mb-3">
+                      Didn't receive the confirmation email? We can send you a new one.
+                    </p>
+                    <Button
+                      onClick={handleResendConfirmation}
+                      disabled={isResending}
+                      size="sm"
+                      variant="outline"
+                      className="w-full border-blue-300 text-blue-700 hover:bg-blue-100"
+                    >
+                      {isResending ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Resend Confirmation Email
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 text-center space-y-3">
               <p className="text-sm text-gray-600">
