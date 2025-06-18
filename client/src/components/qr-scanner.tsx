@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 // @ts-ignore
 import jsQR from "jsqr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,16 +15,16 @@ interface QRScannerProps {
 }
 
 export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
-  const [isScanning, setIsScanning] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [stream, setStream] = React.useState<MediaStream | null>(null);
-  const [scanSuccess, setScanSuccess] = React.useState(false);
-  const [scannedPetCategory, setScannedPetCategory] = React.useState<string>("other");
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [scanSuccess, setScanSuccess] = useState(false);
+  const [scannedPetCategory, setScannedPetCategory] = useState<string>("other");
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());

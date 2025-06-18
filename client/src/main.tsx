@@ -1,12 +1,7 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-
-// Ensure React is globally available for all dependencies
-if (typeof window !== 'undefined') {
-  (window as any).React = React;
-}
 
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
@@ -23,5 +18,10 @@ if ('serviceWorker' in navigator) {
 
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error('Failed to find the root element');
+
 const root = createRoot(rootElement);
-root.render(<App />);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);

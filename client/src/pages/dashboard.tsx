@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,11 +23,10 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = React.useState("overview");
-  const [showVetClinics, setShowVetClinics] = React.useState(false);
-  const [showQRScanner, setShowQRScanner] = React.useState(false);
-  const [scannedPetData, setScannedPetData] = React.useState<any>(null);
-  const [scannedPets, setScannedPets] = React.useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showVetClinics, setShowVetClinics] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scannedPetData, setScannedPetData] = useState<any>(null);
 
   const handleQRScanSuccess = async (data: any) => {
     try {
@@ -54,20 +53,13 @@ export default function Dashboard() {
     }
   };
 
-  // Redirect to login if not authenticated
-  React.useEffect(() => {
+  // Handle authentication redirect
+  useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
+      window.location.href = "/";
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [isAuthenticated, isLoading]);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],

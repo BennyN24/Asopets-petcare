@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,9 +90,9 @@ export default function Profile() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isEditingProfile, setIsEditingProfile] = React.useState(false);
-  const [showContactForm, setShowContactForm] = React.useState(false);
-  const [profileData, setProfileData] = React.useState<UserProfile>({
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [profileData, setProfileData] = useState<UserProfile>({
     id: "",
     firstName: "",
     lastName: "",
@@ -114,7 +114,7 @@ export default function Profile() {
   });
 
   // Initialize profile data when user loads
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       const userData = user as Record<string, any>;
       setProfileData({

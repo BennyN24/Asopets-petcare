@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -20,10 +20,10 @@ export default function PetProfile() {
   const petId = parseInt(id || "0");
   
   // Get URL parameters to determine initial tab
-  const [activeTab, setActiveTab] = React.useState('overview');
+  const [activeTab, setActiveTab] = useState('overview');
   
   // Handle URL parameters for tab switching
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     if (tabParam && ['overview', 'records', 'qr', 'info'].includes(tabParam)) {
@@ -34,7 +34,7 @@ export default function PetProfile() {
   }, []);
   
   // Also check for URL changes (in case user navigates back/forward)
-  React.useEffect(() => {
+  useEffect(() => {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const tabParam = urlParams.get('tab');
@@ -64,7 +64,7 @@ export default function PetProfile() {
     enabled: !!petId,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (petError && isUnauthorizedError(petError as Error)) {
       toast({
         title: "Unauthorized",

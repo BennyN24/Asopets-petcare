@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 interface FloatingParticlesProps {
   show: boolean;
 }
 
 export default function FloatingParticles({ show }: FloatingParticlesProps) {
-  const [particles, setParticles] = React.useState<Array<{id: number, x: number, y: number}>>([]);
+  const [particles, setParticles] = useState<Array<{id: number, x: number, y: number}>>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (show) {
       const newParticles = Array.from({ length: 8 }, (_, i) => ({
         id: i,

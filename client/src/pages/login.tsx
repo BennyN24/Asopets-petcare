@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,11 +39,11 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [showResendConfirmation, setShowResendConfirmation] = React.useState(false);
-  const [isResending, setIsResending] = React.useState(false);
-  const [lastEmailAttempt, setLastEmailAttempt] = React.useState("");
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [lastEmailAttempt, setLastEmailAttempt] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
