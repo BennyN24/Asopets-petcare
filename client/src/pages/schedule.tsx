@@ -26,7 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/bottom-navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Label } from "@/components/ui/label";
 
 export default function Schedule() {
