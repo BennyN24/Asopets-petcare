@@ -50,6 +50,7 @@ interface UserProfile {
   emergencyContact?: string;
   emergencyPhone?: string;
   preferredLanguage?: string;
+  profileImageUrl?: string;
   notificationPreferences?: {
     email: boolean;
     sms: boolean;
@@ -100,6 +101,7 @@ export default function Profile() {
         emergencyContact: userData?.emergencyContact || "",
         emergencyPhone: userData?.emergencyPhone || "",
         preferredLanguage: userData?.preferredLanguage || "en",
+        profileImageUrl: userData?.profileImageUrl || "",
         notificationPreferences: userData?.notificationPreferences || {
           email: true,
           sms: false,
@@ -354,7 +356,7 @@ export default function Profile() {
                 {isEditingProfile && (
                   <div className="absolute -bottom-1 -right-1">
                     <PhotoUpload
-                      onPhotoUploaded={(url) => handleInputChange('profileImageUrl', url)}
+                      onPhotoUploaded={(url: string) => handleInputChange('profileImageUrl', url)}
                       currentPhoto={profileData.profileImageUrl}
                       className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm hover:bg-primary/90 transition-colors"
                     />
@@ -433,7 +435,7 @@ export default function Profile() {
                   )}
                 </div>
                 <PhotoUpload
-                  onPhotoUploaded={(url) => handleInputChange('profileImageUrl', url)}
+                  onPhotoUploaded={(url: string) => handleInputChange('profileImageUrl', url)}
                   currentPhoto={profileData.profileImageUrl}
                   className="flex items-center space-x-2 text-sm text-primary hover:text-primary/80 transition-colors"
                 />
