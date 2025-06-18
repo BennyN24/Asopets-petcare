@@ -126,10 +126,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: string, userData: UpdateUser): Promise<User> {
+    // Filter out empty string dates and undefined values
+    const cleanedData = Object.fromEntries(
+      Object.entries(userData).filter(([key, value]) => 
+        value !== '' && value !== undefined && value !== null
+      )
+    );
+
     const [user] = await db
       .update(users)
       .set({
-        ...userData,
+        ...cleanedData,
         updatedAt: new Date(),
       })
       .where(eq(users.id, id))

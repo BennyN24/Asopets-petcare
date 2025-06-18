@@ -77,6 +77,7 @@ export default function Profile() {
     emergencyContact: "",
     emergencyPhone: "",
     preferredLanguage: "en",
+    profileImageUrl: "",
     notificationPreferences: {
       email: true,
       sms: false,
@@ -291,11 +292,29 @@ export default function Profile() {
     }).format(amount);
   };
 
-  const handleSaveProfile = () => {
-    updateProfileMutation.mutate(profileData);
+  const handleSaveProfile = async () => {
+    try {
+      // Filter out empty strings and null values
+      const cleanData = Object.fromEntries(
+        Object.entries({
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          phone: profileData.phone,
+          address: profileData.address,
+          emergencyContact: profileData.emergencyContact,
+          emergencyPhone: profileData.emergencyPhone,
+          profileImageUrl: profileData.profileImageUrl,
+        }).filter(([key, value]) => value !== "" && value !== null && value !== undefined)
+      );
+
+      await updateProfileMutation.mutateAsync(cleanData);
+      setIsEditingProfile(false);
+    } catch (error) {
+      // Error is handled by the mutation's onError
+    }
   };
 
-  const handleInputChange = (field: keyof UserProfile, value: string) => {
+  const handleInputChange = (field: string, value: string) => {
     setProfileData(prev => ({
       ...prev,
       [field]: value

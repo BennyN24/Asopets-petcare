@@ -25,16 +25,17 @@ import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/bottom-navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Label } from "@/components/ui/label";
 
 export default function Schedule() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<"upcoming" | "completed">("upcoming");
+  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedPet, setSelectedPet] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "type" | "pet">("date");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [filterType, setFilterType] = useState<string>("all");
-  const [filterPet, setFilterPet] = useState<string>("all");
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],
@@ -168,77 +169,85 @@ export default function Schedule() {
 
   return (
     <div className="mobile-container pb-20">
-      {/* Header */}
-      <div className="bg-primary text-white p-4">
-        <div className="flex items-center">
-          <Calendar className="w-6 h-6 mr-3" />
-          <div>
-            <h1 className="text-xl font-bold">Schedule</h1>
-            <p className="text-green-100 text-sm">
-              {activeReminders.length} active reminder{activeReminders.length !== 1 ? 's' : ''}
-            </p>
-          </div>
+      <div className="p-4 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Schedule</h1>
         </div>
-        
-        {/* Filters and Sorting */}
-        <div className="mt-4 flex flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-green-100" />
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-32 bg-white text-gray-900">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="vaccine">Vaccine</SelectItem>
-                <SelectItem value="deworming">Deworming</SelectItem>
-                <SelectItem value="treatment">Treatment</SelectItem>
-                <SelectItem value="checkup">Checkup</SelectItem>
-                <SelectItem value="grooming">Grooming</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <Select value={filterPet} onValueChange={setFilterPet}>
-            <SelectTrigger className="w-32 bg-white text-gray-900">
-              <SelectValue placeholder="Pet" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Pets</SelectItem>
-              {pets.map(pet => (
-                <SelectItem key={pet.id} value={pet.id.toString()}>
-                  {pet.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <div className="flex items-center gap-1">
-            <Select value={sortBy} onValueChange={(value: "date" | "type" | "pet") => setSortBy(value)}>
-              <SelectTrigger className="w-24 bg-white text-gray-900">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="type">Type</SelectItem>
-                <SelectItem value="pet">Pet</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white text-gray-900 border-white"
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            >
-              {sortOrder === "asc" ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
-            </Button>
-          </div>
-        </div>
-      </div>
 
-      <div className="p-4">
-        <Tabs defaultValue="upcoming" className="w-full">
+        {/* Filter Controls - Moved above tabs */}
+        <div className="bg-white rounded-lg border shadow-sm p-4">
+          <div className="flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-700">Filter & Sort</h3>
+              {(selectedType !== "all" || selectedPet !== "all" || sortBy !== "date") && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-xs text-gray-500 hover:text-gray-700"
+                >
+                  Clear filters
+                </Button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Type Filter */}
+              <div>
+                <Label className="text-xs text-gray-600">Type</Label>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="All types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All types</SelectItem>
+                    <SelectItem value="vaccine">Vaccine</SelectItem>
+                    <SelectItem value="deworming">Deworming</SelectItem>
+                    <SelectItem value="treatment">Treatment</SelectItem>
+                    <SelectItem value="surgery">Surgery</SelectItem>
+                    <SelectItem value="checkup">Checkup</SelectItem>
+                    <SelectItem value="grooming">Grooming</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Pet Filter */}
+              <div>
+                <Label className="text-xs text-gray-600">Pet</Label>
+                <Select value={selectedPet} onValueChange={setSelectedPet}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="All pets" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All pets</SelectItem>
+                    {pets.map((pet) => (
+                      <SelectItem key={pet.id} value={pet.id.toString()}>
+                        {pet.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Options */}
+              <div>
+                <Label className="text-xs text-gray-600">Sort by</Label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date">Due Date</SelectItem>
+                    <SelectItem value="type">Type</SelectItem>
+                    <SelectItem value="pet">Pet Name</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
             <TabsTrigger value="completed">Completed</TabsTrigger>
