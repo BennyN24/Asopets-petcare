@@ -146,8 +146,8 @@ export default function MedicalRecordForm({
               />
 
               {/* Photo Upload - Multiple attachments */}
-              <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-3">Photo Attachments (Optional)</Label>
+              <div className="space-y-3">
+                <Label className="block text-sm font-medium text-gray-700">Photo Attachments (Optional)</Label>
                 <MultiPhotoUpload
                   onPhotosUploaded={(photos) => {
                     form.setValue('attachments', photos);

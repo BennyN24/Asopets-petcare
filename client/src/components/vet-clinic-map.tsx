@@ -183,7 +183,7 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
                           <div className="flex items-center space-x-1">
                             <Star className="w-3 h-3 text-yellow-400 fill-current" />
                             <span className="text-xs text-gray-600">
-                              {clinic.averageRating ? clinic.averageRating.toFixed(1) : 'No ratings'}
+                              {clinic.averageRating ? Number(clinic.averageRating).toFixed(1) : 'No ratings'}
                             </span>
                           </div>
                           
