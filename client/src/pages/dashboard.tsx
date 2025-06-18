@@ -91,7 +91,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Welcome back!</h1>
-            <p className="text-green-100 text-sm">
+            <p className="text-white/80 text-sm">
               Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
             </p>
           </div>

@@ -348,6 +348,7 @@ export default function Profile() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <User className="w-6 h-6 mr-3" />
+            <div>
               <h1 className="text-xl font-bold">Profile</h1>
               <p className="text-white/80 text-sm">
                 Account & Settings
