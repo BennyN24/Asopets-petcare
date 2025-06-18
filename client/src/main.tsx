@@ -1,6 +1,10 @@
+import * as React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+
+// Ensure React is globally available for all dependencies
+(window as any).React = React;
 
 // Register service worker for PWA functionality
 if ('serviceWorker' in navigator) {
@@ -15,4 +19,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error('Failed to find the root element');
+const root = createRoot(rootElement);
+root.render(<App />);

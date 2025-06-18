@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,14 +23,14 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showVetClinics, setShowVetClinics] = useState(false);
-  const [showQRScanner, setShowQRScanner] = useState(false);
-  const [scannedPetData, setScannedPetData] = useState<any>(null);
-  const [scannedPets, setScannedPets] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = React.useState("overview");
+  const [showVetClinics, setShowVetClinics] = React.useState(false);
+  const [showQRScanner, setShowQRScanner] = React.useState(false);
+  const [scannedPetData, setScannedPetData] = React.useState<any>(null);
+  const [scannedPets, setScannedPets] = React.useState<any[]>([]);
 
   // Redirect to login if not authenticated
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",
@@ -91,25 +91,32 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Welcome back!</h1>
-            <p className="text-green-100 text-sm">
+            <p className="text-white/80 text-sm">
               Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <button 
-              className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
               onClick={() => setShowQRScanner(true)}
             >
               <QrCode className="w-5 h-5" />
-            </button>
-            <button className="relative" onClick={() => setLocation("/schedule")}>
-              <Bell className="w-6 h-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 relative p-2"
+              onClick={() => setLocation("/schedule")}
+            >
+              <Bell className="w-5 h-5" />
               {totalNotifications > 0 && (
-                <span className="notification-badge warning">
-                  {totalNotifications}
-                </span>
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {totalNotifications > 9 ? '9+' : totalNotifications}
+                </div>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -218,11 +225,18 @@ export default function Dashboard() {
           onClose={() => setShowQRScanner(false)}
           onScanSuccess={(data) => {
             setShowQRScanner(false);
-            if (data.type === "pet_profile") {
+            if (data.type === "pet-profile") {
               setScannedPetData(data);
+              
+              // Add to scanned pets list if not already present
+              const exists = scannedPets.some(pet => pet.petId === data.petId);
+              if (!exists) {
+                setScannedPets(prev => [...prev, data]);
+              }
+              
               toast({
                 title: "Pet Profile Scanned",
-                description: `Found ${data.name} - ${data.breed}`,
+                description: `Successfully scanned ${data.name}'s profile!`,
               });
             }
           }}

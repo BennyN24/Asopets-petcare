@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,11 +27,11 @@ export default function AddPet() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<PetCategory | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const [selectedCategory, setSelectedCategory] = React.useState<PetCategory | null>(null);
+  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const cameraInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<InsertPet>({
     resolver: zodResolver(insertPetSchema.omit({ userId: true })),

@@ -260,6 +260,21 @@ Changelog:
   * Removed bouncing animation from notifications and implemented native push notifications for mobile devices with pet emojis and urgency-based behavior
   * Removed Replit branding and authentication from login page, simplified to SMS-only authentication for cleaner user experience
   * Added comprehensive email/password authentication system with signup page, email confirmation, password hashing, and session management, removing SMS authentication for a unified experience
+- June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
+  * Added advanced sorting and filtering to schedule page with type, pet, and date options
+  * Fixed completed reminders to display completion dates with proper formatting
+  * Implemented multi-photo upload system for medical records with up to 3 images per record
+  * Fixed medical record form to use MultiPhotoUpload component instead of duplicated inputs
+  * Enhanced vet clinic system with proper location services and fallback for Manila coordinates
+  * Fixed all TypeScript errors in database queries and component interactions
+  * Optimized reminder notification timing to show exactly 1 day before due dates
+  * Added comprehensive filtering controls in schedule header with professional UI design
+  * Removed Notes field from medical record forms for cleaner interface
+  * Added profile photo upload functionality for user profiles with camera and gallery options
+  * Fixed profile photo upload date validation error by filtering empty values in database updates
+  * Moved schedule sort/filter controls above the Upcoming/Completed tabs for better UX
+  * Fixed schedule filtering logic to properly filter reminders by type and pet
+  * Fixed duplicate CardContent issue in photo-upload component with redundant click handlers
 - June 16, 2025. Comprehensive pre-launch optimization and app store preparation:
   * Renamed application to "My PetBB" with updated branding throughout
 - June 17, 2025. Complete application rebranding to ASOPETS:

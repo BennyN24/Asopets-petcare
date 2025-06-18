@@ -11,8 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Camera, Upload, Bell, X, Image } from "lucide-react";
-import { useState, useRef } from "react";
+import { ArrowLeft, Bell } from "lucide-react";
+import { useState } from "react";
+import MultiPhotoUpload from "@/components/multi-photo-upload";
 
 interface ExtraField {
   name: keyof InsertMedicalRecord;
@@ -45,64 +46,13 @@ export default function MedicalRecordForm({
 }: MedicalRecordFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<InsertMedicalRecord>({
     resolver: zodResolver(insertMedicalRecordSchema),
     defaultValues,
   });
 
-  const handleFileSelect = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Error",
-        description: "Please select an image file",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    setIsUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string;
-        setSelectedImage(dataUrl);
-        form.setValue('imageUrl', dataUrl);
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to process image",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleCameraCapture = () => {
-    if (cameraInputRef.current) {
-      cameraInputRef.current.click();
-    }
-  };
-
-  const handleFileUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const removeSelectedImage = () => {
-    setSelectedImage(null);
-    form.setValue('imageUrl', '');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    if (cameraInputRef.current) cameraInputRef.current.value = '';
-  };
 
   const createRecordMutation = useMutation({
     mutationFn: async (data: InsertMedicalRecord) => {
@@ -195,78 +145,17 @@ export default function MedicalRecordForm({
                 )}
               />
 
-              {/* Photo Upload - Moved below record type */}
-              <div>
-                <Label className="block text-sm font-medium text-gray-700 mb-3">
-                  Upload Certificate/Record Photo
-                </Label>
-                
-                {/* Hidden file inputs */}
-                <input
-                  ref={cameraInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileSelect(file);
+              {/* Photo Upload - Multiple attachments */}
+              <div className="space-y-3">
+                <Label className="block text-sm font-medium text-gray-700">Photo Attachments (Optional)</Label>
+                <MultiPhotoUpload
+                  onPhotosUploaded={(photos) => {
+                    form.setValue('attachments', photos);
                   }}
-                  className="hidden"
+                  currentPhotos={form.watch('attachments') || []}
+                  maxPhotos={3}
+                  className="w-full"
                 />
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileSelect(file);
-                  }}
-                  className="hidden"
-                />
-
-                {selectedImage ? (
-                  <div className="relative">
-                    <img
-                      src={selectedImage}
-                      alt="Medical record preview"
-                      className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeSelectedImage}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    <button 
-                      type="button" 
-                      onClick={handleCameraCapture}
-                      disabled={isUploading}
-                      className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-gray-50 transition-colors"
-                    >
-                      <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm text-gray-600">Take Photo</span>
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={handleFileUpload}
-                      disabled={isUploading}
-                      className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-gray-50 transition-colors"
-                    >
-                      <Image className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm text-gray-600">Choose Photo</span>
-                    </button>
-                  </div>
-                )}
-                
-                {isUploading && (
-                  <div className="mt-2 text-center">
-                    <span className="text-sm text-gray-500">Processing image...</span>
-                  </div>
-                )}
               </div>
 
               <FormField
@@ -353,27 +242,6 @@ export default function MedicalRecordForm({
                   )}
                 />
               ))}
-
-
-
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Any additional notes or reactions"
-                        className="h-24 resize-none"
-                        {...field}
-                        value={field.value || ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               {/* Reminder Settings */}
               <div className="bg-blue-50 p-4 rounded-lg">

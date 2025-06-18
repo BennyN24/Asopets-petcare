@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, Upload, X, Image as ImageIcon } from "lucide-react";
@@ -11,9 +11,9 @@ interface PhotoUploadProps {
 }
 
 export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className = "" }: PhotoUploadProps) {
-  const [preview, setPreview] = useState<string | null>(currentPhoto || null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = React.useState<string | null>(currentPhoto || null);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,10 +140,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
           </CardContent>
         </Card>
       ) : (
-        <Card 
-          className="border-2 border-dashed border-gray-300 hover:border-primary transition-colors cursor-pointer"
-          onClick={triggerFileInput}
-        >
+        <Card className="border-2 border-dashed border-gray-300 hover:border-primary transition-colors">
           <CardContent className="p-6">
             <div className="text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -165,10 +162,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                   variant="outline"
                   size="sm"
                   disabled={isUploading}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    triggerFileInput();
-                  }}
+                  onClick={triggerFileInput}
                 >
                   <Upload className="w-4 h-4 mr-1" />
                   Choose File
@@ -178,11 +172,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                   variant="outline"
                   size="sm"
                   disabled={isUploading}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // In a real app, you might trigger camera capture here
-                    triggerFileInput();
-                  }}
+                  onClick={triggerFileInput}
                 >
                   <Camera className="w-4 h-4 mr-1" />
                   Camera

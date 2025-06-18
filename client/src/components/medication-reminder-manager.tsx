@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -14,8 +14,8 @@ export default function MedicationReminderManager() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [snoozedReminders, setSnoozedReminders] = useState<Set<number>>(new Set());
-  const [dismissedReminders, setDismissedReminders] = useState<Set<number>>(new Set());
+  const [snoozedReminders, setSnoozedReminders] = React.useState<Set<number>>(new Set());
+  const [dismissedReminders, setDismissedReminders] = React.useState<Set<number>>(new Set());
 
   // Fetch active reminders with pet details
   const { data: reminders = [] } = useQuery<ReminderWithPet[]>({
@@ -108,7 +108,7 @@ export default function MedicationReminderManager() {
   });
 
   // Show notification permission request for urgent reminders
-  useEffect(() => {
+  React.useEffect(() => {
     if (urgentReminders.length > 0 && "Notification" in window) {
       if (Notification.permission === "default") {
         Notification.requestPermission().then(permission => {

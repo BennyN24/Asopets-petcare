@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +32,7 @@ import {
   UserCircle,
   ContactRound
 } from "lucide-react";
+import PhotoUpload from "@/components/photo-upload";
 import { format } from "date-fns";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -50,6 +51,7 @@ interface UserProfile {
   emergencyContact?: string;
   emergencyPhone?: string;
   preferredLanguage?: string;
+  profileImageUrl?: string;
   notificationPreferences?: {
     email: boolean;
     sms: boolean;
@@ -75,6 +77,7 @@ export default function Profile() {
     emergencyContact: "",
     emergencyPhone: "",
     preferredLanguage: "en",
+    profileImageUrl: "",
     notificationPreferences: {
       email: true,
       sms: false,
@@ -84,7 +87,7 @@ export default function Profile() {
   });
 
   // Initialize profile data when user loads
-  useEffect(() => {
+  React.useEffect(() => {
     if (user) {
       const userData = user as Record<string, any>;
       setProfileData({
@@ -100,6 +103,7 @@ export default function Profile() {
         emergencyContact: userData?.emergencyContact || "",
         emergencyPhone: userData?.emergencyPhone || "",
         preferredLanguage: userData?.preferredLanguage || "en",
+        profileImageUrl: userData?.profileImageUrl || "",
         notificationPreferences: userData?.notificationPreferences || {
           email: true,
           sms: false,
@@ -288,11 +292,29 @@ export default function Profile() {
     }).format(amount);
   };
 
-  const handleSaveProfile = () => {
-    updateProfileMutation.mutate(profileData);
+  const handleSaveProfile = async () => {
+    try {
+      // Filter out empty strings and null values
+      const cleanData = Object.fromEntries(
+        Object.entries({
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          phone: profileData.phone,
+          address: profileData.address,
+          emergencyContact: profileData.emergencyContact,
+          emergencyPhone: profileData.emergencyPhone,
+          profileImageUrl: profileData.profileImageUrl,
+        }).filter(([key, value]) => value !== "" && value !== null && value !== undefined)
+      );
+
+      await updateProfileMutation.mutateAsync(cleanData);
+      setIsEditingProfile(false);
+    } catch (error) {
+      // Error is handled by the mutation's onError
+    }
   };
 
-  const handleInputChange = (field: keyof UserProfile, value: string) => {
+  const handleInputChange = (field: string, value: string) => {
     setProfileData(prev => ({
       ...prev,
       [field]: value
@@ -323,13 +345,33 @@ export default function Profile() {
     <div className="mobile-container mobile-safe pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-4">
-        <div className="flex items-center">
-          <User className="w-6 h-6 mr-3" />
-          <div>
-            <h1 className="text-xl font-bold">Profile</h1>
-            <p className="text-green-100 text-sm">
-              Account & Settings
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <User className="w-6 h-6 mr-3" />
+            <div>
+              <h1 className="text-xl font-bold">Profile</h1>
+              <p className="text-white/80 text-sm">
+                Account & Settings
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
+              onClick={handleExportData}
+            >
+              <Download className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -339,8 +381,27 @@ export default function Profile() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
+              <div className="relative">
+                {profileData.profileImageUrl ? (
+                  <img
+                    src={profileData.profileImageUrl}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-primary/20"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-primary" />
+                  </div>
+                )}
+                {isEditingProfile && (
+                  <div className="absolute -bottom-1 -right-1">
+                    <PhotoUpload
+                      onPhotoUploaded={(url: string) => handleInputChange('profileImageUrl', url)}
+                      currentPhoto={profileData.profileImageUrl}
+                      className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm hover:bg-primary/90 transition-colors"
+                    />
+                  </div>
+                )}
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -398,6 +459,28 @@ export default function Profile() {
               <CardTitle>Edit Profile Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Profile Photo Upload */}
+              <div className="flex flex-col items-center space-y-3">
+                <div className="relative">
+                  {profileData.profileImageUrl ? (
+                    <img
+                      src={profileData.profileImageUrl}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-primary/20"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center border-4 border-primary/20">
+                      <User className="w-12 h-12 text-primary" />
+                    </div>
+                  )}
+                </div>
+                <PhotoUpload
+                  onPhotoUploaded={(url: string) => handleInputChange('profileImageUrl', url)}
+                  currentPhoto={profileData.profileImageUrl}
+                  className="flex items-center space-x-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                />
+              </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName">First Name</Label>

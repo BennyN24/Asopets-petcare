@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,19 +41,19 @@ export default function Expenses() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all");
-  const [filterPet, setFilterPet] = useState("all");
-  const [sortBy, setSortBy] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [budgetGoal, setBudgetGoal] = useState(() => {
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [filterType, setFilterType] = React.useState("all");
+  const [filterPet, setFilterPet] = React.useState("all");
+  const [sortBy, setSortBy] = React.useState("date");
+  const [sortOrder, setSortOrder] = React.useState("desc");
+  const [budgetGoal, setBudgetGoal] = React.useState(() => {
     const saved = localStorage.getItem('petBudgetGoal');
     return saved ? Number(saved) : 100;
   });
-  const [isSettingBudget, setIsSettingBudget] = useState(false);
+  const [isSettingBudget, setIsSettingBudget] = React.useState(false);
 
   // Save budget to localStorage whenever it changes
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem('petBudgetGoal', budgetGoal.toString());
   }, [budgetGoal]);
 
@@ -269,13 +269,22 @@ export default function Expenses() {
     <div className="mobile-container pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-4">
-        <div className="flex items-center">
-          <DollarSign className="w-6 h-6 mr-3" />
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Expenses</h1>
-            <p className="text-green-100 text-sm">
+            <p className="text-white/80 text-sm">
               {formatCurrency(yearlyExpenses)} spent this year
             </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
+              onClick={exportToCSV}
+            >
+              <Download className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </div>

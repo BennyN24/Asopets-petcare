@@ -22,11 +22,21 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        try {
+          const responseStr = JSON.stringify(capturedJsonResponse);
+          // Only log response if it's small enough
+          if (responseStr.length < 1000) {
+            logLine += ` :: ${responseStr}`;
+          } else {
+            logLine += ` :: [large response ${responseStr.length} chars]`;
+          }
+        } catch (e) {
+          logLine += ` :: [response not serializable]`;
+        }
       }
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      if (logLine.length > 200) {
+        logLine = logLine.slice(0, 199) + "…";
       }
 
       log(logLine);

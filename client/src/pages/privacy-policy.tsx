@@ -1,4 +1,5 @@
 import { ArrowLeft } from "lucide-react";
+import * as React from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
