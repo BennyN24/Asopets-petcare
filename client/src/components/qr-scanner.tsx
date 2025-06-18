@@ -38,224 +38,162 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       setIsScanning(true);
 
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment", // Use back camera on mobile
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
+        video: { facingMode: "environment" }
       });
+
+      setStream(mediaStream);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.play();
+        scanQRCode();
       }
-
-      setStream(mediaStream);
-      
-      // Start scanning for QR codes
-      startQRDetection();
-
     } catch (err) {
-      setError("Camera access denied or not available");
+      setError("Camera access denied. Please allow camera permissions.");
       setIsScanning(false);
     }
   };
 
-  const startQRDetection = () => {
-    const canvas = canvasRef.current;
+  const scanQRCode = () => {
     const video = videoRef.current;
-    const context = canvas?.getContext('2d');
+    const canvas = canvasRef.current;
 
-    if (!canvas || !video || !context) return;
+    if (!video || !canvas) return;
 
-    const scanFrame = () => {
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const scan = () => {
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-        try {
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
-          });
-
-          if (code) {
-            try {
-              const qrData = JSON.parse(code.data);
-              if (qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId) {
-                setScanSuccess(true);
-                toast({
-                  title: "Pet QR Code Found!",
-                  description: "Loading pet information...",
-                });
-                
-                // Show success animation before processing
-                setTimeout(() => {
-                  stopCamera();
-                  onScanSuccess(qrData);
-                }, 1500);
-                return;
-              } else {
-                setError('This QR code is not a valid pet profile. Please scan a pet QR code.');
-                setTimeout(() => setError(null), 3000);
-              }
-            } catch (e) {
-              setError('Invalid QR code format. Please scan a valid pet profile QR code.');
-              setTimeout(() => setError(null), 3000);
+        if (code) {
+          try {
+            const data = JSON.parse(code.data);
+            if (data.type === "pet-profile" && data.petId) {
+              handleScanSuccess(data);
+              return;
             }
+          } catch (e) {
+            // Not a valid pet QR code
           }
-        } catch (err) {
-          console.error("QR detection error:", err);
         }
       }
 
       if (isScanning) {
-        requestAnimationFrame(scanFrame);
+        requestAnimationFrame(scan);
       }
     };
 
-    scanFrame();
+    requestAnimationFrame(scan);
   };
 
-  const stopCamera = () => {
+  const handleScanSuccess = async (data: any) => {
+    setScanSuccess(true);
+    setScannedPetCategory(data.category || "other");
+    setIsScanning(false);
+
+    // Stop the camera
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
-      setStream(null);
     }
-    setIsScanning(false);
-    setScanSuccess(false);
+
+    // Call the success callback
+    onScanSuccess(data);
+
+    // Show success toast
+    toast({
+      title: "QR Code Scanned!",
+      description: "Pet profile detected successfully.",
+    });
+
+    // Close after animation
+    setTimeout(() => {
+      onClose();
+    }, 2000);
   };
 
   const handleTestScan = () => {
-    // Generate a test QR code for the current user's first pet (if any)
+    // Simulate a successful scan with test data
     const testData = {
-      type: "pet_profile",
-      petId: 10, // Using the pet ID from the logs
-      ownerId: "6f1a0727-3380-4dd8-b401-8483bb8c57f8",
-      timestamp: new Date().toISOString(),
+      type: "pet-profile",
+      petId: 1,
+      category: "dog"
     };
-
-    setScanSuccess(true);
-    setScannedPetCategory("rabbit"); // Based on the pet data from logs
-    
-    toast({
-      title: "Test QR Code Scanned!",
-      description: "Loading real pet information...",
-    });
-
-    // Show success animation before processing
-    setTimeout(() => {
-      stopCamera();
-      onScanSuccess(testData);
-    }, 1500);
+    handleScanSuccess(testData);
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md relative overflow-hidden">
-        <FloatingParticles show={scanSuccess} />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Card className="w-full max-w-md mx-4">
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center">
-              <QrCode className="w-5 h-5 mr-2" />
-              Scan QR Code
-            </CardTitle>
+            <CardTitle>QR Scanner</CardTitle>
             <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Pet Mascot Animation */}
-          <AnimatedPetMascot 
-            isScanning={isScanning} 
-            scanSuccess={scanSuccess}
-            petCategory={scannedPetCategory}
-          />
-          
-          {!isScanning ? (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600 text-center">
-                Scan a pet's QR code to view their profile and medical records.
-              </p>
-              
-              <Button onClick={startCamera} className="w-full">
-                <Camera className="w-4 h-4 mr-2" />
-                Start Camera
-              </Button>
+          {/* Animated Pet Mascot */}
+          <div className="flex justify-center">
+            <AnimatedPetMascot 
+              isScanning={isScanning}
+              scanSuccess={scanSuccess}
+              petCategory={scannedPetCategory}
+            />
+          </div>
 
-              <Button 
-                variant="outline" 
-                onClick={handleTestScan}
-                className="w-full"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Test Scan (Real Data)
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="relative bg-black rounded-lg overflow-hidden">
-                <video
-                  ref={videoRef}
-                  className="w-full h-64 object-cover"
-                  autoPlay
-                  muted
-                  playsInline
-                />
-                <canvas
-                  ref={canvasRef}
-                  className="hidden"
-                />
-                
-                {/* QR Code overlay with animation */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div 
-                    className={`w-48 h-48 border-2 rounded-lg transition-all duration-300 ${
-                      scanSuccess 
-                        ? 'border-green-400 border-solid opacity-90 shadow-lg shadow-green-400/50' 
-                        : 'border-white border-dashed opacity-70'
-                    }`}
-                  >
-                    {/* Scanning line animation */}
-                    {isScanning && !scanSuccess && (
-                      <div className="relative w-full h-full overflow-hidden">
-                        <div className="absolute w-full h-0.5 bg-blue-400 opacity-80 animate-ping"></div>
-                        <div 
-                          className="absolute w-full h-0.5 bg-blue-400"
-                          style={{
-                            animation: 'scan-line 2s linear infinite',
-                          }}
-                        ></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex space-x-2">
-                <Button onClick={stopCamera} variant="outline" className="flex-1">
-                  Stop Camera
-                </Button>
-                <Button onClick={handleTestScan} className="flex-1">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Test Scan
-                </Button>
-              </div>
-
-              {!scanSuccess && (
-                <p className="text-xs text-gray-500 text-center">
-                  Position the QR code within the frame to scan
-                </p>
-              )}
-            </div>
-          )}
+          {/* Floating Particles */}
+          <FloatingParticles show={scanSuccess} />
 
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
+          )}
+
+          {!isScanning && !scanSuccess && (
+            <div className="space-y-4">
+              <div className="relative">
+                <video
+                  ref={videoRef}
+                  className="w-full h-48 bg-gray-100 rounded-lg object-cover"
+                  playsInline
+                  muted
+                />
+                <canvas ref={canvasRef} className="hidden" />
+                
+                {/* Scanning Line Animation */}
+                {isScanning && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-full h-0.5 bg-green-500 animate-pulse"></div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <Button onClick={startCamera} className="flex-1">
+                  <Camera className="h-4 w-4 mr-2" />
+                  Start Scanning
+                </Button>
+                <Button onClick={handleTestScan} variant="outline">
+                  Test Scan
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {scanSuccess && (
+            <div className="text-center space-y-2">
+              <div className="text-green-600 font-medium">Scan Successful!</div>
+              <div className="text-sm text-gray-600">Loading pet information...</div>
+            </div>
           )}
         </CardContent>
       </Card>

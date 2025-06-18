@@ -9,34 +9,34 @@ export default function FloatingParticles({ show }: FloatingParticlesProps) {
 
   useEffect(() => {
     if (show) {
-      const newParticles = Array.from({ length: 8 }, (_, i) => ({
+      const newParticles = Array.from({ length: 10 }, (_, i) => ({
         id: i,
-        x: 50 + (Math.random() - 0.5) * 80,
-        y: 50 + (Math.random() - 0.5) * 80,
+        x: Math.random() * 100,
+        y: Math.random() * 100
       }));
       setParticles(newParticles);
-      
-      // Clear particles after animation
-      const timer = setTimeout(() => setParticles([]), 2000);
+
+      const timer = setTimeout(() => {
+        setParticles([]);
+      }, 2000);
+
       return () => clearTimeout(timer);
-    } else {
-      setParticles([]);
     }
   }, [show]);
 
   if (!show || particles.length === 0) return null;
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-40">
       {particles.map((particle) => (
         <div
           key={particle.id}
-          className="absolute w-2 h-2 bg-green-400 rounded-full animate-ping"
+          className="absolute w-2 h-2 bg-yellow-400 rounded-full animate-ping"
           style={{
             left: `${particle.x}%`,
             top: `${particle.y}%`,
-            animationDelay: `${particle.id * 0.1}s`,
-            animationDuration: '1.5s',
+            animationDelay: `${Math.random() * 1000}ms`,
+            animationDuration: '1s'
           }}
         />
       ))}

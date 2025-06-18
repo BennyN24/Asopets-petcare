@@ -3,11 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { QrCode, Plus, Heart } from "lucide-react";
+import QRScanner from "@/components/qr-scanner";
+import type { Pet } from "@shared/schema";
 import { PageLoader } from "@/components/loading-spinner";
 import PetCard from "@/components/pet-card";
 import DashboardInsights from "@/components/dashboard-insights";
@@ -23,8 +23,6 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showVetClinics, setShowVetClinics] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [scannedPetData, setScannedPetData] = useState<any>(null);
 
@@ -63,16 +61,6 @@ export default function Dashboard() {
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],
-    queryFn: async () => {
-      const response = await fetch("/api/pets?includePhotos=false&limit=20");
-      if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
-      return response.json();
-    },
-    enabled: !!user,
-  });
-
-  const { data: reminders = [] } = useQuery<Reminder[]>({
-    queryKey: ["/api/reminders"],
     enabled: !!user,
   });
 
