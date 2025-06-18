@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React from "react";
 import { Bell, QrCode, Download, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

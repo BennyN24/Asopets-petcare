@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-
+import React from "react";
 
 interface AnimatedPetMascotProps {
   isScanning: boolean;

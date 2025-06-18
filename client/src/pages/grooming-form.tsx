@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React from "react";
 import { useLocation } from "wouter";
 import { useParams } from "wouter";
 import MedicalRecordForm from "@/components/medical-record-form";
