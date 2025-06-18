@@ -33,7 +33,7 @@ export interface IStorage {
   confirmUserEmail(token: string): Promise<User | null>;
   
   // Pet operations
-  getPetsByUserId(userId: string): Promise<Pet[]>;
+  getPetsByUserId(userId: string, options?: { page?: number; limit?: number; includePhotos?: boolean }): Promise<Pet[]>;
   getPetById(id: number): Promise<Pet | undefined>;
   createPet(pet: InsertPet): Promise<Pet>;
   updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet>;

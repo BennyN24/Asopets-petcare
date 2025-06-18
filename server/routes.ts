@@ -363,15 +363,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Pet routes
+  // Pet routes with pagination and size limits
   app.get("/api/pets", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.session.userId || (req.user?.claims?.sub);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const pets = await storage.getPetsByUserId(userId);
-      res.json(pets);
+      
+      // Add pagination parameters
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 50); // Max 50 pets per request
+      const includePhotos = req.query.includePhotos === 'true';
+      
+      const pets = await storage.getPetsByUserId(userId, { page, limit, includePhotos });
+      
+      // If response is still too large, exclude images entirely
+      let responseData = pets;
+      const responseSize = JSON.stringify(responseData).length;
+      if (responseSize > 10 * 1024 * 1024) { // 10MB limit
+        responseData = pets.map(pet => ({
+          ...pet,
+          imageUrl: pet.imageUrl ? '[image_excluded_due_to_size]' : null
+        }));
+      }
+      
+      res.json(responseData);
     } catch (error) {
       console.error("Error fetching pets:", error);
       res.status(500).json({ message: "Failed to fetch pets" });
