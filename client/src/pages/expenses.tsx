@@ -41,16 +41,16 @@ export default function Expenses() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all");
-  const [filterPet, setFilterPet] = useState("all");
-  const [sortBy, setSortBy] = useState("date");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [budgetGoal, setBudgetGoal] = useState(() => {
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [filterType, setFilterType] = React.useState("all");
+  const [filterPet, setFilterPet] = React.useState("all");
+  const [sortBy, setSortBy] = React.useState("date");
+  const [sortOrder, setSortOrder] = React.useState("desc");
+  const [budgetGoal, setBudgetGoal] = React.useState(() => {
     const saved = localStorage.getItem('petBudgetGoal');
     return saved ? Number(saved) : 100;
   });
-  const [isSettingBudget, setIsSettingBudget] = useState(false);
+  const [isSettingBudget, setIsSettingBudget] = React.useState(false);
 
   // Save budget to localStorage whenever it changes
   React.useEffect(() => {

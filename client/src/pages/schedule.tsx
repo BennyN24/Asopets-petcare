@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,10 +33,10 @@ export default function Schedule() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"upcoming" | "completed">("upcoming");
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedPet, setSelectedPet] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<"date" | "type" | "pet">("date");
+  const [activeTab, setActiveTab] = React.useState<"upcoming" | "completed">("upcoming");
+  const [selectedType, setSelectedType] = React.useState<string>("all");
+  const [selectedPet, setSelectedPet] = React.useState<string>("all");
+  const [sortBy, setSortBy] = React.useState<"date" | "type" | "pet">("date");
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],
