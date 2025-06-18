@@ -489,8 +489,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           dateOfBirth: pet.dateOfBirth,
           imageUrl: pet.imageUrl,
           microchipId: pet.microchipId || null,
-          medicalConditions: pet.medicalConditions || null,
-          allergies: pet.allergies || null,
+          medicalConditions: null, // Will be added to schema later
+          allergies: null, // Will be added to schema later
         },
         owner: {
           name: `${owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Pet Owner',

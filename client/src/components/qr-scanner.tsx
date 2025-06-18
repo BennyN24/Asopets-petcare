@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { QrCode, Camera, X, Download, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import AnimatedPetMascot from "./animated-pet-mascot";
+import FloatingParticles from "./floating-particles";
 
 interface QRScannerProps {
   onClose: () => void;
@@ -16,6 +18,8 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   const [isScanning, setIsScanning] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [stream, setStream] = React.useState<MediaStream | null>(null);
+  const [scanSuccess, setScanSuccess] = React.useState(false);
+  const [scannedPetCategory, setScannedPetCategory] = React.useState<string>("other");
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
@@ -80,12 +84,17 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
             try {
               const qrData = JSON.parse(code.data);
               if (qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId) {
+                setScanSuccess(true);
                 toast({
                   title: "Pet QR Code Found!",
                   description: "Loading pet information...",
                 });
-                stopCamera();
-                onScanSuccess(qrData);
+                
+                // Show success animation before processing
+                setTimeout(() => {
+                  stopCamera();
+                  onScanSuccess(qrData);
+                }, 1500);
                 return;
               } else {
                 setError('This QR code is not a valid pet profile. Please scan a pet QR code.');
@@ -115,6 +124,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       setStream(null);
     }
     setIsScanning(false);
+    setScanSuccess(false);
   };
 
   const handleTestScan = () => {
@@ -126,18 +136,25 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       timestamp: new Date().toISOString(),
     };
 
+    setScanSuccess(true);
+    setScannedPetCategory("rabbit"); // Based on the pet data from logs
+    
     toast({
       title: "Test QR Code Scanned!",
       description: "Loading real pet information...",
     });
 
-    stopCamera();
-    onScanSuccess(testData);
+    // Show success animation before processing
+    setTimeout(() => {
+      stopCamera();
+      onScanSuccess(testData);
+    }, 1500);
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md relative overflow-hidden">
+        <FloatingParticles show={scanSuccess} />
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center">
@@ -150,9 +167,16 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Pet Mascot Animation */}
+          <AnimatedPetMascot 
+            isScanning={isScanning} 
+            scanSuccess={scanSuccess}
+            petCategory={scannedPetCategory}
+          />
+          
           {!isScanning ? (
             <div className="space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 text-center">
                 Scan a pet's QR code to view their profile and medical records.
               </p>
               
@@ -185,9 +209,28 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   className="hidden"
                 />
                 
-                {/* QR Code overlay */}
+                {/* QR Code overlay with animation */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-48 h-48 border-2 border-white border-dashed rounded-lg opacity-70"></div>
+                  <div 
+                    className={`w-48 h-48 border-2 rounded-lg transition-all duration-300 ${
+                      scanSuccess 
+                        ? 'border-green-400 border-solid opacity-90 shadow-lg shadow-green-400/50' 
+                        : 'border-white border-dashed opacity-70'
+                    }`}
+                  >
+                    {/* Scanning line animation */}
+                    {isScanning && !scanSuccess && (
+                      <div className="relative w-full h-full overflow-hidden">
+                        <div className="absolute w-full h-0.5 bg-blue-400 opacity-80 animate-ping"></div>
+                        <div 
+                          className="absolute w-full h-0.5 bg-blue-400"
+                          style={{
+                            animation: 'scan-line 2s linear infinite',
+                          }}
+                        ></div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -201,9 +244,11 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 </Button>
               </div>
 
-              <p className="text-xs text-gray-500 text-center">
-                Position the QR code within the frame to scan
-              </p>
+              {!scanSuccess && (
+                <p className="text-xs text-gray-500 text-center">
+                  Position the QR code within the frame to scan
+                </p>
+              )}
             </div>
           )}
 
