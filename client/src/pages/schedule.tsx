@@ -236,11 +236,16 @@ export default function Schedule() {
   }
 
   return (
+    
     <div className="mobile-container pb-20">
-      <div className="p-4 space-y-6">
+      {/* Header */}
+      <div className="bg-primary text-white p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Schedule</h1>
+          <div>
+            <h1 className="text-xl font-bold">Schedule</h1>
+          </div>
         </div>
+      <div className="p-4 space-y-6">
 
         {/* Filter Controls - Moved above tabs */}
         <div className="bg-white rounded-lg border shadow-sm p-4">
