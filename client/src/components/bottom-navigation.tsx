@@ -1,4 +1,3 @@
-import React from "react";
 import React, { memo } from "react";
 import { useLocation } from "wouter";
 import { Home, Calendar, DollarSign, User } from "lucide-react";
