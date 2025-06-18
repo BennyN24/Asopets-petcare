@@ -242,6 +242,45 @@ export default function Profile() {
     });
   };
 
+  const handleImportData = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target?.result as string);
+          
+          // Validate the data structure
+          if (!data.pets || !Array.isArray(data.pets)) {
+            throw new Error('Invalid data format');
+          }
+
+          toast({
+            title: "Import successful",
+            description: `Found ${data.pets.length} pets, ${data.medicalRecords?.length || 0} medical records, and ${data.reminders?.length || 0} reminders.`,
+          });
+
+          // Here you would typically upload this data to your server
+          console.log('Imported data:', data);
+          
+        } catch (error) {
+          toast({
+            title: "Import failed",
+            description: "The file format is invalid or corrupted.",
+            variant: "destructive",
+          });
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-PH', {
       style: 'currency',
@@ -543,6 +582,15 @@ export default function Profile() {
             >
               <Download className="w-4 h-4 mr-2" />
               Export My Data
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full justify-start" 
+              onClick={handleImportData}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Import Data
             </Button>
             
             <Separator />

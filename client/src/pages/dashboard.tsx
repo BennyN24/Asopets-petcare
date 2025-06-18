@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [showVetClinics, setShowVetClinics] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [scannedPetData, setScannedPetData] = useState<any>(null);
+  const [scannedPets, setScannedPets] = useState<any[]>([]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
