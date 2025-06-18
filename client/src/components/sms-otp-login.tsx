@@ -35,7 +35,7 @@ export default function SMSOTPLogin({ onSuccess, onBackToRegular }: SMSOTPLoginP
   const [step, setStep] = React.useState<"phone" | "otp">("phone");
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendCooldown, setResendCooldown] = React.useState(0);
   const { toast } = useToast();
 
   const phoneForm = useForm<PhoneFormData>({

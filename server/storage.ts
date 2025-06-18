@@ -153,12 +153,40 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Pet operations
-  async getPetsByUserId(userId: string): Promise<Pet[]> {
-    return await db
-      .select()
+  async getPetsByUserId(userId: string, options: { page?: number; limit?: number; includePhotos?: boolean } = {}): Promise<Pet[]> {
+    const { page = 1, limit = 20, includePhotos = true } = options;
+    const offset = (page - 1) * limit;
+    
+    let query;
+    
+    // Exclude image URLs if not requested to reduce response size
+    if (!includePhotos) {
+      query = db.select({
+        id: pets.id,
+        userId: pets.userId,
+        name: pets.name,
+        category: pets.category,
+        breed: pets.breed,
+        dateOfBirth: pets.dateOfBirth,
+        age: pets.age,
+        microchipId: pets.microchipId,
+        birthmarks: pets.birthmarks,
+        createdAt: pets.createdAt,
+        updatedAt: pets.updatedAt,
+        imageUrl: null // Explicitly exclude image
+      });
+    } else {
+      query = db.select();
+    }
+    
+    const result = await query
       .from(pets)
       .where(eq(pets.userId, userId))
-      .orderBy(desc(pets.createdAt));
+      .orderBy(desc(pets.createdAt))
+      .limit(limit)
+      .offset(offset);
+    
+    return result as Pet[];
   }
 
   async getPetById(id: number): Promise<Pet | undefined> {

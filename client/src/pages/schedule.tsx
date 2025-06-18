@@ -45,6 +45,11 @@ export default function Schedule() {
 
   const { data: pets = [] } = useQuery<PetType[]>({
     queryKey: ["/api/pets"],
+    queryFn: async () => {
+      const response = await fetch("/api/pets?includePhotos=false&limit=50");
+      if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
+      return response.json();
+    },
     enabled: isAuthenticated,
   });
 

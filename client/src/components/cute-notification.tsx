@@ -49,9 +49,9 @@ export default function CuteNotification({
   onDismiss, 
   onSnooze 
 }: CuteNotificationProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
+  const [showSnoozeOptions, setShowSnoozeOptions] = React.useState(false);
+  const [hasPlayed, setHasPlayed] = React.useState(false);
 
   const getUrgencyLevel = () => {
     if (!reminder.dueDate) return "normal";
