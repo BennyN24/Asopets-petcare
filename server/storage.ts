@@ -173,7 +173,7 @@ export class DatabaseStorage implements IStorage {
         birthmarks: pets.birthmarks,
         createdAt: pets.createdAt,
         updatedAt: pets.updatedAt,
-        imageUrl: null // Explicitly exclude image
+        imageUrl: sql`null::varchar`
       });
     } else {
       query = db.select();
