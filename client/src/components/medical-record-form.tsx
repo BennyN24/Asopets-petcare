@@ -245,24 +245,7 @@ export default function MedicalRecordForm({
 
 
 
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Any additional notes or reactions"
-                        className="h-24 resize-none"
-                        {...field}
-                        value={field.value || ""}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
 
               {/* Reminder Settings */}
               <div className="bg-blue-50 p-4 rounded-lg">

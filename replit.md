@@ -269,6 +269,8 @@ Changelog:
   * Fixed all TypeScript errors in database queries and component interactions
   * Optimized reminder notification timing to show exactly 1 day before due dates
   * Added comprehensive filtering controls in schedule header with professional UI design
+  * Removed Notes field from medical record forms for cleaner interface
+  * Added profile photo upload functionality for user profiles with camera and gallery options
 - June 16, 2025. Comprehensive pre-launch optimization and app store preparation:
   * Renamed application to "My PetBB" with updated branding throughout
 - June 17, 2025. Complete application rebranding to ASOPETS:
