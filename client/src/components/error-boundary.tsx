@@ -1,4 +1,3 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +22,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
     this.setState({
       error,
