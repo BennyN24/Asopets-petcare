@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -43,11 +42,19 @@ import {
   Globe,
   UserCircle,
   ContactRound,
+  MessageSquare,
+  Send,
 } from "lucide-react";
 import PhotoUpload from "@/components/photo-upload";
 import { format } from "date-fns";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
 
 interface UserProfile {
@@ -71,6 +78,13 @@ interface UserProfile {
     reminders: boolean;
   };
 }
+
+const contactSupportSchema = z.object({
+  subject: z.string().min(5, "Subject must be at least 5 characters"),
+  message: z.string().min(20, "Message must be at least 20 characters"),
+});
+
+type ContactSupportData = z.infer<typeof contactSupportSchema>;
 
 export default function Profile() {
   const { user, isAuthenticated } = useAuth();

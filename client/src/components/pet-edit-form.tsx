@@ -29,7 +29,7 @@ interface PetEditFormProps {
 }
 
 export default function PetEditForm({ pet }: PetEditFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
