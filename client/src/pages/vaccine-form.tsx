@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { useParams, useLocation } from "wouter";
 import { insertMedicalRecordSchema } from "@shared/schema";
 import MedicalRecordForm from "@/components/medical-record-form";
