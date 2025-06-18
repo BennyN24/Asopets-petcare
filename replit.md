@@ -305,6 +305,10 @@ Changelog:
   * Optimized component performance with React.memo for PetCard, BottomNavigation, and LoadingSpinner
   * Replaced custom loading states with reusable PageLoader component across all pages
   * Fixed TypeScript errors and improved code organization with proper imports
+  * Fixed mobile overflow issues with proper CSS overflow handling and mobile-safe containers
+  * Enhanced profile page with inline editing capability - no more dialog modals
+  * Added PWA installation button to login page with automatic detection and manual fallback
+  * Improved mobile viewport handling and responsive design across all pages
 ```
 
 ## User Preferences

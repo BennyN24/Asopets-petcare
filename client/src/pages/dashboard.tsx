@@ -84,7 +84,7 @@ export default function Dashboard() {
   const totalNotifications = overdueReminders.length;
 
   return (
-    <div className="mobile-container">
+    <div className="mobile-container mobile-safe">
       {/* Header */}
       <div className="bg-primary text-white p-4">
         <div className="flex items-center justify-between">

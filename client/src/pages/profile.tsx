@@ -256,7 +256,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="mobile-container pb-20">
+    <div className="mobile-container mobile-safe pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-4">
         <div className="flex items-center">
@@ -288,6 +288,24 @@ export default function Profile() {
                   <Mail className="w-4 h-4 mr-2" />
                   <span className="text-sm">{profileData.email || 'Not available'}</span>
                 </div>
+                <Button
+                  onClick={() => setIsEditingProfile(!isEditingProfile)}
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                >
+                  {isEditingProfile ? (
+                    <>
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </>
+                  )}
+                </Button>
                 {profileData.phone && (
                   <div className="flex items-center text-gray-600 mt-1">
                     <Phone className="w-4 h-4 mr-2" />
