@@ -345,13 +345,32 @@ export default function Profile() {
     <div className="mobile-container mobile-safe pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-4">
-        <div className="flex items-center">
-          <User className="w-6 h-6 mr-3" />
-          <div>
-            <h1 className="text-xl font-bold">Profile</h1>
-            <p className="text-green-100 text-sm">
-              Account & Settings
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <User className="w-6 h-6 mr-3" />
+              <h1 className="text-xl font-bold">Profile</h1>
+              <p className="text-white/80 text-sm">
+                Account & Settings
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
+              onClick={handleExportData}
+            >
+              <Download className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </div>

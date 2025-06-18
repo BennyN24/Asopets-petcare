@@ -269,13 +269,22 @@ export default function Expenses() {
     <div className="mobile-container pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-4">
-        <div className="flex items-center">
-          <DollarSign className="w-6 h-6 mr-3" />
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Expenses</h1>
-            <p className="text-green-100 text-sm">
+            <p className="text-white/80 text-sm">
               {formatCurrency(yearlyExpenses)} spent this year
             </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
+              onClick={exportToCSV}
+            >
+              <Download className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </div>

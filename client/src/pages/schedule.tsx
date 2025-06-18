@@ -251,9 +251,9 @@ export default function Schedule() {
               className="text-white hover:bg-white/20 relative p-2"
             >
               <Bell className="w-5 h-5" />
-              {(upcomingReminders.length + completedReminders.length) > 0 && (
+              {(filteredUpcomingReminders.length + filteredCompletedReminders.length) > 0 && (
                 <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                  {upcomingReminders.length + completedReminders.length > 9 ? '9+' : upcomingReminders.length + completedReminders.length}
+                  {(filteredUpcomingReminders.length + filteredCompletedReminders.length) > 9 ? '9+' : (filteredUpcomingReminders.length + filteredCompletedReminders.length)}
                 </div>
               )}
             </Button>

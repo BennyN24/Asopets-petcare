@@ -174,7 +174,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 onClick={handleManualInput}
                 className="w-full"
               >
-                <Download className="w-4 h-4 mr-2" />
+                <Share2 className="w-4 h-4 mr-2" />
                 Demo Scan (Testing)
               </Button>
             </div>
