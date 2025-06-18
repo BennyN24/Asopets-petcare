@@ -20,10 +20,10 @@ export default function PetProfile() {
   const petId = parseInt(id || "0");
   
   // Get URL parameters to determine initial tab
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = React.useState('overview');
   
   // Handle URL parameters for tab switching
-  useEffect(() => {
+  React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     if (tabParam && ['overview', 'records', 'qr', 'info'].includes(tabParam)) {

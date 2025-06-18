@@ -28,7 +28,7 @@ const features = [
 ];
 
 export default function Welcome() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = React.useState(0);
   const [, setLocation] = useLocation();
 
   const steps = [

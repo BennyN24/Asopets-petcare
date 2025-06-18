@@ -31,9 +31,9 @@ type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+  const [token, setToken] = React.useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<ResetPasswordForm>({

@@ -37,8 +37,8 @@ type SignupForm = z.infer<typeof signupSchema>;
 export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [emailSent, setEmailSent] = React.useState(false);
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),

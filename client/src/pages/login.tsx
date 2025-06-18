@@ -39,11 +39,11 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [lastEmailAttempt, setLastEmailAttempt] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [showResendConfirmation, setShowResendConfirmation] = React.useState(false);
+  const [isResending, setIsResending] = React.useState(false);
+  const [lastEmailAttempt, setLastEmailAttempt] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
