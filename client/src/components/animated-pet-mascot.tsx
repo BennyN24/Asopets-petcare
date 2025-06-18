@@ -1,5 +1,4 @@
-import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 
 interface AnimatedPetMascotProps {
   isScanning: boolean;
@@ -20,102 +19,47 @@ const petMascots = {
 export default function AnimatedPetMascot({ isScanning, scanSuccess, petCategory = "other" }: AnimatedPetMascotProps) {
   const mascot = petMascots[petCategory as keyof typeof petMascots] || petMascots.other;
   
-  const scanningAnimation = {
-    initial: { rotate: 0, scale: 1 },
-    animate: { 
-      rotate: [0, -10, 10, -10, 0],
-      scale: [1, 1.1, 1, 1.1, 1],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const successAnimation = {
-    initial: { scale: 1, y: 0 },
-    animate: {
-      scale: [1, 1.3, 1.1],
-      y: [0, -10, 0],
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const idleAnimation = {
-    initial: { scale: 1 },
-    animate: {
-      scale: [1, 1.05, 1],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
+  const getAnimationClass = () => {
+    if (scanSuccess) {
+      return "animate-bounce";
+    } else if (isScanning) {
+      return "animate-pulse";
+    } else {
+      return "animate-pulse";
     }
   };
 
   return (
     <div className="flex flex-col items-center space-y-2">
-      <motion.div
-        className="text-6xl"
-        variants={scanSuccess ? successAnimation : isScanning ? scanningAnimation : idleAnimation}
-        initial="initial"
-        animate="animate"
+      <div
+        className={`text-6xl transition-all duration-500 ${getAnimationClass()}`}
+        style={{
+          transform: scanSuccess ? 'scale(1.2)' : 'scale(1)',
+        }}
       >
         {mascot}
-      </motion.div>
+      </div>
       
-      <AnimatePresence mode="wait">
+      <div className="text-center min-h-[2rem]">
         {isScanning && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-center"
-          >
-            <div className="flex items-center space-x-2">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"
-              />
-              <span className="text-sm text-blue-600 font-medium">Looking for QR codes...</span>
-            </div>
-          </motion.div>
+          <div className="flex items-center space-x-2 justify-center">
+            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm text-blue-600 font-medium">Looking for QR codes...</span>
+          </div>
         )}
         
         {scanSuccess && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="text-center"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
-              className="text-green-600 text-lg font-semibold"
-            >
-              🎉 Found a pet!
-            </motion.div>
-          </motion.div>
+          <div className="text-green-600 text-lg font-semibold animate-pulse">
+            🎉 Found a pet!
+          </div>
         )}
         
         {!isScanning && !scanSuccess && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-center text-gray-500 text-sm"
-          >
+          <div className="text-center text-gray-500 text-sm">
             Ready to scan pet QR codes
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

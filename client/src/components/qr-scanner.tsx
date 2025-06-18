@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 // @ts-ignore
 import jsQR from "jsqr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
