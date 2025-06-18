@@ -275,7 +275,6 @@ Changelog:
   * Moved schedule sort/filter controls above the Upcoming/Completed tabs for better UX
   * Fixed schedule filtering logic to properly filter reminders by type and pet
   * Fixed duplicate CardContent issue in photo-upload component with redundant click handlers
-  * Removed duplicate statistics grid section from profile page for cleaner layout
 - June 16, 2025. Comprehensive pre-launch optimization and app store preparation:
   * Renamed application to "My PetBB" with updated branding throughout
 - June 17, 2025. Complete application rebranding to ASOPETS:
