@@ -20,7 +20,7 @@ import {
   type InsertClinicRating,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, lt, isNull, or, gt } from "drizzle-orm";
+import { eq, and, desc, lt, isNull, or, gt, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations

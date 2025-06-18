@@ -46,6 +46,11 @@ export default function Dashboard() {
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],
+    queryFn: async () => {
+      const response = await fetch("/api/pets?includePhotos=false&limit=20");
+      if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
+      return response.json();
+    },
     enabled: !!user,
   });
 
