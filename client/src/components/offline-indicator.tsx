@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { WifiOff, Wifi } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 

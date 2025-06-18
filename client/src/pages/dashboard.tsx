@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -249,11 +250,7 @@ export default function Dashboard() {
             if (data.type === "pet-profile") {
               setScannedPetData(data);
               
-              // Add to scanned pets list if not already present
-              const exists = scannedPets.some(pet => pet.petId === data.petId);
-              if (!exists) {
-                setScannedPets(prev => [...prev, data]);
-              }
+              // Store scanned pet data for display
               
               toast({
                 title: "Pet Profile Scanned",

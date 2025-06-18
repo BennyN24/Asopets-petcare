@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { useLocation } from "wouter";
 

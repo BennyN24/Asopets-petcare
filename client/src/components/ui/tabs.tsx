@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
