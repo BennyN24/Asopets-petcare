@@ -786,6 +786,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Support contact endpoint
+  app.post("/api/support/contact", isAuthenticated, async (req: any, res) => {
+    try {
+      const { subject, message, userEmail, userName } = req.body;
+      
+      if (!subject || !message) {
+        return res.status(400).json({ message: "Subject and message are required" });
+      }
+
+      // Import sendEmail function
+      const { sendEmail } = await import("./emailService");
+      
+      const emailSent = await sendEmail({
+        to: "support@asopets.com",
+        from: "support@asopets.com", // Verified sender
+        subject: `[ASOPETS Support] ${subject}`,
+        text: `
+Support Request from: ${userName} (${userEmail})
+User ID: ${req.user?.claims?.sub || 'Unknown'}
+
+Subject: ${subject}
+
+Message:
+${message}
+
+---
+This message was sent via the ASOPETS app contact form.
+Reply directly to this email to respond to the user.
+        `,
+        html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+    ASOPETS Support Request
+  </h2>
+  
+  <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+    <p><strong>From:</strong> ${userName}</p>
+    <p><strong>Email:</strong> ${userEmail}</p>
+    <p><strong>User ID:</strong> ${req.user?.claims?.sub || 'Unknown'}</p>
+    <p><strong>Subject:</strong> ${subject}</p>
+  </div>
+  
+  <div style="margin: 20px 0;">
+    <h3 style="color: #374151;">Message:</h3>
+    <div style="background-color: #ffffff; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; white-space: pre-wrap;">${message}</div>
+  </div>
+  
+  <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
+    <p>This message was sent via the ASOPETS app contact form.</p>
+    <p>Reply directly to this email to respond to the user.</p>
+  </div>
+</div>
+        `,
+      });
+
+      if (emailSent) {
+        res.json({ message: "Support request sent successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to send support request" });
+      }
+    } catch (error) {
+      console.error("Error sending support request:", error);
+      res.status(500).json({ message: "Failed to send support request" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

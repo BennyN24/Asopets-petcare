@@ -668,8 +668,8 @@ export default function Profile() {
               </div>
             ) : (
               <ContactSupportForm 
-                userEmail={profileData.email || user?.email || ""}
-                userName={`${profileData.firstName} ${profileData.lastName}`.trim() || "Pet Owner"}
+                userEmail={profileData.email || (user as any)?.email || ""}
+                userName={`${profileData.firstName || ""} ${profileData.lastName || ""}`.trim() || "Pet Owner"}
                 onSuccess={() => {
                   setShowContactForm(false);
                   toast({

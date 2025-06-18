@@ -23,6 +23,11 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       subject: params.subject,
       text: params.text,
       html: params.html,
+      trackingSettings: {
+        clickTracking: {
+          enable: false,
+        },
+      },
     });
     
     console.log(`Email sent successfully to ${params.to}`);
