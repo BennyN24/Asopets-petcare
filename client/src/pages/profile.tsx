@@ -8,14 +8,26 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { 
-  User, 
-  Settings, 
-  Bell, 
-  Shield, 
+import {
+  User,
+  Settings,
+  Bell,
+  Shield,
   Heart,
   Calendar,
   Phone,
@@ -30,7 +42,7 @@ import {
   X,
   Globe,
   UserCircle,
-  ContactRound
+  ContactRound,
 } from "lucide-react";
 import PhotoUpload from "@/components/photo-upload";
 import { format } from "date-fns";
@@ -65,6 +77,7 @@ export default function Profile() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditingProfile, setIsEditingProfile] = React.useState(false);
+  const [showContactForm, setShowContactForm] = React.useState(false);
   const [profileData, setProfileData] = React.useState<UserProfile>({
     id: "",
     firstName: "",
@@ -82,8 +95,8 @@ export default function Profile() {
       email: true,
       sms: false,
       push: true,
-      reminders: true
-    }
+      reminders: true,
+    },
   });
 
   // Initialize profile data when user loads
@@ -108,8 +121,8 @@ export default function Profile() {
           email: true,
           sms: false,
           push: true,
-          reminders: true
-        }
+          reminders: true,
+        },
       });
     }
   }, [user]);
@@ -149,7 +162,7 @@ export default function Profile() {
       const response = await fetch("/api/auth/user", {
         method: "PUT",
         body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to update profile");
       return response.json();
@@ -159,55 +172,57 @@ export default function Profile() {
       setIsEditingProfile(false);
       toast({
         title: "Profile updated",
-        description: "Your profile information has been saved successfully."
+        description: "Your profile information has been saved successfully.",
       });
     },
     onError: () => {
       toast({
         title: "Update failed",
         description: "Failed to update your profile. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   // Calculate user statistics
   const totalRecords = allMedicalRecords.length;
   const totalReminders = reminders.length;
-  const completedReminders = reminders.filter(r => r.isCompleted).length;
-  const overdueReminders = reminders.filter(r => r.isOverdue && !r.isCompleted).length;
+  const completedReminders = reminders.filter((r) => r.isCompleted).length;
+  const overdueReminders = reminders.filter(
+    (r) => r.isOverdue && !r.isCompleted,
+  ).length;
 
   // Calculate total expenses
   const totalExpenses = allMedicalRecords
-    .filter(record => record.cost && !isNaN(parseFloat(record.cost)))
+    .filter((record) => record.cost && !isNaN(parseFloat(record.cost)))
     .reduce((sum, record) => sum + parseFloat(record.cost!), 0);
 
   // Calculate account age based on user registration date
   const calculateAccountAge = () => {
     const userData = user as any;
     if (!userData?.createdAt) return "New member";
-    
+
     const registrationDate = new Date(userData.createdAt);
     const now = new Date();
     const diffInMs = now.getTime() - registrationDate.getTime();
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffInDays < 30) {
-      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''}`;
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""}`;
     } else if (diffInDays < 365) {
       const months = Math.floor(diffInDays / 30);
-      return `${months} month${months !== 1 ? 's' : ''}`;
+      return `${months} month${months !== 1 ? "s" : ""}`;
     } else {
       const years = Math.floor(diffInDays / 365);
       const remainingMonths = Math.floor((diffInDays % 365) / 30);
       if (remainingMonths === 0) {
-        return `${years} year${years !== 1 ? 's' : ''}`;
+        return `${years} year${years !== 1 ? "s" : ""}`;
       } else {
         return `${years}y ${remainingMonths}m`;
       }
     }
   };
-  
+
   const accountAge = calculateAccountAge();
 
   const handleLogout = () => {
@@ -229,12 +244,12 @@ export default function Profile() {
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `pet-care-data-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    link.download = `pet-care-data-${format(new Date(), "yyyy-MM-dd")}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -247,9 +262,9 @@ export default function Profile() {
   };
 
   const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
@@ -258,10 +273,10 @@ export default function Profile() {
       reader.onload = (event) => {
         try {
           const data = JSON.parse(event.target?.result as string);
-          
+
           // Validate the data structure
           if (!data.pets || !Array.isArray(data.pets)) {
-            throw new Error('Invalid data format');
+            throw new Error("Invalid data format");
           }
 
           toast({
@@ -270,8 +285,7 @@ export default function Profile() {
           });
 
           // Here you would typically upload this data to your server
-          console.log('Imported data:', data);
-          
+          console.log("Imported data:", data);
         } catch (error) {
           toast({
             title: "Import failed",
@@ -286,9 +300,9 @@ export default function Profile() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP'
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
     }).format(amount);
   };
 
@@ -304,7 +318,10 @@ export default function Profile() {
           emergencyContact: profileData.emergencyContact,
           emergencyPhone: profileData.emergencyPhone,
           profileImageUrl: profileData.profileImageUrl,
-        }).filter(([key, value]) => value !== "" && value !== null && value !== undefined)
+        }).filter(
+          ([key, value]) =>
+            value !== "" && value !== null && value !== undefined,
+        ),
       );
 
       await updateProfileMutation.mutateAsync(cleanData);
@@ -315,19 +332,19 @@ export default function Profile() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleNotificationChange = (type: string, value: boolean) => {
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
       notificationPreferences: {
         ...prev.notificationPreferences!,
-        [type]: value
-      }
+        [type]: value,
+      },
     }));
   };
 
@@ -350,9 +367,7 @@ export default function Profile() {
             <User className="w-6 h-6 mr-3" />
             <div>
               <h1 className="text-xl font-bold">Profile</h1>
-              <p className="text-white/80 text-sm">
-                Account & Settings
-              </p>
+              <p className="text-white/80 text-sm">Account & Settings</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">
@@ -396,7 +411,9 @@ export default function Profile() {
                 {isEditingProfile && (
                   <div className="absolute -bottom-1 -right-1">
                     <PhotoUpload
-                      onPhotoUploaded={(url: string) => handleInputChange('profileImageUrl', url)}
+                      onPhotoUploaded={(url: string) =>
+                        handleInputChange("profileImageUrl", url)
+                      }
                       currentPhoto={profileData.profileImageUrl}
                       className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm hover:bg-primary/90 transition-colors"
                     />
@@ -405,13 +422,15 @@ export default function Profile() {
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-gray-900">
-                  {profileData.firstName && profileData.lastName 
-                    ? `${profileData.firstName} ${profileData.lastName}` 
+                  {profileData.firstName && profileData.lastName
+                    ? `${profileData.firstName} ${profileData.lastName}`
                     : profileData.firstName || "Pet Owner"}
                 </h2>
                 <div className="flex items-center text-gray-600 mt-1">
                   <Mail className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{profileData.email || 'Not available'}</span>
+                  <span className="text-sm">
+                    {profileData.email || "Not available"}
+                  </span>
                 </div>
                 {profileData.phone && (
                   <div className="flex items-center text-gray-600 mt-1">
@@ -422,7 +441,9 @@ export default function Profile() {
                 {profileData.city && (
                   <div className="flex items-center text-gray-600 mt-1">
                     <MapPin className="w-4 h-4 mr-2" />
-                    <span className="text-sm">{profileData.city}, {profileData.country}</span>
+                    <span className="text-sm">
+                      {profileData.city}, {profileData.country}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center text-gray-600 mt-1">
@@ -475,19 +496,23 @@ export default function Profile() {
                   )}
                 </div>
                 <PhotoUpload
-                  onPhotoUploaded={(url: string) => handleInputChange('profileImageUrl', url)}
+                  onPhotoUploaded={(url: string) =>
+                    handleInputChange("profileImageUrl", url)
+                  }
                   currentPhoto={profileData.profileImageUrl}
                   className="flex items-center space-x-2 text-sm text-primary hover:text-primary/80 transition-colors"
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
                     value={profileData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("firstName", e.target.value)
+                    }
                     placeholder="Enter first name"
                   />
                 </div>
@@ -496,54 +521,35 @@ export default function Profile() {
                   <Input
                     id="lastName"
                     value={profileData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("lastName", e.target.value)
+                    }
                     placeholder="Enter last name"
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
                   value={profileData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
                   placeholder="Enter phone number"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
                   value={profileData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
                   placeholder="Enter address"
                 />
               </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="emergencyContact">Emergency Contact Name</Label>
-                  <Input
-                    id="emergencyContact"
-                    value={profileData.emergencyContact}
-                    onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
-                    placeholder="Emergency contact name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="emergencyPhone">Emergency Contact Phone</Label>
-                  <Input
-                    id="emergencyPhone"
-                    value={profileData.emergencyPhone}
-                    onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-                    placeholder="Emergency contact phone"
-                  />
-                </div>
-              </div>
-              
-              <Button 
+
+              <Button
                 onClick={handleSaveProfile}
                 disabled={updateProfileMutation.isPending}
                 className="w-full"
@@ -554,34 +560,6 @@ export default function Profile() {
             </CardContent>
           </Card>
         )}
-
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary">{pets.length}</div>
-              <div className="text-sm text-gray-600">Pets</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">{totalRecords}</div>
-              <div className="text-sm text-gray-600">Medical Records</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{totalReminders}</div>
-              <div className="text-sm text-gray-600">Total Reminders</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalExpenses)}</div>
-              <div className="text-sm text-gray-600">Total Expenses</div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Statistics */}
         <Card>
@@ -594,22 +572,30 @@ export default function Profile() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">{pets.length}</div>
+                <div className="text-2xl font-bold text-primary">
+                  {pets.length}
+                </div>
                 <div className="text-sm text-gray-600">Pets Registered</div>
               </div>
-              
+
               <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-secondary">{totalRecords}</div>
+                <div className="text-2xl font-bold text-secondary">
+                  {totalRecords}
+                </div>
                 <div className="text-sm text-gray-600">Medical Records</div>
               </div>
-              
+
               <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-accent">{totalReminders}</div>
+                <div className="text-2xl font-bold text-accent">
+                  {totalReminders}
+                </div>
                 <div className="text-sm text-gray-600">Total Reminders</div>
               </div>
-              
+
               <div className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-success">{completedReminders}</div>
+                <div className="text-2xl font-bold text-success">
+                  {completedReminders}
+                </div>
                 <div className="text-sm text-gray-600">Completed</div>
               </div>
             </div>
@@ -619,7 +605,8 @@ export default function Profile() {
                 <div className="flex items-center text-destructive">
                   <Bell className="w-4 h-4 mr-2" />
                   <span className="text-sm font-medium">
-                    {overdueReminders} overdue reminder{overdueReminders !== 1 ? 's' : ''} need attention
+                    {overdueReminders} overdue reminder
+                    {overdueReminders !== 1 ? "s" : ""} need attention
                   </span>
                 </div>
               </div>
@@ -637,15 +624,62 @@ export default function Profile() {
           </CardHeader>
           <CardContent>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-3xl font-bold text-primary">{formatCurrency(totalExpenses)}</div>
-              <div className="text-sm text-gray-600 mt-1">Total Pet Care Expenses</div>
+              <div className="text-3xl font-bold text-primary">
+                {formatCurrency(totalExpenses)}
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                Total Pet Care Expenses
+              </div>
             </div>
-            
+
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
-                Average per pet: {formatCurrency(pets.length > 0 ? totalExpenses / pets.length : 0)}
+                Average per pet:{" "}
+                {formatCurrency(
+                  pets.length > 0 ? totalExpenses / pets.length : 0,
+                )}
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Contact Support */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <MessageSquare className="w-5 h-5 mr-2 text-primary" />
+              Contact Support
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!showContactForm ? (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-4">
+                  Need help? Have questions about your pet care management? 
+                  Our support team is here to assist you.
+                </p>
+                <Button
+                  onClick={() => setShowContactForm(true)}
+                  className="w-full"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Contact Support
+                </Button>
+              </div>
+            ) : (
+              <ContactSupportForm 
+                userEmail={profileData.email || user?.email || ""}
+                userName={`${profileData.firstName} ${profileData.lastName}`.trim() || "Pet Owner"}
+                onSuccess={() => {
+                  setShowContactForm(false);
+                  toast({
+                    title: "Message sent",
+                    description: "Your support request has been sent successfully. We'll get back to you soon!",
+                  });
+                }}
+                onCancel={() => setShowContactForm(false)}
+              />
+            )}
           </CardContent>
         </Card>
 
@@ -658,29 +692,29 @@ export default function Profile() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start" 
+            <Button
+              variant="outline"
+              className="w-full justify-start"
               onClick={handleExportData}
             >
               <Download className="w-4 h-4 mr-2" />
               Export My Data
             </Button>
-            
-            <Button 
-              variant="outline" 
-              className="w-full justify-start" 
+
+            <Button
+              variant="outline"
+              className="w-full justify-start"
               onClick={handleImportData}
             >
               <Upload className="w-4 h-4 mr-2" />
               Import Data
             </Button>
-            
+
             <Separator />
-            
-            <Button 
-              variant="destructive" 
-              className="w-full justify-start" 
+
+            <Button
+              variant="destructive"
+              className="w-full justify-start"
               onClick={handleLogout}
             >
               <LogOut className="w-4 h-4 mr-2" />
@@ -692,5 +726,117 @@ export default function Profile() {
 
       <BottomNavigation activeTab="profile" />
     </div>
+  );
+}
+
+interface ContactSupportFormProps {
+  userEmail: string;
+  userName: string;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
+
+function ContactSupportForm({ userEmail, userName, onSuccess, onCancel }: ContactSupportFormProps) {
+  const { toast } = useToast();
+  const form = useForm<ContactSupportData>({
+    resolver: zodResolver(contactSupportSchema),
+    defaultValues: {
+      subject: "",
+      message: "",
+    },
+  });
+
+  const submitSupportRequest = useMutation({
+    mutationFn: async (data: ContactSupportData) => {
+      await apiRequest("POST", "/api/support/contact", {
+        ...data,
+        userEmail,
+        userName,
+      });
+    },
+    onSuccess: () => {
+      form.reset();
+      onSuccess();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to send support request. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: ContactSupportData) => {
+    submitSupportRequest.mutate(data);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Brief description of your issue"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Message</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Please describe your issue in detail. Include any error messages or steps you've taken."
+                  rows={5}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex space-x-2">
+          <Button
+            type="submit"
+            disabled={submitSupportRequest.isPending}
+            className="flex-1"
+          >
+            {submitSupportRequest.isPending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                Send Message
+              </>
+            )}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={submitSupportRequest.isPending}
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
