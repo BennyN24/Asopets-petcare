@@ -79,27 +79,21 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           if (code) {
             try {
               const qrData = JSON.parse(code.data);
-              toast({
-                title: "QR Code Scanned!",
-                description: `Found pet profile: ${qrData.name || 'Unknown'}`,
-              });
-              stopCamera();
-              onScanSuccess(qrData);
-              return;
+              if (qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId) {
+                toast({
+                  title: "Pet QR Code Found!",
+                  description: "Loading pet information...",
+                });
+                stopCamera();
+                onScanSuccess(qrData);
+                return;
+              } else {
+                setError('This QR code is not a valid pet profile. Please scan a pet QR code.');
+                setTimeout(() => setError(null), 3000);
+              }
             } catch (e) {
-              // If not JSON, treat as plain text
-              const qrData = {
-                type: "text",
-                data: code.data,
-                text: code.data
-              };
-              toast({
-                title: "QR Code Scanned!",
-                description: "QR code data found",
-              });
-              stopCamera();
-              onScanSuccess(qrData);
-              return;
+              setError('Invalid QR code format. Please scan a valid pet profile QR code.');
+              setTimeout(() => setError(null), 3000);
             }
           }
         } catch (err) {
@@ -123,24 +117,22 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     setIsScanning(false);
   };
 
-  const handleManualInput = () => {
-    // For demo purposes, simulate scanning a pet QR code
-    const demoData = {
+  const handleTestScan = () => {
+    // Generate a test QR code for the current user's first pet (if any)
+    const testData = {
       type: "pet_profile",
-      petId: "demo-pet-123",
-      name: "Demo Pet",
-      category: "dog",
-      breed: "Golden Retriever",
-      owner: "Demo Owner",
-      contact: "demo@example.com"
+      petId: 10, // Using the pet ID from the logs
+      ownerId: "6f1a0727-3380-4dd8-b401-8483bb8c57f8",
+      timestamp: new Date().toISOString(),
     };
 
     toast({
-      title: "QR Code Scanned!",
-      description: `Found pet profile: ${demoData.name}`,
+      title: "Test QR Code Scanned!",
+      description: "Loading real pet information...",
     });
 
-    onScanSuccess(demoData);
+    stopCamera();
+    onScanSuccess(testData);
   };
 
   return (
@@ -171,11 +163,11 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
 
               <Button 
                 variant="outline" 
-                onClick={handleManualInput}
+                onClick={handleTestScan}
                 className="w-full"
               >
                 <Share2 className="w-4 h-4 mr-2" />
-                Demo Scan (Testing)
+                Test Scan (Real Data)
               </Button>
             </div>
           ) : (
@@ -203,7 +195,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 <Button onClick={stopCamera} variant="outline" className="flex-1">
                   Stop Camera
                 </Button>
-                <Button onClick={handleManualInput} className="flex-1">
+                <Button onClick={handleTestScan} className="flex-1">
                   <Share2 className="w-4 h-4 mr-2" />
                   Test Scan
                 </Button>

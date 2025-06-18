@@ -461,6 +461,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public endpoint for QR code scanning - returns limited pet info with owner contact
+  app.get("/api/pets/public/:id", async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      
+      const pet = await storage.getPetById(petId);
+      if (!pet) {
+        return res.status(404).json({ message: "Pet not found" });
+      }
+      
+      // Get owner information (limited public data)
+      const owner = await storage.getUser(pet.userId);
+      if (!owner) {
+        return res.status(404).json({ message: "Owner not found" });
+      }
+      
+      // Return limited public information suitable for emergency/contact purposes
+      const publicPetData = {
+        type: 'pet_profile',
+        pet: {
+          id: pet.id,
+          name: pet.name,
+          category: pet.category,
+          breed: pet.breed || 'Unknown',
+          age: pet.age,
+          dateOfBirth: pet.dateOfBirth,
+          imageUrl: pet.imageUrl,
+          microchipId: pet.microchipId || null,
+          medicalConditions: pet.medicalConditions || null,
+          allergies: pet.allergies || null,
+        },
+        owner: {
+          name: `${owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Pet Owner',
+          phone: owner.phone || null,
+          email: owner.email || null,
+          emergencyContact: owner.emergencyContact || null,
+          emergencyPhone: owner.emergencyPhone || null,
+        },
+        scannedAt: new Date().toISOString(),
+      };
+      
+      res.json(publicPetData);
+    } catch (error) {
+      console.error("Error fetching public pet data:", error);
+      res.status(500).json({ message: "Failed to fetch pet information" });
+    }
+  });
+
   app.delete("/api/pets/:id", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.id);
