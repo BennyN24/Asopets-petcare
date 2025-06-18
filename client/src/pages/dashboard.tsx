@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +28,31 @@ export default function Dashboard() {
   const [showQRScanner, setShowQRScanner] = React.useState(false);
   const [scannedPetData, setScannedPetData] = React.useState<any>(null);
   const [scannedPets, setScannedPets] = React.useState<any[]>([]);
+
+  const handleQRScanSuccess = async (data: any) => {
+    try {
+      const response = await fetch(`/api/pets/public/${data.petId}`);
+      if (!response.ok) {
+        throw new Error('Pet not found or access denied');
+      }
+      
+      const petData = await response.json();
+      setScannedPetData(petData);
+      
+      setTimeout(() => {
+        setShowQRScanner(false);
+      }, 500);
+      
+    } catch (error) {
+      console.error('Error fetching pet data:', error);
+      toast({
+        title: "Error",
+        description: "Could not load pet information. The pet may not exist or access is restricted.",
+        variant: "destructive",
+      });
+      setShowQRScanner(false);
+    }
+  };
 
   // Redirect to login if not authenticated
   React.useEffect(() => {

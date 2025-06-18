@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -79,13 +79,6 @@ function Router() {
 }
 
 function App() {
-  // Ensure React is available to child components
-  React.useEffect(() => {
-    if (!(window as any).React) {
-      (window as any).React = React;
-    }
-  }, []);
-
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
