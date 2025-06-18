@@ -32,6 +32,7 @@ import {
   UserCircle,
   ContactRound
 } from "lucide-react";
+import PhotoUpload from "@/components/photo-upload";
 import { format } from "date-fns";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useToast } from "@/hooks/use-toast";

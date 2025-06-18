@@ -276,43 +276,23 @@ export class DatabaseStorage implements IStorage {
 
   // Reminder operations
   async getRemindersByUserId(userId: string): Promise<Reminder[]> {
-    return await db
-      .select({
-        id: reminders.id,
-        petId: reminders.petId,
-        medicalRecordId: reminders.medicalRecordId,
-        type: reminders.type,
-        title: reminders.title,
-        dueDate: reminders.dueDate,
-        isOverdue: reminders.isOverdue,
-        isCompleted: reminders.isCompleted,
-        notificationSent: reminders.notificationSent,
-        createdAt: reminders.createdAt,
-      })
+    const results = await db
+      .select()
       .from(reminders)
       .innerJoin(pets, eq(reminders.petId, pets.id))
       .where(eq(pets.userId, userId))
       .orderBy(reminders.dueDate);
+    return results.map(result => result.reminders);
   }
 
   async getActiveRemindersByUserId(userId: string): Promise<Reminder[]> {
-    return await db
-      .select({
-        id: reminders.id,
-        petId: reminders.petId,
-        medicalRecordId: reminders.medicalRecordId,
-        type: reminders.type,
-        title: reminders.title,
-        dueDate: reminders.dueDate,
-        isOverdue: reminders.isOverdue,
-        isCompleted: reminders.isCompleted,
-        notificationSent: reminders.notificationSent,
-        createdAt: reminders.createdAt,
-      })
+    const results = await db
+      .select()
       .from(reminders)
       .innerJoin(pets, eq(reminders.petId, pets.id))
       .where(and(eq(pets.userId, userId), eq(reminders.isCompleted, false)))
       .orderBy(reminders.dueDate);
+    return results.map(result => result.reminders);
   }
 
   async getRemindersByPetId(petId: number): Promise<Reminder[]> {
@@ -325,19 +305,8 @@ export class DatabaseStorage implements IStorage {
 
   async getOverdueRemindersByUserId(userId: string): Promise<Reminder[]> {
     const today = new Date().toISOString().split('T')[0];
-    return await db
-      .select({
-        id: reminders.id,
-        petId: reminders.petId,
-        medicalRecordId: reminders.medicalRecordId,
-        type: reminders.type,
-        title: reminders.title,
-        dueDate: reminders.dueDate,
-        isOverdue: reminders.isOverdue,
-        isCompleted: reminders.isCompleted,
-        notificationSent: reminders.notificationSent,
-        createdAt: reminders.createdAt,
-      })
+    const results = await db
+      .select()
       .from(reminders)
       .innerJoin(pets, eq(reminders.petId, pets.id))
       .where(
@@ -348,6 +317,7 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(reminders.dueDate);
+    return results.map(result => result.reminders);
   }
 
   async createReminder(reminder: InsertReminder): Promise<Reminder> {
