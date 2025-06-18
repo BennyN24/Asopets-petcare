@@ -178,8 +178,33 @@ export default function Profile() {
     .filter(record => record.cost && !isNaN(parseFloat(record.cost)))
     .reduce((sum, record) => sum + parseFloat(record.cost!), 0);
 
-  // Calculate account age (mock data since we don't have registration date)
-  const accountAge = "2+ years"; // This would come from user registration date
+  // Calculate account age based on user registration date
+  const calculateAccountAge = () => {
+    const userData = user as any;
+    if (!userData?.createdAt) return "New member";
+    
+    const registrationDate = new Date(userData.createdAt);
+    const now = new Date();
+    const diffInMs = now.getTime() - registrationDate.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays < 30) {
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''}`;
+    } else if (diffInDays < 365) {
+      const months = Math.floor(diffInDays / 30);
+      return `${months} month${months !== 1 ? 's' : ''}`;
+    } else {
+      const years = Math.floor(diffInDays / 365);
+      const remainingMonths = Math.floor((diffInDays % 365) / 30);
+      if (remainingMonths === 0) {
+        return `${years} year${years !== 1 ? 's' : ''}`;
+      } else {
+        return `${years}y ${remainingMonths}m`;
+      }
+    }
+  };
+  
+  const accountAge = calculateAccountAge();
 
   const handleLogout = () => {
     toast({
@@ -288,6 +313,22 @@ export default function Profile() {
                   <Mail className="w-4 h-4 mr-2" />
                   <span className="text-sm">{profileData.email || 'Not available'}</span>
                 </div>
+                {profileData.phone && (
+                  <div className="flex items-center text-gray-600 mt-1">
+                    <Phone className="w-4 h-4 mr-2" />
+                    <span className="text-sm">{profileData.phone}</span>
+                  </div>
+                )}
+                {profileData.city && (
+                  <div className="flex items-center text-gray-600 mt-1">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    <span className="text-sm">{profileData.city}, {profileData.country}</span>
+                  </div>
+                )}
+                <div className="flex items-center text-gray-600 mt-1">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Member since {accountAge}</span>
+                </div>
                 <Button
                   onClick={() => setIsEditingProfile(!isEditingProfile)}
                   variant="outline"
@@ -306,252 +347,119 @@ export default function Profile() {
                     </>
                   )}
                 </Button>
-                {profileData.phone && (
-                  <div className="flex items-center text-gray-600 mt-1">
-                    <Phone className="w-4 h-4 mr-2" />
-                    <span className="text-sm">{profileData.phone}</span>
-                  </div>
-                )}
-                {profileData.city && (
-                  <div className="flex items-center text-gray-600 mt-1">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span className="text-sm">{profileData.city}, {profileData.country}</span>
-                  </div>
-                )}
-                <div className="flex items-center text-gray-600 mt-1">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Member since {accountAge}</span>
-                </div>
               </div>
-              <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center">
-                      <UserCircle className="w-5 h-5 mr-2" />
-                      Edit Profile Information
-                    </DialogTitle>
-                  </DialogHeader>
-                  
-                  <div className="space-y-6">
-                    {/* Personal Information */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="firstName">First Name</Label>
-                          <Input
-                            id="firstName"
-                            value={profileData.firstName || ""}
-                            onChange={(e) => handleInputChange('firstName', e.target.value)}
-                            placeholder="Enter your first name"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="lastName">Last Name</Label>
-                          <Input
-                            id="lastName"
-                            value={profileData.lastName || ""}
-                            onChange={(e) => handleInputChange('lastName', e.target.value)}
-                            placeholder="Enter your last name"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                        <Input
-                          id="dateOfBirth"
-                          type="date"
-                          value={profileData.dateOfBirth || ""}
-                          onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Contact Information */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
-                      
-                      <div>
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          value={profileData.phone || ""}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          placeholder="+63 912 345 6789"
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="address">Address</Label>
-                        <Textarea
-                          id="address"
-                          value={profileData.address || ""}
-                          onChange={(e) => handleInputChange('address', e.target.value)}
-                          placeholder="Enter your complete address"
-                          className="min-h-[80px]"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="city">City</Label>
-                          <Input
-                            id="city"
-                            value={profileData.city || ""}
-                            onChange={(e) => handleInputChange('city', e.target.value)}
-                            placeholder="Enter your city"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="country">Country</Label>
-                          <Select 
-                            value={profileData.country} 
-                            onValueChange={(value) => handleInputChange('country', value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select country" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Philippines">Philippines</SelectItem>
-                              <SelectItem value="United States">United States</SelectItem>
-                              <SelectItem value="Canada">Canada</SelectItem>
-                              <SelectItem value="Australia">Australia</SelectItem>
-                              <SelectItem value="United Kingdom">United Kingdom</SelectItem>
-                              <SelectItem value="Singapore">Singapore</SelectItem>
-                              <SelectItem value="Malaysia">Malaysia</SelectItem>
-                              <SelectItem value="Thailand">Thailand</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Emergency Contact */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Emergency Contact</h3>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="emergencyContact">Emergency Contact Name</Label>
-                          <Input
-                            id="emergencyContact"
-                            value={profileData.emergencyContact || ""}
-                            onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
-                            placeholder="Enter emergency contact name"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="emergencyPhone">Emergency Phone Number</Label>
-                          <Input
-                            id="emergencyPhone"
-                            value={profileData.emergencyPhone || ""}
-                            onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-                            placeholder="+63 912 345 6789"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Preferences */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Preferences</h3>
-                      
-                      <div>
-                        <Label htmlFor="preferredLanguage">Preferred Language</Label>
-                        <Select 
-                          value={profileData.preferredLanguage} 
-                          onValueChange={(value) => handleInputChange('preferredLanguage', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select language" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="tl">Filipino</SelectItem>
-                            <SelectItem value="es">Spanish</SelectItem>
-                            <SelectItem value="zh">Chinese</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Notification Preferences */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">Notification Preferences</Label>
-                        
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="email-notifications" className="text-sm">Email Notifications</Label>
-                            <Switch
-                              id="email-notifications"
-                              checked={profileData.notificationPreferences?.email || false}
-                              onCheckedChange={(checked: boolean) => handleNotificationChange('email', checked)}
-                            />
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="sms-notifications" className="text-sm">SMS Notifications</Label>
-                            <Switch
-                              id="sms-notifications"
-                              checked={profileData.notificationPreferences?.sms || false}
-                              onCheckedChange={(checked: boolean) => handleNotificationChange('sms', checked)}
-                            />
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="push-notifications" className="text-sm">Push Notifications</Label>
-                            <Switch
-                              id="push-notifications"
-                              checked={profileData.notificationPreferences?.push || false}
-                              onCheckedChange={(checked: boolean) => handleNotificationChange('push', checked)}
-                            />
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="reminder-notifications" className="text-sm">Medical Reminders</Label>
-                            <Switch
-                              id="reminder-notifications"
-                              checked={profileData.notificationPreferences?.reminders || false}
-                              onCheckedChange={(checked: boolean) => handleNotificationChange('reminders', checked)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-2 pt-4">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setIsEditingProfile(false)}
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Cancel
-                      </Button>
-                      <Button 
-                        onClick={handleSaveProfile}
-                        disabled={updateProfileMutation.isPending}
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
             </div>
           </CardContent>
         </Card>
+
+        {/* Profile Editing Form */}
+        {isEditingProfile && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Edit Profile Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={profileData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    placeholder="Enter first name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={profileData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    placeholder="Enter last name"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={profileData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  placeholder="Enter phone number"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={profileData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  placeholder="Enter address"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="emergencyContact">Emergency Contact Name</Label>
+                  <Input
+                    id="emergencyContact"
+                    value={profileData.emergencyContact}
+                    onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
+                    placeholder="Emergency contact name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="emergencyPhone">Emergency Contact Phone</Label>
+                  <Input
+                    id="emergencyPhone"
+                    value={profileData.emergencyPhone}
+                    onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
+                    placeholder="Emergency contact phone"
+                  />
+                </div>
+              </div>
+              
+              <Button 
+                onClick={handleSaveProfile}
+                disabled={updateProfileMutation.isPending}
+                className="w-full"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Statistics Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-primary">{pets.length}</div>
+              <div className="text-sm text-gray-600">Pets</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{totalRecords}</div>
+              <div className="text-sm text-gray-600">Medical Records</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{totalReminders}</div>
+              <div className="text-sm text-gray-600">Total Reminders</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalExpenses)}</div>
+              <div className="text-sm text-gray-600">Total Expenses</div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Statistics */}
         <Card>
