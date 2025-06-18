@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 import { useLocation } from "wouter";
 import type { Pet, Reminder } from "@shared/schema";
 import { Dog, Cat, Bird, Rabbit, Heart } from "lucide-react";
