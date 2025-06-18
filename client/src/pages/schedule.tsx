@@ -14,18 +14,27 @@ import {
   PillBottle,
   Heart as MedicalKit,
   UserCog,
-  Stethoscope
+  Stethoscope,
+  Filter,
+  SortAsc,
+  SortDesc
 } from "lucide-react";
 import { format, isToday, isTomorrow, isThisWeek, differenceInDays } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/bottom-navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
+import { useState } from "react";
 
 export default function Schedule() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [sortBy, setSortBy] = useState<"date" | "type" | "pet">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterPet, setFilterPet] = useState<string>("all");
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],

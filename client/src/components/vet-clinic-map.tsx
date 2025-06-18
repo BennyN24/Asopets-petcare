@@ -25,8 +25,8 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
       let minDistance = calculateDistance(
         userLocation.latitude,
         userLocation.longitude,
-        closest.latitude,
-        closest.longitude
+        parseFloat(closest.latitude || '0'),
+        parseFloat(closest.longitude || '0')
       );
 
       clinics.forEach(clinic => {
