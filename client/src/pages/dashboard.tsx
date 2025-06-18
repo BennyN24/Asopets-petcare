@@ -218,18 +218,11 @@ export default function Dashboard() {
           onClose={() => setShowQRScanner(false)}
           onScanSuccess={(data) => {
             setShowQRScanner(false);
-            if (data.type === "pet-profile") {
+            if (data.type === "pet_profile") {
               setScannedPetData(data);
-              
-              // Add to scanned pets list if not already present
-              const exists = scannedPets.some(pet => pet.petId === data.petId);
-              if (!exists) {
-                setScannedPets(prev => [...prev, data]);
-              }
-              
               toast({
                 title: "Pet Profile Scanned",
-                description: `Successfully scanned ${data.name}'s profile!`,
+                description: `Found ${data.name} - ${data.breed}`,
               });
             }
           }}
