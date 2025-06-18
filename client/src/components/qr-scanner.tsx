@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+// @ts-ignore
+import jsQR from "jsqr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -68,12 +70,38 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Simple QR code detection using canvas data
-        // In a real implementation, you'd use a library like jsQR
         try {
           const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          // Placeholder for QR detection logic
-          // For now, we'll simulate detection with a manual trigger
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+
+          if (code) {
+            try {
+              const qrData = JSON.parse(code.data);
+              toast({
+                title: "QR Code Scanned!",
+                description: `Found pet profile: ${qrData.name || 'Unknown'}`,
+              });
+              stopCamera();
+              onScanSuccess(qrData);
+              return;
+            } catch (e) {
+              // If not JSON, treat as plain text
+              const qrData = {
+                type: "text",
+                data: code.data,
+                text: code.data
+              };
+              toast({
+                title: "QR Code Scanned!",
+                description: "QR code data found",
+              });
+              stopCamera();
+              onScanSuccess(qrData);
+              return;
+            }
+          }
         } catch (err) {
           console.error("QR detection error:", err);
         }

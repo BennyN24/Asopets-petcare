@@ -96,20 +96,27 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <button 
-              className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
               onClick={() => setShowQRScanner(true)}
             >
               <QrCode className="w-5 h-5" />
-            </button>
-            <button className="relative" onClick={() => setLocation("/schedule")}>
-              <Bell className="w-6 h-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 relative p-2"
+              onClick={() => setLocation("/schedule")}
+            >
+              <Bell className="w-5 h-5" />
               {totalNotifications > 0 && (
-                <span className="notification-badge warning">
-                  {totalNotifications}
-                </span>
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {totalNotifications > 9 ? '9+' : totalNotifications}
+                </div>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

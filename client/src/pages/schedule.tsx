@@ -242,6 +242,21 @@ export default function Schedule() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Schedule</h1>
+            <p className="text-white/80 text-sm">Manage Reminders</p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 relative p-2"
+            >
+              <Bell className="w-5 h-5" />
+              {(upcomingReminders.length + completedReminders.length) > 0 && (
+                <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {upcomingReminders.length + completedReminders.length > 9 ? '9+' : upcomingReminders.length + completedReminders.length}
+                </div>
+              )}
+            </Button>
           </div>
         </div>
       </div>
