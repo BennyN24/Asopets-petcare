@@ -1,9 +1,8 @@
-import * as React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PageLoader } from "@/components/loading-spinner";
@@ -79,20 +78,15 @@ function Router() {
 }
 
 function App() {
-  // Ensure React is available to child components
-  React.useEffect(() => {
-    if (!(window as any).React) {
-      (window as any).React = React;
-    }
-  }, []);
-
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <OfflineIndicator />
-        <Toaster />
-        <Router />
-        <MedicationReminderManager />
+        <TooltipProvider>
+          <OfflineIndicator />
+          <Toaster />
+          <Router />
+          <MedicationReminderManager />
+        </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

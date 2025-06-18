@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,17 +25,17 @@ import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/bottom-navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 
 export default function Schedule() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = React.useState<"upcoming" | "completed">("upcoming");
-  const [selectedType, setSelectedType] = React.useState<string>("all");
-  const [selectedPet, setSelectedPet] = React.useState<string>("all");
-  const [sortBy, setSortBy] = React.useState<"date" | "type" | "pet">("date");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "completed">("upcoming");
+  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedPet, setSelectedPet] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "type" | "pet">("date");
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],
@@ -151,7 +150,7 @@ export default function Schedule() {
   const completedReminders = reminders.filter(r => r.isCompleted && pets.some(pet => pet.id === r.petId));
 
   // Filter and sort reminders
-  const filteredUpcomingReminders = React.useMemo(() => {
+  const filteredUpcomingReminders = useMemo(() => {
     let filtered = activeReminders;
 
     // Apply type filter
@@ -182,7 +181,7 @@ export default function Schedule() {
     return filtered;
   }, [activeReminders, selectedType, selectedPet, sortBy, pets]);
 
-  const filteredCompletedReminders = React.useMemo(() => {
+  const filteredCompletedReminders = useMemo(() => {
     let filtered = completedReminders;
 
     // Apply type filter
@@ -243,21 +242,6 @@ export default function Schedule() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Schedule</h1>
-            <p className="text-white/80 text-sm">Manage Reminders</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 relative p-2"
-            >
-              <Bell className="w-5 h-5" />
-              {(filteredUpcomingReminders.length + filteredCompletedReminders.length) > 0 && (
-                <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                  {(filteredUpcomingReminders.length + filteredCompletedReminders.length) > 9 ? '9+' : (filteredUpcomingReminders.length + filteredCompletedReminders.length)}
-                </div>
-              )}
-            </Button>
           </div>
         </div>
       </div>

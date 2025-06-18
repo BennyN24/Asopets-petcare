@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,14 +23,14 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = React.useState("overview");
-  const [showVetClinics, setShowVetClinics] = React.useState(false);
-  const [showQRScanner, setShowQRScanner] = React.useState(false);
-  const [scannedPetData, setScannedPetData] = React.useState<any>(null);
-  const [scannedPets, setScannedPets] = React.useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showVetClinics, setShowVetClinics] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scannedPetData, setScannedPetData] = useState<any>(null);
+  const [scannedPets, setScannedPets] = useState<any[]>([]);
 
   // Redirect to login if not authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",
@@ -91,32 +91,25 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Welcome back!</h1>
-            <p className="text-white/80 text-sm">
+            <p className="text-green-100 text-sm">
               Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
             </p>
           </div>
           <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 p-2"
+            <button 
+              className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
               onClick={() => setShowQRScanner(true)}
             >
               <QrCode className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 relative p-2"
-              onClick={() => setLocation("/schedule")}
-            >
-              <Bell className="w-5 h-5" />
+            </button>
+            <button className="relative" onClick={() => setLocation("/schedule")}>
+              <Bell className="w-6 h-6" />
               {totalNotifications > 0 && (
-                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                  {totalNotifications > 9 ? '9+' : totalNotifications}
-                </div>
+                <span className="notification-badge warning">
+                  {totalNotifications}
+                </span>
               )}
-            </Button>
+            </button>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { useLocation } from "wouter";
 import { Home, Calendar, DollarSign, User } from "lucide-react";
 
@@ -6,7 +6,7 @@ interface BottomNavigationProps {
   activeTab: "home" | "schedule" | "expenses" | "profile";
 }
 
-export default React.memo(function BottomNavigation({ activeTab }: BottomNavigationProps) {
+export default memo(function BottomNavigation({ activeTab }: BottomNavigationProps) {
   const [, setLocation] = useLocation();
 
   const navItems = [

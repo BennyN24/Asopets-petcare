@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { useLocation } from "wouter";
 import type { Pet, Reminder } from "@shared/schema";
 import { Dog, Cat, Bird, Rabbit, Heart } from "lucide-react";
@@ -8,7 +8,7 @@ interface PetCardProps {
   reminders: Reminder[];
 }
 
-export default React.memo(function PetCard({ pet, reminders }: PetCardProps) {
+export default memo(function PetCard({ pet, reminders }: PetCardProps) {
   const [, setLocation] = useLocation();
   
   const getCategoryIcon = (category: string) => {
