@@ -44,7 +44,7 @@ export default function ResetPassword() {
     },
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenParam = urlParams.get('token');
     if (tokenParam) {
