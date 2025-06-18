@@ -502,25 +502,24 @@ export default function Profile() {
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="emergencyContact">Emergency Contact Name</Label>
-                  <Input
-                    id="emergencyContact"
-                    value={profileData.emergencyContact}
-                    onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
-                    placeholder="Emergency contact name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="emergencyPhone">Emergency Contact Phone</Label>
-                  <Input
-                    id="emergencyPhone"
-                    value={profileData.emergencyPhone}
-                    onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
-                    placeholder="Emergency contact phone"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="emergencyContact">Emergency Contact Name</Label>
+                <Input
+                  id="emergencyContact"
+                  value={profileData.emergencyContact}
+                  onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
+                  placeholder="Emergency contact name"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="emergencyPhone">Emergency Contact Phone</Label>
+                <Input
+                  id="emergencyPhone"
+                  value={profileData.emergencyPhone}
+                  onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
+                  placeholder="Emergency contact phone"
+                />
               </div>
               
               <Button 
@@ -535,33 +534,7 @@ export default function Profile() {
           </Card>
         )}
 
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-primary">{pets.length}</div>
-              <div className="text-sm text-gray-600">Pets</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">{totalRecords}</div>
-              <div className="text-sm text-gray-600">Medical Records</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{totalReminders}</div>
-              <div className="text-sm text-gray-600">Total Reminders</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalExpenses)}</div>
-              <div className="text-sm text-gray-600">Total Expenses</div>
-            </CardContent>
-          </Card>
-        </div>
+        
 
         {/* Statistics */}
         <Card>
