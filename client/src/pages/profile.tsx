@@ -64,8 +64,8 @@ export default function Profile() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileData, setProfileData] = useState<UserProfile>({
+  const [isEditingProfile, setIsEditingProfile] = React.useState(false);
+  const [profileData, setProfileData] = React.useState<UserProfile>({
     id: "",
     firstName: "",
     lastName: "",
