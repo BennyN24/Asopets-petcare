@@ -65,7 +65,7 @@ export default function OfflineSyncIndicator() {
   };
 
   // Auto-sync when coming back online
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOnline && offlineData.hasOfflineData && !isSyncing) {
       setTimeout(() => {
         handleSync();
