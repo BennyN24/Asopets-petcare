@@ -243,10 +243,6 @@ export default function MedicalRecordForm({
                 />
               ))}
 
-
-
-              
-
               {/* Reminder Settings */}
               <div className="bg-blue-50 p-4 rounded-lg">
                 <div className="flex items-start">
