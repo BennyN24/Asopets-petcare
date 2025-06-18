@@ -53,7 +53,7 @@ export default function Expenses() {
   const [isSettingBudget, setIsSettingBudget] = useState(false);
 
   // Save budget to localStorage whenever it changes
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem('petBudgetGoal', budgetGoal.toString());
   }, [budgetGoal]);
 

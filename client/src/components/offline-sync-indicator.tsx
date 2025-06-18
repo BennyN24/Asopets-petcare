@@ -12,7 +12,7 @@ export default function OfflineSyncIndicator() {
   const [isSyncing, setIsSyncing] = React.useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 

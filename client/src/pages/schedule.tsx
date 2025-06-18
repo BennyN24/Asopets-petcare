@@ -151,7 +151,7 @@ export default function Schedule() {
   const completedReminders = reminders.filter(r => r.isCompleted && pets.some(pet => pet.id === r.petId));
 
   // Filter and sort reminders
-  const filteredUpcomingReminders = useMemo(() => {
+  const filteredUpcomingReminders = React.useMemo(() => {
     let filtered = activeReminders;
 
     // Apply type filter
@@ -182,7 +182,7 @@ export default function Schedule() {
     return filtered;
   }, [activeReminders, selectedType, selectedPet, sortBy, pets]);
 
-  const filteredCompletedReminders = useMemo(() => {
+  const filteredCompletedReminders = React.useMemo(() => {
     let filtered = completedReminders;
 
     // Apply type filter

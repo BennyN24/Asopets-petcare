@@ -23,11 +23,11 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showVetClinics, setShowVetClinics] = useState(false);
-  const [showQRScanner, setShowQRScanner] = useState(false);
-  const [scannedPetData, setScannedPetData] = useState<any>(null);
-  const [scannedPets, setScannedPets] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = React.useState("overview");
+  const [showVetClinics, setShowVetClinics] = React.useState(false);
+  const [showQRScanner, setShowQRScanner] = React.useState(false);
+  const [scannedPetData, setScannedPetData] = React.useState<any>(null);
+  const [scannedPets, setScannedPets] = React.useState<any[]>([]);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
