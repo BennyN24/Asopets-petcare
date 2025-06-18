@@ -13,14 +13,14 @@ interface QRScannerProps {
 }
 
 export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
-  const [isScanning, setIsScanning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isScanning, setIsScanning] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [stream, setStream] = React.useState<MediaStream | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
