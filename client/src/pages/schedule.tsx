@@ -236,7 +236,6 @@ export default function Schedule() {
   }
 
   return (
-    
     <div className="mobile-container pb-20">
       {/* Header */}
       <div className="bg-primary text-white p-4">
@@ -245,6 +244,7 @@ export default function Schedule() {
             <h1 className="text-xl font-bold">Schedule</h1>
           </div>
         </div>
+      </div>
       <div className="p-4 space-y-6">
 
         {/* Filter Controls - Moved above tabs */}
