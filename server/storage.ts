@@ -371,7 +371,10 @@ export class DatabaseStorage implements IStorage {
   async markReminderCompleted(id: number): Promise<void> {
     await db
       .update(reminders)
-      .set({ isCompleted: true })
+      .set({ 
+        isCompleted: true,
+        completedAt: new Date()
+      })
       .where(eq(reminders.id, id));
   }
 

@@ -33,8 +33,8 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
         const distance = calculateDistance(
           userLocation.latitude,
           userLocation.longitude,
-          clinic.latitude,
-          clinic.longitude
+          parseFloat(clinic.latitude || '0'),
+          parseFloat(clinic.longitude || '0')
         );
         if (distance < minDistance) {
           minDistance = distance;
@@ -72,8 +72,8 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
     const distance = calculateDistance(
       userLocation.latitude,
       userLocation.longitude,
-      clinic.latitude,
-      clinic.longitude
+      parseFloat(clinic.latitude || '0'),
+      parseFloat(clinic.longitude || '0')
     );
     return `${distance.toFixed(1)} km away`;
   };
@@ -152,8 +152,8 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
                         </div>
                         
                         <div className="flex items-center space-x-2">
-                          <Badge className={`text-xs ${getClinicTypeColor(clinic.type || 'general')}`}>
-                            {clinic.type || 'General'}
+                          <Badge className={`text-xs ${getClinicTypeColor((clinic as any).type || 'general')}`}>
+                            {(clinic as any).type || 'General'}
                           </Badge>
                           {userLocation && (
                             <span className="text-xs text-gray-500">{formatDistance(clinic)}</span>
@@ -172,10 +172,10 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
                           </div>
                         )}
                         
-                        {clinic.hours && (
+                        {(clinic as any).hours && (
                           <div className="flex items-center text-xs text-gray-600">
                             <Clock className="w-3 h-3 mr-1" />
-                            <span>{clinic.hours}</span>
+                            <span>{(clinic as any).hours}</span>
                           </div>
                         )}
                         
@@ -237,18 +237,18 @@ export default function VetClinicMap({ clinics, userLocation, onClose }: VetClin
                 </div>
               )}
               
-              {selectedClinic.hours && (
+              {(selectedClinic as any).hours && (
                 <div>
                   <p className="font-medium text-gray-600">Hours</p>
-                  <p>{selectedClinic.hours}</p>
+                  <p>{(selectedClinic as any).hours}</p>
                 </div>
               )}
             </div>
             
-            {selectedClinic.description && (
+            {(selectedClinic as any).description && (
               <div className="mt-3">
                 <p className="font-medium text-gray-600 mb-1">About</p>
-                <p className="text-sm text-gray-700">{selectedClinic.description}</p>
+                <p className="text-sm text-gray-700">{(selectedClinic as any).description}</p>
               </div>
             )}
           </div>

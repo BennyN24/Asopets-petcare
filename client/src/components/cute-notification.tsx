@@ -152,6 +152,18 @@ export default function CuteNotification({
     return format(dueDate, "MMM d");
   };
 
+  // Check if reminder should show - only 1 day before due date
+  const shouldShowNotification = () => {
+    if (reminder.isCompleted) return false;
+    
+    const now = new Date();
+    const dueDate = new Date(reminder.dueDate);
+    const diffInHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    
+    // Show notification only when due date is between 23-25 hours away (1 day with tolerance)
+    return diffInHours >= 23 && diffInHours <= 25;
+  };
+
   // Don't show notification if not due tomorrow or already completed
   if (!isVisible || !shouldShowNotification()) return null;
 

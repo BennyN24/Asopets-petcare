@@ -15,8 +15,10 @@ import {
   FileText,
   Image as ImageIcon,
   Trash2,
-  Eye
+  Eye,
+  Camera
 } from "lucide-react";
+import MedicalAttachmentViewer from "@/components/medical-attachment-viewer";
 import { format, isValid } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -29,11 +31,12 @@ interface MedicalTimelineProps {
 }
 
 export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimelineProps) {
-
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [attachmentIndex, setAttachmentIndex] = useState(0);
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
