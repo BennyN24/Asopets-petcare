@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,9 +32,9 @@ interface SMSOTPLoginProps {
 }
 
 export default function SMSOTPLogin({ onSuccess, onBackToRegular }: SMSOTPLoginProps) {
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = React.useState<"phone" | "otp">("phone");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const { toast } = useToast();
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -88,7 +88,7 @@ export default function CuteNotification({
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!hasPlayed) {
       // Play appropriate sound and send push notification
       const urgency = getUrgencyLevel();
