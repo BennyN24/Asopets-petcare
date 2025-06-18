@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -137,7 +137,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     generateQRCode();
   }, [pet, medicalRecords]);
 
