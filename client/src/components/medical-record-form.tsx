@@ -11,8 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Camera, Upload, Bell, X, Image } from "lucide-react";
-import { useState, useRef } from "react";
+import { ArrowLeft, Bell } from "lucide-react";
+import { useState } from "react";
+import MultiPhotoUpload from "@/components/multi-photo-upload";
 
 interface ExtraField {
   name: keyof InsertMedicalRecord;
@@ -45,64 +46,13 @@ export default function MedicalRecordForm({
 }: MedicalRecordFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<InsertMedicalRecord>({
     resolver: zodResolver(insertMedicalRecordSchema),
     defaultValues,
   });
 
-  const handleFileSelect = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Error",
-        description: "Please select an image file",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    setIsUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string;
-        setSelectedImage(dataUrl);
-        form.setValue('imageUrl', dataUrl);
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to process image",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleCameraCapture = () => {
-    if (cameraInputRef.current) {
-      cameraInputRef.current.click();
-    }
-  };
-
-  const handleFileUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const removeSelectedImage = () => {
-    setSelectedImage(null);
-    form.setValue('imageUrl', '');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    if (cameraInputRef.current) cameraInputRef.current.value = '';
-  };
 
   const createRecordMutation = useMutation({
     mutationFn: async (data: InsertMedicalRecord) => {

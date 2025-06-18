@@ -152,7 +152,8 @@ export default function CuteNotification({
     return format(dueDate, "MMM d");
   };
 
-  if (!isVisible) return null;
+  // Don't show notification if not due tomorrow or already completed
+  if (!isVisible || !shouldShowNotification()) return null;
 
   return (
     <Card 

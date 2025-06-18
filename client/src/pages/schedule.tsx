@@ -331,7 +331,14 @@ export default function Schedule() {
                         <div className="flex-1">
                           <p className="font-medium text-gray-900">{reminder.title}</p>
                           <p className="text-sm text-gray-600">{getPetName(reminder.petId)}</p>
-                          <Badge className="text-xs bg-success text-success-foreground">Completed</Badge>
+                          <div className="space-y-1">
+                            <Badge className="text-xs bg-success text-success-foreground">Completed</Badge>
+                            {reminder.completedAt && (
+                              <p className="text-xs text-gray-500">
+                                Completed: {format(new Date(reminder.completedAt), "MMM d, yyyy 'at' h:mm a")}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
