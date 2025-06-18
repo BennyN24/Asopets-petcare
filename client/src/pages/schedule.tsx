@@ -137,7 +137,7 @@ export default function Schedule() {
     };
 
     reminderList
-      .filter(reminder => !reminder.isCompleted && reminder.dueDate)
+      .filter(reminder => reminder.dueDate)
       .forEach(reminder => {
         const category = getDateCategory(reminder.dueDate!);
         categories[category].push(reminder);
@@ -148,7 +148,75 @@ export default function Schedule() {
 
   const activeReminders = reminders.filter(r => !r.isCompleted);
   const completedReminders = reminders.filter(r => r.isCompleted && pets.some(pet => pet.id === r.petId));
-  const categorizedReminders = categorizeReminders(activeReminders);
+
+  // Filter and sort reminders
+  const filteredUpcomingReminders = useMemo(() => {
+    let filtered = activeReminders;
+
+    // Apply type filter
+    if (selectedType !== "all") {
+      filtered = filtered.filter(reminder => reminder.type === selectedType);
+    }
+
+    // Apply pet filter
+    if (selectedPet !== "all") {
+      filtered = filtered.filter(reminder => reminder.petId.toString() === selectedPet);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "type":
+          return a.type.localeCompare(b.type);
+        case "pet":
+          const petA = pets.find(p => p.id === a.petId)?.name || "";
+          const petB = pets.find(p => p.id === b.petId)?.name || "";
+          return petA.localeCompare(petB);
+        case "date":
+        default:
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+    });
+
+    return filtered;
+  }, [activeReminders, selectedType, selectedPet, sortBy, pets]);
+
+  const filteredCompletedReminders = useMemo(() => {
+    let filtered = completedReminders;
+
+    // Apply type filter
+    if (selectedType !== "all") {
+      filtered = filtered.filter(reminder => reminder.type === selectedType);
+    }
+
+    // Apply pet filter
+    if (selectedPet !== "all") {
+      filtered = filtered.filter(reminder => reminder.petId.toString() === selectedPet);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "type":
+          return a.type.localeCompare(b.type);
+        case "pet":
+          const petA = pets.find(p => p.id === a.petId)?.name || "";
+          const petB = pets.find(p => p.id === b.petId)?.name || "";
+          return petA.localeCompare(petB);
+        case "date":
+        default:
+          // For completed reminders, sort by completion date descending
+          if (a.completedAt && b.completedAt) {
+            return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+          }
+          return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
+      }
+    });
+
+    return filtered;
+  }, [completedReminders, selectedType, selectedPet, sortBy, pets]);
+
+  const categorizedReminders = categorizeReminders(filteredUpcomingReminders);
 
   const handleCompleteReminder = (reminderId: number) => {
     completeReminderMutation.mutate(reminderId);
@@ -183,7 +251,11 @@ export default function Schedule() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={clearFilters}
+                  onClick={() => {
+                    setSelectedType("all");
+                    setSelectedPet("all");
+                    setSortBy("date");
+                  }}
                   className="text-xs text-gray-500 hover:text-gray-700"
                 >
                   Clear filters
@@ -395,7 +467,7 @@ export default function Schedule() {
           <TabsContent value="completed" className="space-y-4 mt-6">
             {filteredCompletedReminders.length > 0 ? (
               <div className="space-y-3">
-                {filteredCompletedReminders.map((reminder) => (
+                {filteredCompletedReminders.map((reminder: Reminder) => (
                   <Card key={reminder.id}>
                     <CardContent className="p-3">
                       <div className="flex items-center space-x-3">
