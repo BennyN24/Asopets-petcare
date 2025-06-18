@@ -140,7 +140,10 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
           </CardContent>
         </Card>
       ) : (
-        <Card className="border-2 border-dashed border-gray-300 hover:border-primary transition-colors">
+        <Card 
+          className="border-2 border-dashed border-gray-300 hover:border-primary transition-colors cursor-pointer"
+          onClick={triggerFileInput}
+        >
           <CardContent className="p-6">
             <div className="text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -162,7 +165,10 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                   variant="outline"
                   size="sm"
                   disabled={isUploading}
-                  onClick={triggerFileInput}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerFileInput();
+                  }}
                 >
                   <Upload className="w-4 h-4 mr-1" />
                   Choose File
@@ -172,7 +178,11 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                   variant="outline"
                   size="sm"
                   disabled={isUploading}
-                  onClick={triggerFileInput}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // In a real app, you might trigger camera capture here
+                    triggerFileInput();
+                  }}
                 >
                   <Camera className="w-4 h-4 mr-1" />
                   Camera

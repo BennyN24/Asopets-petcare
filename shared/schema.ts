@@ -95,7 +95,6 @@ export const medicalRecords = pgTable("medical_records", {
   cost: varchar("cost"),
   notes: text("notes"),
   imageUrl: varchar("image_url"), // for certificates/records
-  attachments: text("attachments").array(), // multiple photo attachments
   reminderEnabled: boolean("reminder_enabled").default(true),
   reminderSms: boolean("reminder_sms").default(false),
   createdAt: timestamp("created_at").defaultNow(),
@@ -112,7 +111,6 @@ export const reminders = pgTable("reminders", {
   dueDate: date("due_date").notNull(),
   isOverdue: boolean("is_overdue").default(false),
   isCompleted: boolean("is_completed").default(false),
-  completedAt: timestamp("completed_at"),
   notificationSent: boolean("notification_sent").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -124,10 +122,6 @@ export const vetClinics = pgTable("vet_clinics", {
   address: text("address").notNull(),
   phone: varchar("phone"),
   email: varchar("email"),
-  type: varchar("type").default("general"), // general, emergency, specialty, 24hour
-  hours: text("hours"),
-  description: text("description"),
-  website: varchar("website"),
   latitude: numeric("latitude", { precision: 10, scale: 8 }),
   longitude: numeric("longitude", { precision: 11, scale: 8 }),
   averageRating: numeric("average_rating", { precision: 3, scale: 2 }).default("0"),

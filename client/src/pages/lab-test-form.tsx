@@ -2,13 +2,21 @@ import { useParams, useLocation } from "wouter";
 import MedicalRecordForm from "@/components/medical-record-form";
 
 const labTestTypes = [
-  "Blood Test",
+  "Blood Test - Complete Blood Count (CBC)",
+  "Blood Test - Chemistry Panel",
+  "Blood Test - Thyroid Function",
+  "Blood Test - Liver Function",
+  "Blood Test - Kidney Function",
   "Urinalysis",
   "Fecal Examination",
-  "Tissue / Skin",
-  "Imaging",
-  "Rapid Test Kit",
-  "Culture",
+  "Heartworm Test",
+  "FeLV/FIV Test (Cats)",
+  "Allergy Testing",
+  "Cytology",
+  "Biopsy",
+  "X-Ray/Radiography",
+  "Ultrasound",
+  "Echocardiogram",
   "Other"
 ];
 
