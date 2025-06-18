@@ -232,7 +232,7 @@ export default function Schedule() {
               {/* Sort Options */}
               <div>
                 <Label className="text-xs text-gray-600">Sort by</Label>
-                <Select value={sortBy} onValueChange={setSortBy}>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as "date" | "type" | "pet")}>
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -247,7 +247,7 @@ export default function Schedule() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "upcoming" | "completed")} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
             <TabsTrigger value="completed">Completed</TabsTrigger>
@@ -393,9 +393,9 @@ export default function Schedule() {
           </TabsContent>
 
           <TabsContent value="completed" className="space-y-4 mt-6">
-            {completedReminders.length > 0 ? (
+            {filteredCompletedReminders.length > 0 ? (
               <div className="space-y-3">
-                {completedReminders.map((reminder) => (
+                {filteredCompletedReminders.map((reminder) => (
                   <Card key={reminder.id}>
                     <CardContent className="p-3">
                       <div className="flex items-center space-x-3">
