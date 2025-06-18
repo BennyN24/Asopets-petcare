@@ -179,6 +179,62 @@ export default function Schedule() {
             </p>
           </div>
         </div>
+        
+        {/* Filters and Sorting */}
+        <div className="mt-4 flex flex-wrap gap-3">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-green-100" />
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-32 bg-white text-gray-900">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="vaccine">Vaccine</SelectItem>
+                <SelectItem value="deworming">Deworming</SelectItem>
+                <SelectItem value="treatment">Treatment</SelectItem>
+                <SelectItem value="checkup">Checkup</SelectItem>
+                <SelectItem value="grooming">Grooming</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Select value={filterPet} onValueChange={setFilterPet}>
+            <SelectTrigger className="w-32 bg-white text-gray-900">
+              <SelectValue placeholder="Pet" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Pets</SelectItem>
+              {pets.map(pet => (
+                <SelectItem key={pet.id} value={pet.id.toString()}>
+                  {pet.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <div className="flex items-center gap-1">
+            <Select value={sortBy} onValueChange={(value: "date" | "type" | "pet") => setSortBy(value)}>
+              <SelectTrigger className="w-24 bg-white text-gray-900">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date</SelectItem>
+                <SelectItem value="type">Type</SelectItem>
+                <SelectItem value="pet">Pet</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white text-gray-900 border-white"
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            >
+              {sortOrder === "asc" ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="p-4">
