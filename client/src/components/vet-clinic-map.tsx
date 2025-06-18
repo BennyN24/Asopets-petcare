@@ -14,8 +14,8 @@ interface VetClinicMapProps {
 }
 
 export default function VetClinicMap({ clinics, userLocation, onClose }: VetClinicMapProps) {
-  const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
-  const [nearestClinic, setNearestClinic] = useState<VetClinic | null>(null);
+  const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
+  const [nearestClinic, setNearestClinic] = React.useState<VetClinic | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {

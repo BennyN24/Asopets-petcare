@@ -16,8 +16,8 @@ export default function MedicalAttachmentViewer({
   onClose, 
   initialIndex = 0 
 }: MedicalAttachmentViewerProps) {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
+  const [isZoomed, setIsZoomed] = React.useState(false);
 
   const nextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % attachments.length);

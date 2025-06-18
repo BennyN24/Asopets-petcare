@@ -48,7 +48,7 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
   });
 
   // Reset form when pet data changes
-  useEffect(() => {
+  React.useEffect(() => {
     if (pet && pet.id) {
       form.reset({
         name: pet.name || "",

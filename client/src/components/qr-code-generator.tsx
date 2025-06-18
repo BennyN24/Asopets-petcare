@@ -13,8 +13,8 @@ interface QRCodeGeneratorProps {
 }
 
 export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGeneratorProps) {
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = React.useState<string>("");
+  const [isGenerating, setIsGenerating] = React.useState(false);
   const { toast } = useToast();
 
   const generateQRData = () => {
