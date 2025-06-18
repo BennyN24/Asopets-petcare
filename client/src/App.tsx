@@ -79,15 +79,22 @@ function Router() {
 }
 
 function App() {
+  // Ensure React is available to child components
+  React.useEffect(() => {
+    if (!(window as any).React) {
+      (window as any).React = React;
+    }
+  }, []);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
         <OfflineIndicator />
         <Toaster />
         <Router />
         <MedicationReminderManager />
-      </ErrorBoundary>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
