@@ -494,29 +494,6 @@ export default function Profile() {
               <CardTitle>Edit Profile Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Profile Photo Upload */}
-              <div className="flex flex-col items-center space-y-3">
-                <div className="relative">
-                  {profileData.profileImageUrl ? (
-                    <img
-                      src={profileData.profileImageUrl}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-primary/20"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center border-4 border-primary/20">
-                      <User className="w-12 h-12 text-primary" />
-                    </div>
-                  )}
-                </div>
-                <PhotoUpload
-                  onPhotoUploaded={(url: string) =>
-                    handleInputChange("profileImageUrl", url)
-                  }
-                  currentPhoto={profileData.profileImageUrl}
-                  className="flex items-center space-x-2 text-sm text-primary hover:text-primary/80 transition-colors"
-                />
-              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
