@@ -38,6 +38,7 @@ function Router() {
 
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading });
+  console.log('Current location:', window.location.pathname);
 
   if (isLoading) {
     return <PageLoader />;
@@ -66,7 +67,12 @@ function Router() {
           <Route path="/expenses" component={Expenses} />
           <Route path="/profile" component={Profile} />
           <Route path="/add-pet" component={AddPet} />
-          <Route path="/pet/:id" component={PetProfile} />
+          <Route path="/pet/:id">
+            {(params) => {
+              console.log('Pet route matched with params:', params);
+              return <PetProfile />;
+            }}
+          </Route>
           <Route path="/pet/:id/vaccine" component={VaccineForm} />
           <Route path="/pet/:id/deworming" component={DewormingForm} />
           <Route path="/pet/:id/treatment" component={TreatmentForm} />
@@ -80,7 +86,12 @@ function Router() {
           <Route path="/terms-of-service" component={TermsOfService} />
         </>
       )}
-      <Route component={NotFound} />
+      <Route>
+        {(params) => {
+          console.log('Unmatched route:', params, window.location.pathname);
+          return <NotFound />;
+        }}
+      </Route>
     </Switch>
   );
 }

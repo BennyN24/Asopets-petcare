@@ -11,6 +11,11 @@ interface PetCardProps {
 export default React.memo(function PetCard({ pet, reminders }: PetCardProps) {
   const [, setLocation] = useLocation();
   
+  const handleCardClick = () => {
+    console.log('Navigating to pet profile:', `/pet/${pet.id}`);
+    setLocation(`/pet/${pet.id}`);
+  };
+  
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "dog": return <Dog className="w-8 h-8 text-gray-600" />;
@@ -28,7 +33,7 @@ export default React.memo(function PetCard({ pet, reminders }: PetCardProps) {
   return (
     <div 
       className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative cursor-pointer hover:shadow-md transition-shadow"
-      onClick={() => setLocation(`/pet/${pet.id}`)}
+      onClick={handleCardClick}
     >
       {/* Pet Image or Icon */}
       {pet.imageUrl ? (

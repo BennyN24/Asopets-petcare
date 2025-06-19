@@ -25,7 +25,10 @@ export default React.memo(function BottomNavigation({ activeTab }: BottomNavigat
             className={`flex flex-col items-center py-2 px-3 ${
               activeTab === key ? "text-primary" : "text-gray-400"
             }`}
-            onClick={() => setLocation(path)}
+            onClick={() => {
+              console.log('Bottom nav clicked:', path);
+              setLocation(path);
+            }}
           >
             <Icon className="w-5 h-5 mb-1" />
             <span className="text-xs">{label}</span>
