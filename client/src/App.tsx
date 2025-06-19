@@ -57,25 +57,12 @@ function Router() {
     return <PageLoader />;
   }
 
+  console.log('Rendering routes with auth state:', { isAuthenticated, isLoading });
+
   return (
     <Switch>
-      {/* Public routes - always available */}
-      <Route path="/privacy" component={PrivacyPolicy} />
-      <Route path="/terms" component={TermsOfService} />
-      <Route path="/privacy-policy" component={PrivacyPolicy} />
-      <Route path="/terms-of-service" component={TermsOfService} />
-      
-      {/* Authentication-based routing */}
-      {!isAuthenticated ? (
-        <>
-          <Route path="/" component={Login} />
-          <Route path="/signup" component={Signup} />
-          <Route path="/forgot-password" component={ForgotPassword} />
-          <Route path="/reset-password" component={ResetPassword} />
-          <Route path="/email-confirmed" component={EmailConfirmed} />
-          <Route path="/landing" component={Landing} />
-        </>
-      ) : (
+      {/* Always render authenticated routes if user is authenticated */}
+      {isAuthenticated && (
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/welcome" component={Welcome} />
@@ -91,6 +78,24 @@ function Router() {
           <Route path="/pet/:id/checkup" component={CheckupForm} />
           <Route path="/pet/:id/lab-test" component={LabTestForm} />
           <Route path="/pet/:id/grooming" component={GroomingForm} />
+        </>
+      )}
+      
+      {/* Public routes - always available */}
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      
+      {/* Unauthenticated routes */}
+      {!isAuthenticated && (
+        <>
+          <Route path="/" component={Login} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/forgot-password" component={ForgotPassword} />
+          <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/email-confirmed" component={EmailConfirmed} />
+          <Route path="/landing" component={Landing} />
         </>
       )}
       

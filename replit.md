@@ -260,6 +260,14 @@ Changelog:
   * Removed bouncing animation from notifications and implemented native push notifications for mobile devices with pet emojis and urgency-based behavior
   * Removed Replit branding and authentication from login page, simplified to SMS-only authentication for cleaner user experience
   * Added comprehensive email/password authentication system with signup page, email confirmation, password hashing, and session management, removing SMS authentication for a unified experience
+- June 19, 2025. Fixed critical routing and 404 page issues:
+  * Identified and resolved race condition between authentication state and client-side routing
+  * Enhanced authentication system with better state management and debugging capabilities
+  * Restructured routing logic to properly handle authenticated vs unauthenticated states
+  * Fixed pet profile and navigation pages showing 404 errors despite successful authentication
+  * Improved useAuth hook with local state management to prevent routing flicker
+  * Added comprehensive debugging for authentication flow and route matching
+  * Ensured proper rendering of authenticated routes when user session is valid
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
