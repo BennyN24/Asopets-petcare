@@ -36,6 +36,9 @@ import EmailConfirmed from "@/pages/email-confirmed";
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
+  // Debug authentication state
+  console.log('Router state:', { isAuthenticated, isLoading });
+
   if (isLoading) {
     return <PageLoader />;
   }
