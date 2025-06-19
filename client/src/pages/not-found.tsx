@@ -10,6 +10,7 @@ export default function NotFound() {
   // Debug why 404 is showing
   React.useEffect(() => {
     console.log('NotFound component rendered for path:', window.location.pathname);
+    console.log('User agent authentication state from storage:', localStorage.getItem('auth-state'));
   }, []);
 
   const goHome = () => {

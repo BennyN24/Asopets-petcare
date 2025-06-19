@@ -53,6 +53,13 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes - always available */}
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      
+      {/* Authentication-based routing */}
       {!isAuthenticated ? (
         <>
           <Route path="/" component={Login} />
@@ -61,10 +68,6 @@ function Router() {
           <Route path="/reset-password" component={ResetPassword} />
           <Route path="/email-confirmed" component={EmailConfirmed} />
           <Route path="/landing" component={Landing} />
-          <Route path="/privacy" component={PrivacyPolicy} />
-          <Route path="/terms" component={TermsOfService} />
-          <Route path="/privacy-policy" component={PrivacyPolicy} />
-          <Route path="/terms-of-service" component={TermsOfService} />
         </>
       ) : (
         <>
@@ -82,12 +85,10 @@ function Router() {
           <Route path="/pet/:id/checkup" component={CheckupForm} />
           <Route path="/pet/:id/lab-test" component={LabTestForm} />
           <Route path="/pet/:id/grooming" component={GroomingForm} />
-          <Route path="/privacy" component={PrivacyPolicy} />
-          <Route path="/terms" component={TermsOfService} />
-          <Route path="/privacy-policy" component={PrivacyPolicy} />
-          <Route path="/terms-of-service" component={TermsOfService} />
         </>
       )}
+      
+      {/* Catch-all route for 404 */}
       <Route component={NotFound} />
     </Switch>
   );

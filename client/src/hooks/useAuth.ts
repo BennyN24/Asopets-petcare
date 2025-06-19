@@ -10,6 +10,9 @@ export function useAuth() {
 
   // Consider user authenticated if we have user data and no 401 error
   const isAuthenticated = !!user && !error;
+  
+  // Debug authentication state
+  console.log('useAuth:', { user: !!user, isLoading, error: error?.message, isAuthenticated });
 
   return {
     user,
