@@ -63,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid signup data", errors: error.errors });
       }
-      console.error("Signup error:", error);
+      // console.error("Signup error:", error);
       res.status(500).json({ message: "Failed to create account" });
     }
   });
@@ -101,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid login data", errors: error.errors });
       }
-      console.error("Login error:", error);
+      // console.error("Login error:", error);
       res.status(500).json({ message: "Failed to login" });
     }
   });
@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // If decoding fails, use the original token
       }
       
-      console.log(`Attempting email confirmation with token: ${cleanToken.substring(0, 20)}...`);
+      // console.log(`Attempting email confirmation with token: ${cleanToken.substring(0, 20)}...`);
       
       const user = await storage.confirmUserEmail(cleanToken);
       if (!user) {
@@ -134,7 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "Email confirmed successfully. You can now log in." });
     } catch (error) {
-      console.error("Email confirmation error:", error);
+      // console.error("Email confirmation error:", error);
       res.status(500).json({ message: "Failed to confirm email" });
     }
   });
@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "A new confirmation email has been sent. Please check your inbox." });
     } catch (error) {
-      console.error("Resend confirmation error:", error);
+      // console.error("Resend confirmation error:", error);
       res.status(500).json({ message: "Failed to resend confirmation email" });
     }
   });
@@ -209,7 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "If the email exists, a reset link has been sent" });
     } catch (error) {
-      console.error("Password reset error:", error);
+      // console.error("Password reset error:", error);
       res.status(500).json({ message: "Failed to process password reset" });
     }
   });
@@ -240,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "Password reset successful. You can now log in with your new password." });
     } catch (error) {
-      console.error("Password reset error:", error);
+      // console.error("Password reset error:", error);
       res.status(500).json({ message: "Failed to reset password" });
     }
   });
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP
       otpStore.set(phoneNumber, { otp, expires, verified: false });
 
-      console.log(`[SMS] Generated OTP for ${phoneNumber}: ${otp}`);
+      // console.log(`[SMS] Generated OTP for ${phoneNumber}: ${otp}`);
       
       // Production-ready SMS implementation
       if (process.env.NODE_ENV === 'development') {
@@ -276,14 +276,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         // Production mode: For now, log OTP (replace with actual SMS service)
-        console.log(`[PRODUCTION SMS] OTP for ${phoneNumber}: ${otp}`);
+        // console.log(`[PRODUCTION SMS] OTP for ${phoneNumber}: ${otp}`);
         res.json({ 
           message: "OTP sent successfully", 
           note: "Check server logs for OTP (temporary production setup)"
         });
       }
     } catch (error) {
-      console.error("Error sending OTP:", error);
+      // console.error("Error sending OTP:", error);
       res.status(500).json({ message: "Failed to send OTP" });
     }
   });
@@ -324,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ message: "OTP verified successfully", user });
     } catch (error) {
-      console.error("Error verifying OTP:", error);
+      // console.error("Error verifying OTP:", error);
       res.status(500).json({ message: "Failed to verify OTP" });
     }
   });
@@ -339,7 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
-      console.error("Error fetching user:", error);
+      // console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
@@ -358,7 +358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid user data", errors: error.errors });
       }
-      console.error("Error updating user:", error);
+      // console.error("Error updating user:", error);
       res.status(500).json({ message: "Failed to update user" });
     }
   });
@@ -390,7 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(responseData);
     } catch (error) {
-      console.error("Error fetching pets:", error);
+      // console.error("Error fetching pets:", error);
       res.status(500).json({ message: "Failed to fetch pets" });
     }
   });
@@ -412,7 +412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(pet);
     } catch (error) {
-      console.error("Error fetching pet:", error);
+      // console.error("Error fetching pet:", error);
       res.status(500).json({ message: "Failed to fetch pet" });
     }
   });
@@ -430,7 +430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid pet data", errors: error.errors });
       }
-      console.error("Error creating pet:", error);
+      // console.error("Error creating pet:", error);
       res.status(500).json({ message: "Failed to create pet" });
     }
   });
@@ -456,7 +456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid pet data", errors: error.errors });
       }
-      console.error("Error updating pet:", error);
+      // console.error("Error updating pet:", error);
       res.status(500).json({ message: "Failed to update pet" });
     }
   });
@@ -504,7 +504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(publicPetData);
     } catch (error) {
-      console.error("Error fetching public pet data:", error);
+      // console.error("Error fetching public pet data:", error);
       res.status(500).json({ message: "Failed to fetch pet information" });
     }
   });
@@ -526,7 +526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deletePet(petId);
       res.status(204).send();
     } catch (error) {
-      console.error("Error deleting pet:", error);
+      // console.error("Error deleting pet:", error);
       res.status(500).json({ message: "Failed to delete pet" });
     }
   });
@@ -549,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const records = await storage.getMedicalRecordsByPetId(petId);
       res.json(records);
     } catch (error) {
-      console.error("Error fetching medical records:", error);
+      // console.error("Error fetching medical records:", error);
       res.status(500).json({ message: "Failed to fetch medical records" });
     }
   });
@@ -584,7 +584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid medical record data", errors: error.errors });
       }
-      console.error("Error creating medical record:", error);
+      // console.error("Error creating medical record:", error);
       res.status(500).json({ message: "Failed to create medical record" });
     }
   });
@@ -615,7 +615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid medical record data", errors: error.errors });
       }
-      console.error("Error updating medical record:", error);
+      // console.error("Error updating medical record:", error);
       res.status(500).json({ message: "Failed to update medical record" });
     }
   });
@@ -642,7 +642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.deleteMedicalRecord(recordId);
       res.status(204).send();
     } catch (error) {
-      console.error("Error deleting medical record:", error);
+      // console.error("Error deleting medical record:", error);
       res.status(500).json({ message: "Failed to delete medical record" });
     }
   });
@@ -657,7 +657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reminders = await storage.getRemindersByUserId(userId);
       res.json(reminders);
     } catch (error) {
-      console.error("Error fetching reminders:", error);
+      // console.error("Error fetching reminders:", error);
       res.status(500).json({ message: "Failed to fetch reminders" });
     }
   });
@@ -681,7 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(remindersWithPets);
     } catch (error) {
-      console.error("Error fetching reminders with pets:", error);
+      // console.error("Error fetching reminders with pets:", error);
       res.status(500).json({ message: "Failed to fetch reminders with pets" });
     }
   });
@@ -695,7 +695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const overdueReminders = await storage.getOverdueRemindersByUserId(userId);
       res.json(overdueReminders);
     } catch (error) {
-      console.error("Error fetching overdue reminders:", error);
+      // console.error("Error fetching overdue reminders:", error);
       res.status(500).json({ message: "Failed to fetch overdue reminders" });
     }
   });
@@ -717,7 +717,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reminders = await storage.getRemindersByPetId(petId);
       res.json(reminders);
     } catch (error) {
-      console.error("Error fetching pet reminders:", error);
+      // console.error("Error fetching pet reminders:", error);
       res.status(500).json({ message: "Failed to fetch pet reminders" });
     }
   });
@@ -734,7 +734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.markReminderCompleted(reminderId);
       res.json({ message: "Reminder marked as completed" });
     } catch (error) {
-      console.error("Error completing reminder:", error);
+      // console.error("Error completing reminder:", error);
       res.status(500).json({ message: "Failed to complete reminder" });
     }
   });
@@ -758,7 +758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(clinics);
     } catch (error) {
-      console.error("Error fetching vet clinics:", error);
+      // console.error("Error fetching vet clinics:", error);
       res.status(500).json({ message: "Failed to fetch vet clinics" });
     }
   });
@@ -774,7 +774,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(clinic);
     } catch (error) {
-      console.error("Error fetching vet clinic:", error);
+      // console.error("Error fetching vet clinic:", error);
       res.status(500).json({ message: "Failed to fetch vet clinic" });
     }
   });
@@ -784,7 +784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const clinic = await storage.createVetClinic(req.body);
       res.status(201).json(clinic);
     } catch (error) {
-      console.error("Error creating vet clinic:", error);
+      // console.error("Error creating vet clinic:", error);
       res.status(500).json({ message: "Failed to create vet clinic" });
     }
   });
@@ -796,7 +796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ratings = await storage.getClinicRatingsByClinicId(clinicId);
       res.json(ratings);
     } catch (error) {
-      console.error("Error fetching clinic ratings:", error);
+      // console.error("Error fetching clinic ratings:", error);
       res.status(500).json({ message: "Failed to fetch clinic ratings" });
     }
   });
@@ -815,7 +815,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rating = await storage.createClinicRating(ratingData);
       res.status(201).json(rating);
     } catch (error) {
-      console.error("Error creating clinic rating:", error);
+      // console.error("Error creating clinic rating:", error);
       res.status(500).json({ message: "Failed to create clinic rating" });
     }
   });
@@ -829,7 +829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ratings = await storage.getClinicRatingsByUserId(userId);
       res.json(ratings);
     } catch (error) {
-      console.error("Error fetching user ratings:", error);
+      // console.error("Error fetching user ratings:", error);
       res.status(500).json({ message: "Failed to fetch user ratings" });
     }
   });
@@ -895,7 +895,7 @@ Reply directly to this email to respond to the user.
         res.status(500).json({ message: "Failed to send support request" });
       }
     } catch (error) {
-      console.error("Error sending support request:", error);
+      // console.error("Error sending support request:", error);
       res.status(500).json({ message: "Failed to send support request" });
     }
   });

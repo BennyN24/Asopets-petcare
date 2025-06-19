@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -346,14 +346,14 @@ export default function Profile() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfileData((prev) => ({
+    setProfileData((prev: any) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleNotificationChange = (type: string, value: boolean) => {
-    setProfileData((prev) => ({
+    setProfileData((prev: any) => ({
       ...prev,
       notificationPreferences: {
         ...prev.notificationPreferences!,
