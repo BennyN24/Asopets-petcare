@@ -275,23 +275,6 @@ Changelog:
   * Moved schedule sort/filter controls above the Upcoming/Completed tabs for better UX
   * Fixed schedule filtering logic to properly filter reminders by type and pet
   * Fixed duplicate CardContent issue in photo-upload component with redundant click handlers
-- June 18, 2025. Real-time QR scanning implementation and animated mascot interactions:
-  * Removed demo data from QR scanner and implemented real-time scanning with actual pet data exchange
-  * Created public API endpoint for secure pet information retrieval via QR codes
-  * Updated QR code generation to use minimal pet ID references for enhanced security
-  * Enhanced scanned pet viewer to display comprehensive pet and owner information
-  * Added proper error handling for invalid or non-existent pet QR codes
-  * Implemented animated pet mascot system with category-specific mascots and scanning states
-  * Added floating particle effects and success animations for enhanced user experience
-  * Created scanning line animation and visual feedback for QR code detection
-  * Enhanced contact support form functionality with SendGrid email integration
-- June 19, 2025. Deployment optimization and code cleanup:
-  * Replaced paw print icon with professional ASOPETS logo on login page
-  * Cleaned up all console statements throughout application for production
-  * Fixed TypeScript errors and syntax issues in authentication system
-  * Completed comprehensive router setup with all authenticated and public routes
-  * Optimized build process and removed development logging for production readiness
-  * Verified all 23 pages are properly routed and accessible
 - June 16, 2025. Comprehensive pre-launch optimization and app store preparation:
   * Renamed application to "My PetBB" with updated branding throughout
 - June 17, 2025. Complete application rebranding to ASOPETS:

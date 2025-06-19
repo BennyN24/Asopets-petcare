@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,9 +49,9 @@ export default function CuteNotification({
   onDismiss, 
   onSnooze 
 }: CuteNotificationProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
+  const [showSnoozeOptions, setShowSnoozeOptions] = React.useState(false);
+  const [hasPlayed, setHasPlayed] = React.useState(false);
 
   const getUrgencyLevel = () => {
     if (!reminder.dueDate) return "normal";
@@ -83,12 +83,12 @@ export default function CuteNotification({
           });
         }
       } catch (error) {
-        // Push notification failed silently
+        console.log('Push notification error:', error);
       }
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!hasPlayed) {
       // Play appropriate sound and send push notification
       const urgency = getUrgencyLevel();

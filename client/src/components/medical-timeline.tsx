@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,10 +33,10 @@ interface MedicalTimelineProps {
 export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimelineProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [showAttachments, setShowAttachments] = useState(false);
-  const [attachmentIndex, setAttachmentIndex] = useState(0);
+  const [selectedRecord, setSelectedRecord] = React.useState<MedicalRecord | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [showAttachments, setShowAttachments] = React.useState(false);
+  const [attachmentIndex, setAttachmentIndex] = React.useState(0);
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {

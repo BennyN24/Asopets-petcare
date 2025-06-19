@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext } from "react"
+import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
 import {
@@ -42,8 +42,8 @@ const FormField = <
 }
 
 const useFormField = () => {
-  const fieldContext = useContext(FormFieldContext)
-  const itemContext = useContext(FormItemContext)
+  const fieldContext = React.useContext(FormFieldContext)
+  const itemContext = React.useContext(FormItemContext)
   const { getFieldState, formState } = useFormContext()
 
   const fieldState = getFieldState(fieldContext.name, formState)

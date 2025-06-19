@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ const features = [
 ];
 
 export default function Welcome() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = React.useState(0);
   const [, setLocation] = useLocation();
 
   const steps = [

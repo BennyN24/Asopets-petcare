@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, Upload, X, Image as ImageIcon } from "lucide-react";
@@ -11,9 +11,9 @@ interface PhotoUploadProps {
 }
 
 export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className = "" }: PhotoUploadProps) {
-  const [preview, setPreview] = useState<string | null>(currentPhoto || null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = React.useState<string | null>(currentPhoto || null);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {

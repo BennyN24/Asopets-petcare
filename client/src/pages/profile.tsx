@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,9 +90,9 @@ export default function Profile() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [showContactForm, setShowContactForm] = useState(false);
-  const [profileData, setProfileData] = useState<UserProfile>({
+  const [isEditingProfile, setIsEditingProfile] = React.useState(false);
+  const [showContactForm, setShowContactForm] = React.useState(false);
+  const [profileData, setProfileData] = React.useState<UserProfile>({
     id: "",
     firstName: "",
     lastName: "",
@@ -114,7 +114,7 @@ export default function Profile() {
   });
 
   // Initialize profile data when user loads
-  useEffect(() => {
+  React.useEffect(() => {
     if (user) {
       const userData = user as Record<string, any>;
       setProfileData({
@@ -299,7 +299,7 @@ export default function Profile() {
           });
 
           // Here you would typically upload this data to your server
-          // Data imported successfully
+          console.log("Imported data:", data);
         } catch (error) {
           toast({
             title: "Import failed",
@@ -346,14 +346,14 @@ export default function Profile() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfileData((prev: any) => ({
+    setProfileData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleNotificationChange = (type: string, value: boolean) => {
-    setProfileData((prev: any) => ({
+    setProfileData((prev) => ({
       ...prev,
       notificationPreferences: {
         ...prev.notificationPreferences!,

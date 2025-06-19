@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,7 +29,7 @@ interface PetEditFormProps {
 }
 
 export default function PetEditForm({ pet }: PetEditFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -48,7 +48,7 @@ export default function PetEditForm({ pet }: PetEditFormProps) {
   });
 
   // Reset form when pet data changes
-  useEffect(() => {
+  React.useEffect(() => {
     if (pet && pet.id) {
       form.reset({
         name: pet.name || "",

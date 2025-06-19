@@ -82,10 +82,10 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
   // Always log the confirmation link for testing
-  // console.log(`\n=== EMAIL CONFIRMATION LINK ===`);
-  // console.log(`Email: ${email}`);
-  // console.log(`Link: ${confirmationLink}`);
-  // console.log(`================================\n`);
+  console.log(`\n=== EMAIL CONFIRMATION LINK ===`);
+  console.log(`Email: ${email}`);
+  console.log(`Link: ${confirmationLink}`);
+  console.log(`================================\n`);
 
   try {
     // Check if SendGrid is configured
@@ -143,22 +143,28 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
       };
 
       const result = await sgMail.send(msg);
-      // console.log(`Confirmation email sent to ${email}`);
-      // console.log("SendGrid response:", result[0].statusCode, result[0].body);
+      console.log(`Confirmation email sent to ${email}`);
+      console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
       // Development mode - log the link
-      // console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
-      // console.log("Note: Configure SENDGRID_API_KEY environment variable to send actual emails");
+      console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+      console.log(
+        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
+      );
     }
   } catch (error: any) {
-    // console.error("Failed to send confirmation email:", error);
+    console.error("Failed to send confirmation email:", error);
     if (error.response?.body?.errors) {
-      // SendGrid detailed errors logged in development
+      console.error(
+        "SendGrid detailed errors:",
+        JSON.stringify(error.response.body.errors, null, 2),
+      );
     }
     if (error.code) {
-      // SendGrid error code logged in development
+      console.error("SendGrid error code:", error.code);
     }
-    // Still log the link as fallback in development
+    // Still log the link as fallback
+    console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
   }
 };
 
@@ -170,10 +176,10 @@ export const sendPasswordResetEmail = async (
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
   // Always log the password reset link for testing
-  // console.log(`\n=== PASSWORD RESET LINK ===`);
-  // console.log(`Email: ${email}`);
-  // console.log(`Link: ${resetLink}`);
-  // console.log(`===========================\n`);
+  console.log(`\n=== PASSWORD RESET LINK ===`);
+  console.log(`Email: ${email}`);
+  console.log(`Link: ${resetLink}`);
+  console.log(`===========================\n`);
 
   try {
     if (process.env.SENDGRID_API_KEY) {
@@ -233,19 +239,25 @@ export const sendPasswordResetEmail = async (
       };
 
       const result = await sgMail.send(msg);
-      // console.log(`Password reset email sent to ${email}`);
-      // console.log("SendGrid response:", result[0].statusCode, result[0].body);
+      console.log(`Password reset email sent to ${email}`);
+      console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
-      // Development mode - email service not configured
+      console.log(`Password reset link for ${email}: ${resetLink}`);
+      console.log(
+        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
+      );
     }
   } catch (error: any) {
-    // console.error("Failed to send password reset email:", error);
+    console.error("Failed to send password reset email:", error);
     if (error.response?.body?.errors) {
-      // SendGrid detailed errors logged in development
+      console.error(
+        "SendGrid detailed errors:",
+        JSON.stringify(error.response.body.errors, null, 2),
+      );
     }
     if (error.code) {
-      // SendGrid error code logged in development
+      console.error("SendGrid error code:", error.code);
     }
-    // Password reset link available for development debugging
+    console.log(`Password reset link for ${email}: ${resetLink}`);
   }
 };

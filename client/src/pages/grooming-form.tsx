@@ -1,4 +1,3 @@
-import React from "react";
 import { useLocation } from "wouter";
 import { useParams } from "wouter";
 import MedicalRecordForm from "@/components/medical-record-form";

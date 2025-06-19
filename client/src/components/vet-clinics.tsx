@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,16 +111,16 @@ function ClinicReviews({ clinicId }: ClinicReviewsProps) {
 }
 
 export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinicsProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
-  const [showRatingForm, setShowRatingForm] = useState(false);
-  const [showReviews, setShowReviews] = useState<{ [key: number]: boolean }>({});
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
+  const [showRatingForm, setShowRatingForm] = React.useState(false);
+  const [showReviews, setShowReviews] = React.useState<{ [key: number]: boolean }>({});
+  const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Get user location
-  useEffect(() => {
+  React.useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {

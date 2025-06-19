@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,10 +22,10 @@ import {
   Smartphone,
   CheckCircle,
   AlertCircle,
+  PawPrint,
   Eye,
   EyeOff,
 } from "lucide-react";
-import logoPath from "@assets/AsoPets-Logo-500x500_1750348527646.png";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,11 +39,11 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResendConfirmation, setShowResendConfirmation] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [lastEmailAttempt, setLastEmailAttempt] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [showResendConfirmation, setShowResendConfirmation] = React.useState(false);
+  const [isResending, setIsResending] = React.useState(false);
+  const [lastEmailAttempt, setLastEmailAttempt] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -70,8 +70,7 @@ export default function Login() {
         setLastEmailAttempt(data.email);
         toast({
           title: "Email confirmation required",
-          description:
-            "Please confirm your email before logging in. Click 'Resend Confirmation' if you didn't receive the email.",
+          description: "Please confirm your email before logging in. Click 'Resend Confirmation' if you didn't receive the email.",
           variant: "default",
         });
       } else {
@@ -89,16 +88,15 @@ export default function Login() {
 
   const handleResendConfirmation = async () => {
     if (!lastEmailAttempt) return;
-
+    
     setIsResending(true);
     try {
-      await apiRequest("POST", "/api/auth/resend-confirmation", {
-        email: lastEmailAttempt,
+      await apiRequest("POST", "/api/auth/resend-confirmation", { 
+        email: lastEmailAttempt 
       });
       toast({
         title: "Confirmation email sent",
-        description:
-          "Please check your inbox and spam folder for the confirmation email.",
+        description: "Please check your inbox and spam folder for the confirmation email.",
         variant: "default",
       });
       setShowResendConfirmation(false);
@@ -113,9 +111,7 @@ export default function Login() {
       } else {
         toast({
           title: "Failed to resend",
-          description:
-            error.message ||
-            "Failed to resend confirmation email. Please try again.",
+          description: error.message || "Failed to resend confirmation email. Please try again.",
           variant: "destructive",
         });
       }
@@ -129,12 +125,8 @@ export default function Login() {
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Title */}
         <div className="text-center space-y-2">
-          <div className="mx-auto w-20 h-20 flex items-center justify-center">
-            <img
-              src={logoPath}
-              alt="ASOPETS Logo"
-              className="w-20 h-20 object-contain"
-            />
+          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+            <PawPrint className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">
             Welcome to ASOPETS
@@ -231,8 +223,7 @@ export default function Login() {
                   <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="text-sm text-blue-800 mb-3">
-                      Didn't receive the confirmation email? We can send you a
-                      new one.
+                      Didn't receive the confirmation email? We can send you a new one.
                     </p>
                     <Button
                       onClick={handleResendConfirmation}

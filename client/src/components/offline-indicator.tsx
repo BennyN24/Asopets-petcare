@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { WifiOff, Wifi } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function OfflineIndicator() {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showOfflineMessage, setShowOfflineMessage] = useState(false);
+  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
+  const [showOfflineMessage, setShowOfflineMessage] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
       setShowOfflineMessage(false);

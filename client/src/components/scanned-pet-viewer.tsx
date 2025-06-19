@@ -1,32 +1,21 @@
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, User, Phone, Mail, MapPin, Heart, Calendar, AlertTriangle } from "lucide-react";
-import { format } from "date-fns";
+import { X, User, Phone, Mail, MapPin, Heart, Calendar } from "lucide-react";
 
 interface ScannedPetData {
   type: string;
-  pet: {
-    id: number;
-    name: string;
-    category: string;
-    breed?: string;
-    age?: number;
-    dateOfBirth?: string;
-    imageUrl?: string;
-    microchipId?: string;
-    medicalConditions?: string;
-    allergies?: string;
-  };
-  owner: {
-    name: string;
-    phone?: string;
-    email?: string;
-    emergencyContact?: string;
-    emergencyPhone?: string;
-  };
-  scannedAt: string;
+  petId: string;
+  name: string;
+  category: string;
+  breed: string;
+  age?: number;
+  owner: string;
+  contact?: string;
+  email?: string;
+  address?: string;
+  medicalNotes?: string;
+  emergencyContact?: string;
 }
 
 interface ScannedPetViewerProps {
@@ -62,73 +51,22 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
         <CardContent className="space-y-4">
           {/* Pet Info */}
           <div className="text-center space-y-2">
-            {data.pet.imageUrl && (
-              <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gray-200">
-                <img 
-                  src={data.pet.imageUrl} 
-                  alt={data.pet.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <h3 className="text-xl font-bold text-gray-800">{data.pet.name}</h3>
+            <h3 className="text-xl font-bold text-gray-800">{data.name}</h3>
             <div className="flex justify-center space-x-2">
-              <Badge className={categoryColors[data.pet.category as keyof typeof categoryColors]}>
-                {data.pet.category.charAt(0).toUpperCase() + data.pet.category.slice(1)}
+              <Badge className={categoryColors[data.category as keyof typeof categoryColors]}>
+                {data.category.charAt(0).toUpperCase() + data.category.slice(1)}
               </Badge>
-              {data.pet.breed && (
-                <Badge variant="outline">{data.pet.breed}</Badge>
+              {data.breed && (
+                <Badge variant="outline">{data.breed}</Badge>
               )}
             </div>
-            {data.pet.age && (
+            {data.age && (
               <div className="flex items-center justify-center text-sm text-gray-600">
                 <Calendar className="w-4 h-4 mr-1" />
-                {Math.floor(data.pet.age / 12)} years {data.pet.age % 12} months
-              </div>
-            )}
-            {data.pet.dateOfBirth && (
-              <div className="text-sm text-gray-500">
-                Born: {format(new Date(data.pet.dateOfBirth), "MMM dd, yyyy")}
+                {Math.floor(data.age / 12)} years {data.age % 12} months
               </div>
             )}
           </div>
-
-          {/* Medical Information */}
-          {(data.pet.medicalConditions || data.pet.allergies || data.pet.microchipId) && (
-            <div className="border-t pt-4 space-y-3">
-              <h4 className="font-semibold text-gray-700 flex items-center">
-                <Heart className="w-4 h-4 mr-2 text-red-500" />
-                Medical Information
-              </h4>
-              
-              {data.pet.microchipId && (
-                <div className="text-sm">
-                  <span className="font-medium text-gray-700">Microchip ID:</span>
-                  <span className="ml-2 text-gray-900 font-mono">{data.pet.microchipId}</span>
-                </div>
-              )}
-              
-              {data.pet.medicalConditions && (
-                <div className="bg-yellow-50 p-3 rounded-lg">
-                  <div className="flex items-center mb-1">
-                    <AlertTriangle className="w-4 h-4 text-yellow-600 mr-2" />
-                    <span className="font-medium text-yellow-800">Medical Conditions</span>
-                  </div>
-                  <p className="text-sm text-yellow-700">{data.pet.medicalConditions}</p>
-                </div>
-              )}
-              
-              {data.pet.allergies && (
-                <div className="bg-red-50 p-3 rounded-lg">
-                  <div className="flex items-center mb-1">
-                    <AlertTriangle className="w-4 h-4 text-red-600 mr-2" />
-                    <span className="font-medium text-red-800">Allergies</span>
-                  </div>
-                  <p className="text-sm text-red-700 font-medium">{data.pet.allergies}</p>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Owner Info */}
           <div className="border-t pt-4 space-y-3">
@@ -137,52 +75,61 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
               Owner Information
             </h4>
             
-            <div className="space-y-3">
-              <div>
-                <span className="font-medium text-gray-700">Name:</span>
-                <span className="ml-2 text-gray-900">{data.owner.name}</span>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center">
+                <span className="font-medium min-w-16">Name:</span>
+                <span className="text-gray-600">{data.owner}</span>
               </div>
               
-              {data.owner.phone && (
+              {data.contact && (
                 <div className="flex items-center">
                   <Phone className="w-4 h-4 mr-2 text-green-600" />
-                  <span className="font-medium text-gray-700">Phone:</span>
-                  <a href={`tel:${data.owner.phone}`} className="ml-2 text-blue-600 hover:underline">
-                    {data.owner.phone}
+                  <span className="font-medium min-w-16">Phone:</span>
+                  <a href={`tel:${data.contact}`} className="text-blue-600 hover:underline">
+                    {data.contact}
                   </a>
                 </div>
               )}
               
-              {data.owner.email && (
+              {data.email && (
                 <div className="flex items-center">
                   <Mail className="w-4 h-4 mr-2 text-blue-600" />
-                  <span className="font-medium text-gray-700">Email:</span>
-                  <a href={`mailto:${data.owner.email}`} className="ml-2 text-blue-600 hover:underline">
-                    {data.owner.email}
+                  <span className="font-medium min-w-16">Email:</span>
+                  <a href={`mailto:${data.email}`} className="text-blue-600 hover:underline">
+                    {data.email}
                   </a>
+                </div>
+              )}
+              
+              {data.address && (
+                <div className="flex items-start">
+                  <MapPin className="w-4 h-4 mr-2 mt-0.5 text-red-600" />
+                  <span className="font-medium min-w-16">Address:</span>
+                  <span className="text-gray-600 text-xs">{data.address}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Emergency Contact */}
-          {(data.owner.emergencyContact || data.owner.emergencyPhone) && (
+          {/* Medical Notes */}
+          {data.medicalNotes && (
             <div className="border-t pt-4">
-              <div className="bg-red-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-red-800 mb-2 flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Emergency Contact
-                </h4>
-                {data.owner.emergencyContact && (
-                  <p className="text-sm text-red-700 font-medium mb-1">
-                    {data.owner.emergencyContact}
-                  </p>
-                )}
-                {data.owner.emergencyPhone && (
-                  <a href={`tel:${data.owner.emergencyPhone}`} className="text-red-600 hover:underline font-medium">
-                    {data.owner.emergencyPhone}
-                  </a>
-                )}
+              <h4 className="font-semibold text-gray-700 mb-2">Medical Notes</h4>
+              <p className="text-sm text-gray-600 bg-red-50 p-3 rounded-lg">
+                {data.medicalNotes}
+              </p>
+            </div>
+          )}
+
+          {/* Emergency Contact */}
+          {data.emergencyContact && (
+            <div className="border-t pt-4">
+              <h4 className="font-semibold text-gray-700 mb-2">Emergency Contact</h4>
+              <div className="flex items-center">
+                <Phone className="w-4 h-4 mr-2 text-red-600" />
+                <a href={`tel:${data.emergencyContact}`} className="text-red-600 hover:underline font-medium">
+                  {data.emergencyContact}
+                </a>
               </div>
             </div>
           )}

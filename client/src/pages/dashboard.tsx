@@ -1,163 +1,261 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { QrCode, Plus, Heart } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode } from "lucide-react";
+import { PageLoader } from "@/components/loading-spinner";
+import PetCard from "@/components/pet-card";
+import DashboardInsights from "@/components/dashboard-insights";
+import OfflineSyncIndicator from "@/components/offline-sync-indicator";
+import BottomNavigation from "@/components/bottom-navigation";
+import QuickActions from "@/components/quick-actions";
+import VetClinics from "@/components/vet-clinics";
 import QRScanner from "@/components/qr-scanner";
-import type { Pet } from "@shared/schema";
+import ScannedPetViewer from "@/components/scanned-pet-viewer";
+import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
 export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [showQRScanner, setShowQRScanner] = useState(false);
-  const [scannedPetData, setScannedPetData] = useState<any>(null);
+  const [activeTab, setActiveTab] = React.useState("overview");
+  const [showVetClinics, setShowVetClinics] = React.useState(false);
+  const [showQRScanner, setShowQRScanner] = React.useState(false);
+  const [scannedPetData, setScannedPetData] = React.useState<any>(null);
+  const [scannedPets, setScannedPets] = React.useState<any[]>([]);
 
-  const handleQRScanSuccess = async (data: any) => {
-    try {
-      const response = await fetch(`/api/pets/public/${data.petId}`);
-      if (!response.ok) {
-        throw new Error('Pet not found or access denied');
-      }
-
-      const petData = await response.json();
-      
-      if (petData) {
-        setScannedPetData(petData);
-        
-        toast({
-          title: "Pet Scanned Successfully!",
-          description: `Found ${petData.name} - ${petData.breed}`,
-        });
-      }
-    } catch (error) {
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
       toast({
-        title: "Scan Error",
-        description: "Failed to load pet information",
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
         variant: "destructive",
       });
-    }
-  };
-
-  // Handle authentication redirect
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      window.location.href = "/";
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
       return;
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, toast]);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<Pet[]>({
     queryKey: ["/api/pets"],
+    queryFn: async () => {
+      const response = await fetch("/api/pets?includePhotos=false&limit=20");
+      if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
+      return response.json();
+    },
     enabled: !!user,
   });
 
+  const { data: reminders = [] } = useQuery<Reminder[]>({
+    queryKey: ["/api/reminders"],
+    enabled: !!user,
+  });
+
+  const { data: overdueReminders = [] } = useQuery<Reminder[]>({
+    queryKey: ["/api/reminders/overdue"],
+    enabled: !!user,
+  });
+
+  // Fetch all medical records for insights
+  const allMedicalRecordsQueries = useQuery({
+    queryKey: ["/api/medical-records/all"],
+    queryFn: async () => {
+      const allRecords: MedicalRecord[] = [];
+      for (const pet of pets) {
+        const response = await fetch(`/api/pets/${pet.id}/medical-records`);
+        if (response.ok) {
+          const records = await response.json();
+          allRecords.push(...records);
+        }
+      }
+      return allRecords;
+    },
+    enabled: !!user && pets.length > 0,
+  });
+
+  const allMedicalRecords = allMedicalRecordsQueries.data || [];
+
   if (isLoading || petsLoading) {
-    return <div>Loading...</div>;
+    return <PageLoader />;
   }
 
+  const totalNotifications = overdueReminders.length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4">
+    <div className="mobile-container mobile-safe">
+      {/* Header */}
+      <div className="bg-primary text-white p-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {user?.firstName || "Pet Parent"}!
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Your pets are counting on you 🐾
+            <h1 className="text-xl font-bold">Welcome back!</h1>
+            <p className="text-white/80 text-sm">
+              Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
             </p>
           </div>
-          
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => setLocation("/add-pet")}
-              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Pet
-            </Button>
-            <Button 
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2"
               onClick={() => setShowQRScanner(true)}
-              variant="outline"
             >
-              <QrCode className="h-4 w-4 mr-2" />
-              QR Scanner
+              <QrCode className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 relative p-2"
+              onClick={() => setLocation("/schedule")}
+            >
+              <Bell className="w-5 h-5" />
+              {totalNotifications > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {totalNotifications > 9 ? '9+' : totalNotifications}
+                </div>
+              )}
             </Button>
           </div>
         </div>
-
-        {/* Pet Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-pink-500" />
-              Your Pets ({pets.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {pets.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No pets added yet</p>
-                <Button onClick={() => setLocation("/add-pet")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Your First Pet
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {pets.map((pet) => (
-                  <Card key={pet.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold">{pet.name}</h3>
-                      <p className="text-sm text-gray-600">{pet.breed}</p>
-                      <p className="text-xs text-gray-500">{pet.category}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Scanned Pet Data Display */}
-        {scannedPetData && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Scanned Pet Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <h3 className="font-semibold text-lg">{scannedPetData.name}</h3>
-                <p className="text-gray-600">{scannedPetData.breed}</p>
-                <p className="text-sm text-gray-500 capitalize">{scannedPetData.category}</p>
-                {scannedPetData.microchipId && (
-                  <p className="text-sm">Microchip: {scannedPetData.microchipId}</p>
-                )}
-                {scannedPetData.owner && (
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium">Owner Information</h4>
-                    <p className="text-sm">{scannedPetData.owner.firstName} {scannedPetData.owner.lastName}</p>
-                    <p className="text-sm">{scannedPetData.owner.email}</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* QR Scanner Modal */}
-        {showQRScanner && (
-          <QRScanner
-            onClose={() => setShowQRScanner(false)}
-            onScanSuccess={handleQRScanSuccess}
-          />
-        )}
       </div>
+      {/* Content */}
+      <div className="p-4 pb-20">
+        {/* Offline Sync Indicator */}
+        <OfflineSyncIndicator />
+
+        <Tabs defaultValue="pets" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="pets">My Pets</TabsTrigger>
+            <TabsTrigger value="insights">Health Insights</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="pets" className="space-y-6 mt-6">
+            <div className="flex items-center">
+              <h2 className="text-lg font-semibold text-gray-900">Your Pets</h2>
+            </div>
+            {/* Pet Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {pets.map((pet) => (
+                <PetCard
+                  key={pet.id}
+                  pet={pet}
+                  reminders={reminders.filter((r) => r.petId === pet.id)}
+                />
+              ))}
+              {/* Add Pet Card */}
+
+              <div
+                className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+                onClick={() => setLocation("/add-pet")}
+              >
+                <Plus className="text-gray-400 text-2xl mb-2" />
+                <p className="text-gray-500 text-sm font-medium">Add Pet</p>
+              </div>
+            </div>
+            {/* Quick Actions */}
+            <QuickActions onFindClinics={() => setShowVetClinics(true)} />
+
+            {/* Overdue Reminders Alert */}
+            {overdueReminders.length > 0 && (
+              <Card className="border-destructive bg-red-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center mb-3">
+                    <Bell className="text-destructive mr-2 w-5 h-5" />
+                    <h3 className="font-semibold text-gray-900">
+                      Overdue Reminders
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {overdueReminders.slice(0, 3).map((reminder) => (
+                      <div
+                        key={reminder.id}
+                        className="flex justify-between items-center"
+                      >
+                        <span className="text-sm text-gray-700">
+                          {reminder.title}
+                        </span>
+                        <span className="status-badge overdue">Overdue</span>
+                      </div>
+                    ))}
+                    {overdueReminders.length > 3 && (
+                      <p className="text-xs text-gray-500">
+                        +{overdueReminders.length - 3} more overdue items
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="insights" className="mt-6">
+            <DashboardInsights
+              pets={pets}
+              allMedicalRecords={allMedicalRecords}
+              reminders={reminders}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Find Vet Clinics Modal */}
+      {showVetClinics && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-10">
+          <div className="bg-white rounded-lg m-4 max-w-lg w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-4 border-b flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Find Vet Clinics</h2>
+              <button
+                onClick={() => setShowVetClinics(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4">
+              <VetClinics />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showQRScanner && (
+        <QRScanner 
+          onClose={() => setShowQRScanner(false)}
+          onScanSuccess={(data) => {
+            setShowQRScanner(false);
+            if (data.type === "pet-profile") {
+              setScannedPetData(data);
+              
+              // Add to scanned pets list if not already present
+              const exists = scannedPets.some(pet => pet.petId === data.petId);
+              if (!exists) {
+                setScannedPets(prev => [...prev, data]);
+              }
+              
+              toast({
+                title: "Pet Profile Scanned",
+                description: `Successfully scanned ${data.name}'s profile!`,
+              });
+            }
+          }}
+        />
+      )}
+
+      {scannedPetData && (
+        <ScannedPetViewer 
+          data={scannedPetData}
+          onClose={() => setScannedPetData(null)}
+        />
+      )}
+
+      <BottomNavigation activeTab="home" />
     </div>
   );
 }

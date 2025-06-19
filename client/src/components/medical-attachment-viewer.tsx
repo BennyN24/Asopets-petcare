@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
@@ -16,8 +16,8 @@ export default function MedicalAttachmentViewer({
   onClose, 
   initialIndex = 0 
 }: MedicalAttachmentViewerProps) {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
+  const [isZoomed, setIsZoomed] = React.useState(false);
 
   const nextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % attachments.length);

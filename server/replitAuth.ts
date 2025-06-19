@@ -15,20 +15,22 @@ if (!process.env.REPLIT_DOMAINS) {
 const getOidcConfig = memoize(
   async () => {
     try {
-      // OIDC configuration logging disabled
+      console.log('[AUTH] Initializing OIDC configuration');
+      console.log('[AUTH] REPL_ID:', process.env.REPL_ID ? 'exists' : 'missing');
+      console.log('[AUTH] REPLIT_DOMAINS:', process.env.REPLIT_DOMAINS ? 'exists' : 'missing');
       
       const issuerUrl = process.env.ISSUER_URL ?? "https://replit.com/oidc";
-      // Issuer URL logging disabled
+      console.log('[AUTH] Using issuer URL:', issuerUrl);
       
       const config = await client.discovery(
         new URL(issuerUrl),
         process.env.REPL_ID!
       );
       
-      // OIDC config loaded
+      console.log('[AUTH] OIDC configuration loaded successfully');
       return config;
     } catch (error) {
-      // OIDC config failed
+      console.error('[AUTH] Failed to load OIDC configuration:', error);
       throw error;
     }
   },
@@ -91,7 +93,7 @@ export async function setupAuth(app: Express) {
   try {
     config = await getOidcConfig();
   } catch (error) {
-    // console.error('[AUTH] Failed to initialize OIDC config, auth routes will not work:', error);
+    console.error('[AUTH] Failed to initialize OIDC config, auth routes will not work:', error);
     // Continue setup without OIDC to prevent server crash
     return;
   }
@@ -101,14 +103,14 @@ export async function setupAuth(app: Express) {
     verified: passport.AuthenticateCallback
   ) => {
     try {
-      // console.log('[AUTH] Verifying tokens for user:', tokens.claims()?.sub);
+      console.log('[AUTH] Verifying tokens for user:', tokens.claims()?.sub);
       const user = {};
       updateUserSession(user, tokens);
       await upsertUser(tokens.claims());
-      // console.log('[AUTH] User verified successfully:', tokens.claims()?.sub);
+      console.log('[AUTH] User verified successfully:', tokens.claims()?.sub);
       verified(null, user);
     } catch (error) {
-      // console.error('[AUTH] Verification error:', error);
+      console.error('[AUTH] Verification error:', error);
       verified(error, null);
     }
   };
@@ -118,7 +120,7 @@ export async function setupAuth(app: Express) {
   const domains = process.env.NODE_ENV === 'development' 
     ? baseDomains.concat(['localhost', '127.0.0.1'])
     : baseDomains;
-  // console.log('[AUTH] Registering strategies for domains:', domains);
+  console.log('[AUTH] Registering strategies for domains:', domains);
   
   for (const domain of domains) {
     const isLocal = domain === 'localhost' || domain === '127.0.0.1';
@@ -136,7 +138,7 @@ export async function setupAuth(app: Express) {
       verify,
     );
     passport.use(strategy);
-    // console.log(`[AUTH] Registered strategy for domain: ${domain} with callback: ${callbackURL}`);
+    console.log(`[AUTH] Registered strategy for domain: ${domain} with callback: ${callbackURL}`);
   }
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
@@ -145,11 +147,11 @@ export async function setupAuth(app: Express) {
   // Add fallback routes in case OIDC configuration fails
   app.get("/api/login", (req, res, next) => {
     if (!config) {
-      // console.log('[AUTH] OIDC not configured, redirecting to login page');
+      console.log('[AUTH] OIDC not configured, redirecting to login page');
       return res.redirect("/login?error=auth_not_configured");
     }
     
-    // console.log(`[AUTH] Login attempt for hostname: ${req.hostname}`);
+    console.log(`[AUTH] Login attempt for hostname: ${req.hostname}`);
     passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
@@ -159,34 +161,34 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/callback", (req, res, next) => {
     if (!config) {
-      // console.log('[AUTH] OIDC not configured for callback');
+      console.log('[AUTH] OIDC not configured for callback');
       return res.redirect("/login?error=auth_not_configured");
     }
     
     if (process.env.NODE_ENV === 'development') {
-      // console.log(`[AUTH] Callback received for hostname: ${req.hostname}`);
-      // console.log(`[AUTH] Callback query params:`, req.query);
-      // console.log(`[AUTH] Session ID:`, req.sessionID);
+      console.log(`[AUTH] Callback received for hostname: ${req.hostname}`);
+      console.log(`[AUTH] Callback query params:`, req.query);
+      console.log(`[AUTH] Session ID:`, req.sessionID);
     }
     
     passport.authenticate(`replitauth:${req.hostname}`, (err: any, user: any, info: any) => {
       if (err) {
-        // console.error("[AUTH] Callback authentication error:", err);
+        console.error("[AUTH] Callback authentication error:", err);
         return res.redirect("/login?error=callback_error");
       }
       
       if (!user) {
-        // console.error("[AUTH] No user returned from authentication:", info);
+        console.error("[AUTH] No user returned from authentication:", info);
         return res.redirect("/login?error=callback_failed");
       }
       
       req.logIn(user, (loginErr: any) => {
         if (loginErr) {
-          // console.error("[AUTH] Login error:", loginErr);
+          console.error("[AUTH] Login error:", loginErr);
           return res.redirect("/login?error=login_failed");
         }
         
-        // console.log("[AUTH] User successfully logged in:", user.claims?.sub);
+        console.log("[AUTH] User successfully logged in:", user.claims?.sub);
         return res.redirect("/");
       });
     })(req, res, next);
@@ -213,56 +215,56 @@ export async function setupAuth(app: Express) {
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
-    // console.log('[AUTH] Checking authentication for:', req.url);
-    // console.log('[AUTH] Session ID:', req.sessionID);
-    // console.log('[AUTH] Is authenticated:', req.isAuthenticated());
+    console.log('[AUTH] Checking authentication for:', req.url);
+    console.log('[AUTH] Session ID:', req.sessionID);
+    console.log('[AUTH] Is authenticated:', req.isAuthenticated());
   }
   
   const user = req.user as any;
   if (process.env.NODE_ENV === 'development') {
-    // console.log('[AUTH] User object:', user ? 'exists' : 'null');
+    console.log('[AUTH] User object:', user ? 'exists' : 'null');
   }
 
   if (!req.isAuthenticated()) {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[AUTH] User not authenticated');
+      console.log('[AUTH] User not authenticated');
     }
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   if (!user) {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[AUTH] No user object in session');
+      console.log('[AUTH] No user object in session');
     }
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   if (!user.expires_at) {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[AUTH] No expiration time in user session');
+      console.log('[AUTH] No expiration time in user session');
     }
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   const now = Math.floor(Date.now() / 1000);
   if (process.env.NODE_ENV === 'development') {
-    // console.log('[AUTH] Token expires at:', user.expires_at, 'Current time:', now);
+    console.log('[AUTH] Token expires at:', user.expires_at, 'Current time:', now);
   }
   
   if (now <= user.expires_at) {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[AUTH] Token still valid');
+      console.log('[AUTH] Token still valid');
     }
     return next();
   }
 
   if (process.env.NODE_ENV === 'development') {
-    // console.log('[AUTH] Token expired, attempting refresh');
+    console.log('[AUTH] Token expired, attempting refresh');
   }
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[AUTH] No refresh token available');
+      console.log('[AUTH] No refresh token available');
     }
     res.status(401).json({ message: "Unauthorized" });
     return;
@@ -273,11 +275,11 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
     updateUserSession(user, tokenResponse);
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[AUTH] Token refreshed successfully');
+      console.log('[AUTH] Token refreshed successfully');
     }
     return next();
   } catch (error) {
-    // console.error('[AUTH] Token refresh failed:', error);
+    console.error('[AUTH] Token refresh failed:', error);
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
