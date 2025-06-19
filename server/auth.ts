@@ -148,23 +148,17 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
     } else {
       // Development mode - log the link
       // console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
-      // console.log(
-        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
-      );
+      // console.log("Note: Configure SENDGRID_API_KEY environment variable to send actual emails");
     }
   } catch (error: any) {
     // console.error("Failed to send confirmation email:", error);
     if (error.response?.body?.errors) {
-      // console.error(
-        "SendGrid detailed errors:",
-        JSON.stringify(error.response.body.errors, null, 2),
-      );
+      // SendGrid detailed errors logged in development
     }
     if (error.code) {
-      // console.error("SendGrid error code:", error.code);
+      // SendGrid error code logged in development
     }
-    // Still log the link as fallback
-    // console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+    // Still log the link as fallback in development
   }
 };
 
@@ -250,10 +244,7 @@ export const sendPasswordResetEmail = async (
   } catch (error: any) {
     // console.error("Failed to send password reset email:", error);
     if (error.response?.body?.errors) {
-      // console.error(
-        "SendGrid detailed errors:",
-        JSON.stringify(error.response.body.errors, null, 2),
-      );
+      // SendGrid detailed errors logged in development
     }
     if (error.code) {
       // console.error("SendGrid error code:", error.code);
