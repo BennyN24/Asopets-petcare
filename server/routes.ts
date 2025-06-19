@@ -490,8 +490,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           dateOfBirth: pet.dateOfBirth,
           imageUrl: pet.imageUrl,
           microchipId: pet.microchipId || null,
-          medicalConditions: pet.medicalConditions || null,
-          allergies: pet.allergies || null,
+          birthmarks: pet.birthmarks || null,
         },
         owner: {
           name: `${owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Pet Owner',
@@ -901,22 +900,9 @@ Reply directly to this email to respond to the user.
     }
   });
 
-  // Handle client-side routing - serve index.html for all unmatched routes
-  app.get("*", (req, res) => {
-    // Skip API routes and static assets
-    if (req.path.startsWith("/api/") || 
-        req.path.startsWith("/assets/") || 
-        req.path.includes(".")) {
-      return res.status(404).json({ message: "API endpoint not found" });
-    }
-    
-    // For all other routes, serve the React app (SPA routing)
-    try {
-      res.sendFile(path.join(process.cwd(), "dist", "index.html"));
-    } catch (error) {
-      console.error("Error serving index.html:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
+  // Handle 404 for API routes only - let Vite handle client routing in development
+  app.use("/api/*", (req, res) => {
+    res.status(404).json({ message: "API endpoint not found" });
   });
 
   const httpServer = createServer(app);
