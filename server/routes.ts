@@ -900,10 +900,8 @@ Reply directly to this email to respond to the user.
     }
   });
 
-  // Handle 404 for API routes only - let Vite handle client routing in development
-  app.use("/api/*", (req, res) => {
-    res.status(404).json({ message: "API endpoint not found" });
-  });
+  // Only handle 404 for unmatched API routes - let Vite handle all client routes
+  // This ensures client-side routing works properly in development
 
   const httpServer = createServer(app);
   return httpServer;
