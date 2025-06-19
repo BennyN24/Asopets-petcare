@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { 
-  PawPrint,
   Mail,
   Lock,
   User,
@@ -18,6 +17,7 @@ import {
   CheckCircle,
   ArrowLeft
 } from "lucide-react";
+import asopetsLogo from "@/assets/asopets-logo.png";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -110,8 +110,12 @@ export default function Signup() {
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Title */}
         <div className="text-center space-y-2">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <PawPrint className="w-8 h-8 text-white" />
+          <div className="mx-auto w-20 h-20 flex items-center justify-center">
+            <img 
+              src={asopetsLogo} 
+              alt="ASOPETS Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Join ASOPETS</h1>
           <p className="text-gray-600">Create your pet care account</p>
