@@ -15,22 +15,20 @@ if (!process.env.REPLIT_DOMAINS) {
 const getOidcConfig = memoize(
   async () => {
     try {
-      // console.log('[AUTH] Initializing OIDC configuration');
-      // console.log('[AUTH] REPL_ID:', process.env.REPL_ID ? 'exists' : 'missing');
-      // console.log('[AUTH] REPLIT_DOMAINS:', process.env.REPLIT_DOMAINS ? 'exists' : 'missing');
+      // OIDC configuration logging disabled
       
       const issuerUrl = process.env.ISSUER_URL ?? "https://replit.com/oidc";
-      // console.log('[AUTH] Using issuer URL:', issuerUrl);
+      // Issuer URL logging disabled
       
       const config = await client.discovery(
         new URL(issuerUrl),
         process.env.REPL_ID!
       );
       
-      // console.log('[AUTH] OIDC configuration loaded successfully');
+      // OIDC config loaded
       return config;
     } catch (error) {
-      // console.error('[AUTH] Failed to load OIDC configuration:', error);
+      // OIDC config failed
       throw error;
     }
   },
