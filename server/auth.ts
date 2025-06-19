@@ -236,10 +236,7 @@ export const sendPasswordResetEmail = async (
       // console.log(`Password reset email sent to ${email}`);
       // console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
-      // console.log(`Password reset link for ${email}: ${resetLink}`);
-      // console.log(
-        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
-      );
+      // Development mode - email service not configured
     }
   } catch (error: any) {
     // console.error("Failed to send password reset email:", error);
@@ -247,8 +244,8 @@ export const sendPasswordResetEmail = async (
       // SendGrid detailed errors logged in development
     }
     if (error.code) {
-      // console.error("SendGrid error code:", error.code);
+      // SendGrid error code logged in development
     }
-    // console.log(`Password reset link for ${email}: ${resetLink}`);
+    // Password reset link available for development debugging
   }
 };
