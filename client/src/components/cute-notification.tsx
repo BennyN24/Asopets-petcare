@@ -83,7 +83,7 @@ export default function CuteNotification({
           });
         }
       } catch (error) {
-        console.log('Push notification error:', error);
+        // Push notification failed silently
       }
     }
   };

@@ -299,7 +299,7 @@ export default function Profile() {
           });
 
           // Here you would typically upload this data to your server
-          console.log("Imported data:", data);
+          // Data imported successfully
         } catch (error) {
           toast({
             title: "Import failed",

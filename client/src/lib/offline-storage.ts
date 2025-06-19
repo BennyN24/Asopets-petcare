@@ -140,7 +140,7 @@ export class OfflineStorage {
           this.markPetSynced(pet.id, savedPet.id);
         }
       } catch (error) {
-        console.error('Failed to sync pet:', error);
+        // Pet sync failed silently
       }
     }
 
@@ -175,7 +175,7 @@ export class OfflineStorage {
           this.markRecordSynced(record.id);
         }
       } catch (error) {
-        console.error('Failed to sync record:', error);
+        // Record sync failed silently
       }
     }
   }

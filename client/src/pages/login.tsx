@@ -70,7 +70,8 @@ export default function Login() {
         setLastEmailAttempt(data.email);
         toast({
           title: "Email confirmation required",
-          description: "Please confirm your email before logging in. Click 'Resend Confirmation' if you didn't receive the email.",
+          description:
+            "Please confirm your email before logging in. Click 'Resend Confirmation' if you didn't receive the email.",
           variant: "default",
         });
       } else {
@@ -88,15 +89,16 @@ export default function Login() {
 
   const handleResendConfirmation = async () => {
     if (!lastEmailAttempt) return;
-    
+
     setIsResending(true);
     try {
-      await apiRequest("POST", "/api/auth/resend-confirmation", { 
-        email: lastEmailAttempt 
+      await apiRequest("POST", "/api/auth/resend-confirmation", {
+        email: lastEmailAttempt,
       });
       toast({
         title: "Confirmation email sent",
-        description: "Please check your inbox and spam folder for the confirmation email.",
+        description:
+          "Please check your inbox and spam folder for the confirmation email.",
         variant: "default",
       });
       setShowResendConfirmation(false);
@@ -111,7 +113,9 @@ export default function Login() {
       } else {
         toast({
           title: "Failed to resend",
-          description: error.message || "Failed to resend confirmation email. Please try again.",
+          description:
+            error.message ||
+            "Failed to resend confirmation email. Please try again.",
           variant: "destructive",
         });
       }
@@ -126,9 +130,9 @@ export default function Login() {
         {/* Logo and Title */}
         <div className="text-center space-y-2">
           <div className="mx-auto w-20 h-20 flex items-center justify-center">
-            <img 
-              src={logoPath} 
-              alt="ASOPETS Logo" 
+            <img
+              src={logoPath}
+              alt="ASOPETS Logo"
               className="w-20 h-20 object-contain"
             />
           </div>
@@ -227,7 +231,8 @@ export default function Login() {
                   <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="text-sm text-blue-800 mb-3">
-                      Didn't receive the confirmation email? We can send you a new one.
+                      Didn't receive the confirmation email? We can send you a
+                      new one.
                     </p>
                     <Button
                       onClick={handleResendConfirmation}
