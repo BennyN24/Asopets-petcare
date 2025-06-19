@@ -34,7 +34,7 @@ export default function PetProfile() {
   }, []);
   
   // Also check for URL changes (in case user navigates back/forward)
-  useEffect(() => {
+  React.useEffect(() => {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const tabParam = urlParams.get('tab');
@@ -64,7 +64,7 @@ export default function PetProfile() {
     enabled: !!petId,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (petError && isUnauthorizedError(petError as Error)) {
       toast({
         title: "Unauthorized",
