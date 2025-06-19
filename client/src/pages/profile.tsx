@@ -429,7 +429,8 @@ export default function Profile() {
                         handleInputChange("profileImageUrl", url)
                       }
                       currentPhoto={profileData.profileImageUrl}
-                      className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm hover:bg-primary/90 transition-colors"
+                      compact={true}
+                      className=""
                     />
                   </div>
                 )}

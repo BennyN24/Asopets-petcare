@@ -8,9 +8,10 @@ interface PhotoUploadProps {
   onPhotoUploaded: (url: string) => void;
   currentPhoto?: string;
   className?: string;
+  compact?: boolean;
 }
 
-export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className = "" }: PhotoUploadProps) {
+export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className = "", compact = false }: PhotoUploadProps) {
   const [preview, setPreview] = React.useState<string | null>(currentPhoto || null);
   const [isUploading, setIsUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -107,6 +108,35 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
+
+  // Compact mode for profile avatar usage
+  if (compact) {
+    return (
+      <div className={className}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+        <Button
+          type="button"
+          size="sm"
+          disabled={isUploading}
+          onClick={triggerFileInput}
+          className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm hover:bg-primary/90 transition-colors p-0"
+        >
+          {isUploading ? (
+            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <Camera className="w-3 h-3" />
+          )}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className={className}>
