@@ -22,10 +22,10 @@ import {
   Smartphone,
   CheckCircle,
   AlertCircle,
-  PawPrint,
   Eye,
   EyeOff,
 } from "lucide-react";
+import logoPath from "@assets/AsoPets-Logo-500x500_1750348527646.png";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -125,8 +125,12 @@ export default function Login() {
       <div className="w-full max-w-md space-y-6">
         {/* Logo and Title */}
         <div className="text-center space-y-2">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <PawPrint className="w-8 h-8 text-white" />
+          <div className="mx-auto w-20 h-20 flex items-center justify-center">
+            <img 
+              src={logoPath} 
+              alt="ASOPETS Logo" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">
             Welcome to ASOPETS
