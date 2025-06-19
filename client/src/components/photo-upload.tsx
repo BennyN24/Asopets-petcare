@@ -169,7 +169,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
               </p>
             </div>
           </CardContent>
-        </div>
+        </Card>
       )}
     </div>
   );
