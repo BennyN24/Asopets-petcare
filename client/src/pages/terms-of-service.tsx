@@ -1,121 +1,113 @@
-import { ArrowLeft } from "lucide-react";
 import * as React from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, FileText } from "lucide-react";
 
 export default function TermsOfService() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
         <div className="mb-6">
           <Button 
+            onClick={() => setLocation("/")} 
             variant="ghost" 
-            onClick={() => setLocation("/")}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            Back to Dashboard
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-center">Terms of Service</CardTitle>
-            <p className="text-center text-gray-600">ASOPETS - Pet Care Management</p>
-            <p className="text-center text-sm text-gray-500">Last updated: December 2024</p>
+            <CardTitle className="flex items-center text-2xl">
+              <FileText className="w-6 h-6 mr-3 text-blue-600" />
+              Terms of Service
+            </CardTitle>
+            <p className="text-gray-600 mt-2">
+              Last updated: {new Date().toLocaleDateString()}
+            </p>
           </CardHeader>
-          <CardContent className="prose prose-sm max-w-none">
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Acceptance of Terms</h2>
-              <p className="mb-3">
-                By accessing and using ASOPETS, you accept and agree to be bound by the terms and provision of this agreement.
+          <CardContent className="prose max-w-none space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">1. Acceptance of Terms</h3>
+              <p className="text-gray-700">
+                By accessing and using ASOPETS, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
               </p>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Description of Service</h2>
-              <p className="mb-3">
-                ASOPETS is a pet care management application that helps users:
+            <div>
+              <h3 className="text-lg font-semibold mb-3">2. Service Description</h3>
+              <p className="text-gray-700 mb-4">
+                ASOPETS is a pet care management platform that allows users to:
               </p>
-              <ul className="list-disc pl-6 mb-3 space-y-1">
+              <ul className="list-disc pl-6 space-y-2 text-gray-700">
                 <li>Track pet medical records and vaccinations</li>
-                <li>Schedule and manage medical reminders</li>
-                <li>Monitor pet expenses and budgets</li>
+                <li>Set reminders for pet care activities</li>
+                <li>Generate QR codes for pet identification</li>
+                <li>Manage pet expenses and budgets</li>
                 <li>Find and rate veterinary clinics</li>
-                <li>Store pet photos and health documentation</li>
               </ul>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">User Responsibilities</h2>
-              <p className="mb-3">You agree to:</p>
-              <ul className="list-disc pl-6 mb-3 space-y-1">
-                <li>Provide accurate and complete information</li>
-                <li>Maintain the security of your account credentials</li>
-                <li>Use the service only for lawful purposes</li>
-                <li>Respect the privacy and rights of other users</li>
-                <li>Not attempt to interfere with the service's operation</li>
+            <div>
+              <h3 className="text-lg font-semibold mb-3">3. User Responsibilities</h3>
+              <p className="text-gray-700 mb-4">
+                As a user of ASOPETS, you agree to:
+              </p>
+              <ul className="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Provide accurate and complete information about your pets</li>
+                <li>Keep your medical records up to date</li>
+                <li>Use the service responsibly and lawfully</li>
+                <li>Respect the privacy of other users</li>
+                <li>Not share false or misleading information</li>
               </ul>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Medical Disclaimer</h2>
-              <p className="mb-3">
-                <strong>Important:</strong> ASOPETS is a pet care management tool and does not provide medical advice. 
-                The information stored and managed through this app should not replace professional veterinary care. 
-                Always consult with qualified veterinarians for medical decisions regarding your pets.
+            <div>
+              <h3 className="text-lg font-semibold mb-3">4. Medical Disclaimer</h3>
+              <p className="text-gray-700">
+                ASOPETS is not a substitute for professional veterinary advice, diagnosis, or treatment. Always seek the advice of your veterinarian with any questions you may have regarding your pet's health. Never disregard professional veterinary advice or delay in seeking it because of something you have read on ASOPETS.
               </p>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Data Ownership</h2>
-              <p className="mb-3">
-                You retain ownership of all data you input into ASOPETS, including pet information, medical records, 
-                and photos. We provide tools to export your data at any time.
+            <div>
+              <h3 className="text-lg font-semibold mb-3">5. Data and Privacy</h3>
+              <p className="text-gray-700">
+                Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices regarding the collection, use, and disclosure of your information.
               </p>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Service Availability</h2>
-              <p className="mb-3">
-                We strive to maintain high service availability but cannot guarantee uninterrupted access. 
-                We may perform maintenance, updates, or modifications that temporarily affect service availability.
+            <div>
+              <h3 className="text-lg font-semibold mb-3">6. Service Availability</h3>
+              <p className="text-gray-700">
+                We strive to provide reliable service, but cannot guarantee 100% uptime. The service may be temporarily unavailable due to maintenance, updates, or technical issues.
               </p>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Limitation of Liability</h2>
-              <p className="mb-3">
-                ASOPETS shall not be liable for any indirect, incidental, special, consequential, or punitive damages 
-                resulting from your use of the service.
+            <div>
+              <h3 className="text-lg font-semibold mb-3">7. Limitation of Liability</h3>
+              <p className="text-gray-700">
+                ASOPETS shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses.
               </p>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Account Termination</h2>
-              <p className="mb-3">
-                You may terminate your account at any time. We reserve the right to suspend or terminate accounts 
-                that violate these terms of service.
+            <div>
+              <h3 className="text-lg font-semibold mb-3">8. Changes to Terms</h3>
+              <p className="text-gray-700">
+                We reserve the right to modify these terms at any time. We will notify users of any material changes via email or through the app. Continued use of the service after changes constitutes acceptance of the new terms.
               </p>
-            </section>
+            </div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Changes to Terms</h2>
-              <p className="mb-3">
-                We may update these terms from time to time. Users will be notified of significant changes, 
-                and continued use of the service constitutes acceptance of updated terms.
+            <div>
+              <h3 className="text-lg font-semibold mb-3">9. Contact Information</h3>
+              <p className="text-gray-700">
+                If you have any questions about these Terms of Service, please contact us at support@asopets.com
               </p>
-            </section>
-
-            <section className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Contact Information</h2>
-              <p className="mb-3">
-                For questions about these Terms of Service, please contact us through the app's support section.
-              </p>
-            </section>
+            </div>
           </CardContent>
         </Card>
       </div>

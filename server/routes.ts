@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { setupAuth as setupReplitAuth, isAuthenticated as replitIsAuthenticated } from "./replitAuth";
 import { setupAuth, isAuthenticated, hashPassword, verifyPassword, generateToken, generateUserId, sendConfirmationEmail, sendPasswordResetEmail } from "./auth";
@@ -897,6 +898,24 @@ Reply directly to this email to respond to the user.
     } catch (error) {
       console.error("Error sending support request:", error);
       res.status(500).json({ message: "Failed to send support request" });
+    }
+  });
+
+  // Handle client-side routing - serve index.html for all unmatched routes
+  app.get("*", (req, res) => {
+    // Skip API routes and static assets
+    if (req.path.startsWith("/api/") || 
+        req.path.startsWith("/assets/") || 
+        req.path.includes(".")) {
+      return res.status(404).json({ message: "API endpoint not found" });
+    }
+    
+    // For all other routes, serve the React app (SPA routing)
+    try {
+      res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+    } catch (error) {
+      console.error("Error serving index.html:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
