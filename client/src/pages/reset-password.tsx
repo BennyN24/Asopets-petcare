@@ -19,13 +19,15 @@ import { Lock, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-const resetPasswordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
@@ -46,7 +48,7 @@ export default function ResetPassword() {
 
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const tokenParam = urlParams.get('token');
+    const tokenParam = urlParams.get("token");
     if (tokenParam) {
       setToken(tokenParam);
     } else {
@@ -61,7 +63,7 @@ export default function ResetPassword() {
 
   const onSubmit = async (data: ResetPasswordForm) => {
     if (!token) return;
-    
+
     setIsLoading(true);
     try {
       await apiRequest("POST", "/api/auth/reset-password", {
@@ -71,13 +73,16 @@ export default function ResetPassword() {
       setIsSuccess(true);
       toast({
         title: "Password reset successful",
-        description: "Your password has been updated. You can now log in with your new password.",
+        description:
+          "Your password has been updated. You can now log in with your new password.",
       });
       setTimeout(() => setLocation("/login"), 3000);
     } catch (error: any) {
       toast({
         title: "Reset failed",
-        description: error.message || "Failed to reset password. The link may have expired.",
+        description:
+          error.message ||
+          "Failed to reset password. The link may have expired.",
         variant: "destructive",
       });
     } finally {
@@ -93,13 +98,16 @@ export default function ResetPassword() {
             <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
-            <CardTitle className="text-2xl text-green-600">Password Updated!</CardTitle>
+            <CardTitle className="text-2xl text-green-600">
+              Password Updated!
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-gray-600 mb-4">
-              Your password has been successfully updated. You will be redirected to the login page.
+              Your password has been successfully updated. You will be
+              redirected to the login page.
             </p>
-            <Button onClick={() => setLocation("/login")} className="w-full">
+            <Button onClick={() => setLocation("/")} className="w-full">
               Go to Login
             </Button>
           </CardContent>
@@ -112,10 +120,10 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
-            onClick={() => setLocation("/login")}
+            onClick={() => setLocation("/")}
             className="absolute top-4 left-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -166,7 +174,11 @@ export default function ResetPassword() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading || !token}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading || !token}
+              >
                 {isLoading ? "Updating..." : "Update Password"}
               </Button>
             </form>
@@ -176,7 +188,8 @@ export default function ResetPassword() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Your new password must be at least 8 characters long and should be unique for security.
+                Your new password must be at least 8 characters long and should
+                be unique for security.
               </AlertDescription>
             </Alert>
           </div>

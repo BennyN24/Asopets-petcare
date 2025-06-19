@@ -1,6 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
+import * as React from "react";
 
 export function useAuth() {
+  const [authState, setAuthState] = React.useState<{
+    isAuthenticated: boolean;
+    user: any;
+    isLoading: boolean;
+  }>({
+    isAuthenticated: false,
+    user: null,
+    isLoading: true,
+  });
+
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
@@ -8,16 +19,23 @@ export function useAuth() {
     refetchOnWindowFocus: false,
   });
 
-  // Consider user authenticated if we have user data and no 401 error
-  const isAuthenticated = !!user && !error;
-  
-  // Debug authentication state
-  console.log('useAuth:', { user: !!user, isLoading, error: error?.message, isAuthenticated });
+  React.useEffect(() => {
+    const isAuthenticated = !!user && !error;
+    setAuthState({
+      isAuthenticated,
+      user,
+      isLoading,
+    });
+    
+    // Debug authentication state
+    console.log('useAuth update:', { 
+      user: !!user, 
+      isLoading, 
+      error: error?.message, 
+      isAuthenticated,
+      errorDetails: error 
+    });
+  }, [user, isLoading, error]);
 
-  return {
-    user,
-    isLoading,
-    isAuthenticated,
-    error,
-  };
+  return authState;
 }

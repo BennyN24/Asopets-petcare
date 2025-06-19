@@ -36,18 +36,24 @@ import LabTestForm from "@/pages/lab-test-form";
 import GroomingForm from "@/pages/grooming-form";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   // Debug authentication state
-  console.log('Router state:', { isAuthenticated, isLoading });
+  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user });
   console.log('Current location:', window.location.pathname);
   
   // Add route debugging
   React.useEffect(() => {
-    console.log('Route changed to:', window.location.pathname, { isAuthenticated, isLoading });
-  }, [window.location.pathname, isAuthenticated, isLoading]);
+    console.log('Route changed to:', window.location.pathname, { 
+      isAuthenticated, 
+      isLoading, 
+      hasUser: !!user 
+    });
+  }, [window.location.pathname, isAuthenticated, isLoading, user]);
 
+  // Show loading while authentication is being determined
   if (isLoading) {
+    console.log('Showing loader - authentication in progress');
     return <PageLoader />;
   }
 
