@@ -21,19 +21,19 @@ import EmailConfirmed from "@/pages/email-confirmed";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
 
-// Lazy load authenticated pages to improve initial load time
-const Schedule = React.lazy(() => import("@/pages/schedule"));
-const Expenses = React.lazy(() => import("@/pages/expenses"));
-const Profile = React.lazy(() => import("@/pages/profile"));
-const AddPet = React.lazy(() => import("@/pages/add-pet"));
-const PetProfile = React.lazy(() => import("@/pages/pet-profile"));
-const VaccineForm = React.lazy(() => import("@/pages/vaccine-form"));
-const DewormingForm = React.lazy(() => import("@/pages/deworming-form"));
-const TreatmentForm = React.lazy(() => import("@/pages/treatment-form"));
-const SurgeryForm = React.lazy(() => import("@/pages/surgery-form"));
-const CheckupForm = React.lazy(() => import("@/pages/checkup-form"));
-const LabTestForm = React.lazy(() => import("@/pages/lab-test-form"));
-const GroomingForm = React.lazy(() => import("@/pages/grooming-form"));
+// Import authenticated pages directly to avoid lazy loading issues
+import Schedule from "@/pages/schedule";
+import Expenses from "@/pages/expenses";
+import Profile from "@/pages/profile";
+import AddPet from "@/pages/add-pet";
+import PetProfile from "@/pages/pet-profile";
+import VaccineForm from "@/pages/vaccine-form";
+import DewormingForm from "@/pages/deworming-form";
+import TreatmentForm from "@/pages/treatment-form";
+import SurgeryForm from "@/pages/surgery-form";
+import CheckupForm from "@/pages/checkup-form";
+import LabTestForm from "@/pages/lab-test-form";
+import GroomingForm from "@/pages/grooming-form";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -41,6 +41,11 @@ function Router() {
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading });
   console.log('Current location:', window.location.pathname);
+  
+  // Add route debugging
+  React.useEffect(() => {
+    console.log('Route changed to:', window.location.pathname, { isAuthenticated, isLoading });
+  }, [window.location.pathname, isAuthenticated, isLoading]);
 
   if (isLoading) {
     return <PageLoader />;
@@ -62,7 +67,7 @@ function Router() {
           <Route path="/terms-of-service" component={TermsOfService} />
         </>
       ) : (
-        <React.Suspense fallback={<PageLoader />}>
+        <>
           <Route path="/" component={Dashboard} />
           <Route path="/welcome" component={Welcome} />
           <Route path="/schedule" component={Schedule} />
@@ -81,7 +86,7 @@ function Router() {
           <Route path="/terms" component={TermsOfService} />
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
-        </React.Suspense>
+        </>
       )}
       <Route component={NotFound} />
     </Switch>

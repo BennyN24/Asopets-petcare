@@ -6,6 +6,11 @@ import { Home, ArrowLeft, Search } from "lucide-react";
 
 export default function NotFound() {
   const [, setLocation] = useLocation();
+  
+  // Debug why 404 is showing
+  React.useEffect(() => {
+    console.log('NotFound component rendered for path:', window.location.pathname);
+  }, []);
 
   const goHome = () => {
     setLocation("/");
