@@ -120,25 +120,21 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
       />
 
       {preview ? (
-        <Card>
-          <CardContent className="p-3">
-            <div className="relative">
-              <img
-                src={preview}
-                alt="Uploaded photo"
-                className="w-full h-32 object-cover rounded-lg"
-              />
-              <Button
-                variant="destructive"
-                size="sm"
-                className="absolute top-2 right-2 w-6 h-6 p-0"
-                onClick={handleRemovePhoto}
-              >
-                <X className="w-3 h-3" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative">
+          <img
+            src={preview}
+            alt="Uploaded photo"
+            className="w-full h-32 object-cover rounded-lg border"
+          />
+          <Button
+            variant="destructive"
+            size="sm"
+            className="absolute top-2 right-2 w-6 h-6 p-0"
+            onClick={handleRemovePhoto}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
       ) : (
         <Card className="border-2 border-dashed border-gray-300 hover:border-primary transition-colors">
           <CardContent className="p-6">
@@ -164,18 +160,8 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                   disabled={isUploading}
                   onClick={triggerFileInput}
                 >
-                  <Upload className="w-4 h-4 mr-1" />
-                  Choose File
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  disabled={isUploading}
-                  onClick={triggerFileInput}
-                >
                   <Camera className="w-4 h-4 mr-1" />
-                  Camera
+                  Choose Photo
                 </Button>
               </div>
               <p className="text-xs text-gray-400 mt-2">
@@ -183,7 +169,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
               </p>
             </div>
           </CardContent>
-        </Card>
+        </div>
       )}
     </div>
   );
