@@ -274,6 +274,14 @@ Changelog:
   * Added official ASOPETS logo to login and signup pages, replacing generic paw print icons
   * Created assets directory and integrated brand logo for consistent visual identity
   * Enhanced profile photo editing with small camera button overlay instead of large upload cards
+- June 19, 2025. Enhanced medical records image functionality:
+  * Increased image upload size limit from 2MB to 8MB for medical records
+  * Implemented aggressive image compression (40-50% quality) for optimal database storage
+  * Added image thumbnails to medical timeline with proper preview functionality
+  * Integrated lightbox viewer for medical record images with zoom and navigation
+  * Enhanced MedicalAttachmentViewer to support both new attachments array and legacy imageUrl
+  * Added clickable image previews in both timeline view and detailed record dialogs
+  * Server configured with 10MB payload limits to support large image uploads
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

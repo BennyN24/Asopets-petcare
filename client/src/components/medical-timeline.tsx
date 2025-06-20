@@ -251,11 +251,25 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                             <ImageIcon className="w-3 h-3 mr-1" />
                             <span>Attached document</span>
                           </div>
-                          <img 
-                            src={record.imageUrl} 
-                            alt="Medical record"
-                            className="max-w-32 h-auto rounded border"
-                          />
+                          <div 
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedRecord(record);
+                              const allImages = [
+                                ...(record.attachments || []),
+                                ...(record.imageUrl ? [record.imageUrl] : [])
+                              ];
+                              setAttachmentIndex(allImages.findIndex(img => img === record.imageUrl));
+                              setShowAttachments(true);
+                            }}
+                          >
+                            <img 
+                              src={record.imageUrl} 
+                              alt="Medical record"
+                              className="max-w-32 h-auto rounded border"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -369,14 +383,49 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                   </div>
                 )}
 
-                {selectedRecord.imageUrl && (
+                {/* Images section */}
+                {((selectedRecord.attachments && selectedRecord.attachments.length > 0) || selectedRecord.imageUrl) && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-2">Attached Document</h4>
-                    <img 
-                      src={selectedRecord.imageUrl} 
-                      alt="Medical record document"
-                      className="w-full h-auto rounded border max-h-48 object-contain"
-                    />
+                    <h4 className="font-medium text-sm text-gray-900 mb-2">
+                      Attached Images ({(selectedRecord.attachments?.length || 0) + (selectedRecord.imageUrl ? 1 : 0)})
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedRecord.attachments?.map((attachment, idx) => (
+                        <div 
+                          key={idx}
+                          className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border"
+                          onClick={() => {
+                            setAttachmentIndex(idx);
+                            setShowAttachments(true);
+                          }}
+                        >
+                          <img
+                            src={attachment}
+                            alt={`Medical record attachment ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                      {selectedRecord.imageUrl && (
+                        <div 
+                          className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border"
+                          onClick={() => {
+                            const allImages = [
+                              ...(selectedRecord.attachments || []),
+                              selectedRecord.imageUrl!
+                            ];
+                            setAttachmentIndex(allImages.length - 1);
+                            setShowAttachments(true);
+                          }}
+                        >
+                          <img 
+                            src={selectedRecord.imageUrl} 
+                            alt="Medical record document"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -384,6 +433,19 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Image Lightbox */}
+      {showAttachments && selectedRecord && (
+        <MedicalAttachmentViewer
+          attachments={[
+            ...(selectedRecord.attachments || []),
+            ...(selectedRecord.imageUrl ? [selectedRecord.imageUrl] : [])
+          ]}
+          isOpen={showAttachments}
+          onClose={() => setShowAttachments(false)}
+          initialIndex={attachmentIndex}
+        />
+      )}
     </div>
   );
 }
