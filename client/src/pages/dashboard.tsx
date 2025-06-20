@@ -240,7 +240,7 @@ export default function Dashboard() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setScannedPetData(pet)}
-                            className="text-primary hover:text-primary/80"
+                            className="text-primary hover:text-primary/80 text-[#000]"
                           >
                             View
                           </Button>
