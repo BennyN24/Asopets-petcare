@@ -4,7 +4,7 @@ import jsQR from "jsqr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { QrCode, Camera, X, Download, Share2 } from "lucide-react";
+import { QrCode, Camera, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface QRScannerProps {
@@ -117,23 +117,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     setIsScanning(false);
   };
 
-  const handleTestScan = () => {
-    // Generate a test QR code for the current user's first pet (if any)
-    const testData = {
-      type: "pet_profile",
-      petId: 10, // Using the pet ID from the logs
-      ownerId: "6f1a0727-3380-4dd8-b401-8483bb8c57f8",
-      timestamp: new Date().toISOString(),
-    };
 
-    toast({
-      title: "Test QR Code Scanned!",
-      description: "Loading real pet information...",
-    });
-
-    stopCamera();
-    onScanSuccess(testData);
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -191,13 +175,9 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 </div>
               </div>
 
-              <div className="flex space-x-2">
-                <Button onClick={stopCamera} variant="outline" className="flex-1">
+              <div className="flex justify-center">
+                <Button onClick={stopCamera} variant="outline">
                   Stop Camera
-                </Button>
-                <Button onClick={handleTestScan} className="flex-1">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Test Scan
                 </Button>
               </div>
 

@@ -193,6 +193,49 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Other Pets Section - Scanned QR Codes */}
+            {scannedPets.length > 0 && (
+              <>
+                <div className="flex items-center justify-between mt-8">
+                  <h2 className="text-lg font-semibold text-gray-900">Other Pets</h2>
+                  <span className="text-sm text-gray-500">{scannedPets.length} scanned</span>
+                </div>
+                <div className="grid grid-cols-1 gap-4">
+                  {scannedPets.map((pet, index) => (
+                    <Card key={pet.petId || index} className="cursor-pointer hover:shadow-md transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                            <span className="text-lg">🐾</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">{pet.petName || pet.name}</h3>
+                            <p className="text-sm text-gray-600">{pet.breed}</p>
+                            {pet.owner && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                Owner: {pet.owner.name}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-400 mt-1">
+                              Scanned: {new Date(pet.scannedAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setScannedPetData(pet)}
+                            className="text-primary hover:text-primary/80"
+                          >
+                            View
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="insights" className="mt-6">
@@ -230,19 +273,21 @@ export default function Dashboard() {
           onClose={() => setShowQRScanner(false)}
           onScanSuccess={(data) => {
             setShowQRScanner(false);
-            if (data.type === "pet-profile") {
-              setScannedPetData(data);
-              
+            if (data.type === "pet_profile") {
               // Add to scanned pets list if not already present
               const exists = scannedPets.some(pet => pet.petId === data.petId);
               if (!exists) {
-                setScannedPets(prev => [...prev, data]);
+                setScannedPets(prev => [...prev, { ...data, scannedAt: new Date().toISOString() }]);
+                toast({
+                  title: "Pet Profile Scanned",
+                  description: `Added ${data.petName} to Other Pets section`,
+                });
+              } else {
+                toast({
+                  title: "Pet Already Scanned",
+                  description: `${data.petName} is already in your Other Pets list`,
+                });
               }
-              
-              toast({
-                title: "Pet Profile Scanned",
-                description: `Successfully scanned ${data.name}'s profile!`,
-              });
             }
           }}
         />

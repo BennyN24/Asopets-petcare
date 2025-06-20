@@ -285,6 +285,10 @@ Changelog:
   * Fixed duplicate veterinarian field in grooming forms by implementing conditional field rendering
   * Enhanced medical record form to use context-appropriate labels (Groomer Name vs Veterinarian/Clinic)
   * Temporarily removed SMS reminder option from medical record forms (to be implemented in future update)
+  * Removed test scan button from QR scanner and implemented automatic detection
+  * Added "Other Pets" section to dashboard for displaying scanned pet QR codes
+  * Enhanced QR scanner to automatically detect and add pets to Other Pets list
+  * Implemented persistence of scanned pet data in dashboard with view functionality
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
