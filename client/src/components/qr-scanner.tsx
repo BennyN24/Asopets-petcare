@@ -79,19 +79,23 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           if (code) {
             try {
               const qrData = JSON.parse(code.data);
+              console.log("QR Code detected:", qrData);
+              
               if (qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId) {
                 toast({
                   title: "Pet QR Code Found!",
-                  description: "Loading pet information...",
+                  description: `Found ${qrData.name || 'pet'} profile with ${qrData.medicalRecordCount || 0} records`,
                 });
                 stopCamera();
                 onScanSuccess(qrData);
                 return;
               } else {
-                setError('This QR code is not a valid pet profile. Please scan a pet QR code.');
+                console.log("QR code format not recognized:", qrData);
+                setError(`Invalid QR code. Expected pet profile, found: ${qrData.type || 'unknown'}`);
                 setTimeout(() => setError(null), 3000);
               }
             } catch (e) {
+              console.error("QR parsing error:", e);
               setError('Invalid QR code format. Please scan a valid pet profile QR code.');
               setTimeout(() => setError(null), 3000);
             }

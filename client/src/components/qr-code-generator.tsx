@@ -18,30 +18,21 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
   const { toast } = useToast();
 
   const generateQRData = () => {
-    const baseUrl = window.location.origin;
-    
-    // Generate comprehensive pet data including profile and medical records
+    // Generate scannable pet profile data that matches scanner expectations
     const petData = {
-      type: "pet_complete",
-      pet: {
-        name: pet.name,
-        category: pet.category,
-        breed: pet.breed,
-        dateOfBirth: pet.dateOfBirth,
-        microchipId: pet.microchipId,
-        birthmarks: pet.birthmarks,
-      },
-      medicalRecords: medicalRecords.map(record => ({
-        type: record.type,
-        title: record.title,
-        dateAdministered: record.dateAdministered,
-        veterinarian: record.veterinarian,
-        clinic: record.clinic,
-        nextDueDate: record.nextDueDate,
-      })),
-      recordCount: medicalRecords.length,
-      generatedAt: new Date().toISOString(),
-      shareUrl: `${baseUrl}/shared/pet/${pet.id}`,
+      type: "pet_profile",
+      petId: pet.id,
+      ownerId: pet.userId,
+      name: pet.name,
+      category: pet.category,
+      breed: pet.breed,
+      dateOfBirth: pet.dateOfBirth,
+      age: pet.age,
+      microchipId: pet.microchipId,
+      birthmarks: pet.birthmarks,
+      medicalRecordCount: medicalRecords.length,
+      lastUpdated: new Date().toISOString(),
+      timestamp: new Date().toISOString(),
     };
     return JSON.stringify(petData);
   };
@@ -56,7 +47,8 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
         color: {
           dark: '#000000',
           light: '#FFFFFF'
-        }
+        },
+        errorCorrectionLevel: 'M'
       });
       setQrCodeUrl(qrCodeDataUrl);
     } catch (error) {
@@ -174,8 +166,9 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
         </div>
 
         <div className="text-center text-sm text-gray-600">
-          <p className="font-medium">{pet.name}'s Complete Profile & Medical Records</p>
+          <p className="font-medium">{pet.name}'s Profile QR Code</p>
           <p>Scan to view pet information and {medicalRecords.length} medical record{medicalRecords.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-500 mt-1">Pet ID: {pet.id}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -211,7 +204,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
         </div>
 
         <div className="text-xs text-gray-500 text-center">
-          <p>QR code contains complete pet profile and medical record information</p>
+          <p>QR code contains pet profile data for scanning and sharing</p>
           <p>Generated on {new Date().toLocaleDateString()}</p>
         </div>
       </CardContent>

@@ -292,6 +292,10 @@ Changelog:
   * Fixed password reset token validation issue with improved debugging and error handling
   * Enhanced reset password page with better token detection and user feedback
   * Updated BASE_URL handling for development environment to use localhost properly
+  * Fixed QR code scanner compatibility by aligning data format between generator and scanner
+  * Changed QR data type from "pet_complete" to "pet_profile" for proper recognition
+  * Enhanced QR scanner with detailed logging and better error messages for debugging
+  * Updated QR code content to include essential pet data (ID, owner, basic info) for scanning
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
