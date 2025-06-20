@@ -193,7 +193,7 @@ export default function NotificationDropdown({
                         className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-100"
                         onClick={() => handleSnooze(reminder.id, 60)}
                       >
-                        <Snooze className="w-4 h-4" />
+                        <Clock3 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
@@ -237,7 +237,7 @@ export default function NotificationDropdown({
                         className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-100"
                         onClick={() => handleSnooze(reminder.id, 60)}
                       >
-                        <Snooze className="w-4 h-4" />
+                        <Clock3 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
