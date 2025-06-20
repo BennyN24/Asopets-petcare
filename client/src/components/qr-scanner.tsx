@@ -117,8 +117,6 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     setIsScanning(false);
   };
 
-
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md">
@@ -143,15 +141,6 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
               <Button onClick={startCamera} className="w-full">
                 <Camera className="w-4 h-4 mr-2" />
                 Start Camera
-              </Button>
-
-              <Button 
-                variant="outline" 
-                onClick={handleTestScan}
-                className="w-full"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Test Scan (Real Data)
               </Button>
             </div>
           ) : (
