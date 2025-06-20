@@ -194,23 +194,28 @@ export default function MedicalRecordForm({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="veterinarian"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Veterinarian/Clinic</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter vet name or clinic" 
-                        {...field} 
-                        value={field.value || ""} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Only show default veterinarian field if not provided in extraFields */}
+              {!extraFields.some(field => field.name === "veterinarian") && (
+                <FormField
+                  control={form.control}
+                  name="veterinarian"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {recordType === "grooming" ? "Groomer Name" : "Veterinarian/Clinic"}
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder={recordType === "grooming" ? "Enter groomer name" : "Enter vet name or clinic"} 
+                          {...field} 
+                          value={field.value || ""} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* Extra Fields */}
               {extraFields.map((extraField) => (

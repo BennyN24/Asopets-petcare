@@ -282,6 +282,8 @@ Changelog:
   * Enhanced MedicalAttachmentViewer to support both new attachments array and legacy imageUrl
   * Added clickable image previews in both timeline view and detailed record dialogs
   * Server configured with 10MB payload limits to support large image uploads
+  * Fixed duplicate veterinarian field in grooming forms by implementing conditional field rendering
+  * Enhanced medical record form to use context-appropriate labels (Groomer Name vs Veterinarian/Clinic)
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
