@@ -301,6 +301,11 @@ Changelog:
   * Moved MedicationReminderManager from global App to Dashboard with dropdown control
   * Enhanced dashboard with notification bell button showing reminder count badge
   * Fixed notification system to show reminders in proper dropdown when bell is clicked
+  * Removed redundant reminder count display element from medication reminder manager
+  * Enhanced QR scanner with better detection settings and improved error handling
+  * Updated camera resolution settings for better QR code recognition
+  * Added comprehensive logging to debug QR code scanning issues
+  * Fixed QR scanner to properly detect generated pet profile QR codes
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

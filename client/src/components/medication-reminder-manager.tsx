@@ -165,12 +165,6 @@ export default function MedicationReminderManager({
           onSnooze={handleSnooze}
         />
       ))}
-      
-      {activeReminders.length > 3 && (
-        <div className="text-center text-sm text-gray-600 bg-white rounded-lg p-2 shadow-md border">
-          +{activeReminders.length - 3} more reminders in your schedule
-        </div>
-      )}
 
       {/* Notification Dropdown */}
       <NotificationDropdown

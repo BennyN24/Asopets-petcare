@@ -36,8 +36,9 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment", // Use back camera on mobile
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 1920, min: 640 },
+          height: { ideal: 1080, min: 480 },
+          frameRate: { ideal: 30, min: 15 }
         }
       });
 
@@ -73,15 +74,18 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
         try {
           const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
           const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
+            inversionAttempts: "attemptBoth",
           });
 
           if (code) {
+            console.log("Raw QR code data detected:", code.data);
             try {
               const qrData = JSON.parse(code.data);
-              console.log("QR Code detected:", qrData);
+              console.log("Parsed QR Code data:", qrData);
               
+              // Check for pet_profile type with required fields
               if (qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId) {
+                console.log("Valid pet QR code found:", qrData);
                 toast({
                   title: "Pet QR Code Found!",
                   description: `Found ${qrData.name || 'pet'} profile with ${qrData.medicalRecordCount || 0} records`,
@@ -90,14 +94,25 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 onScanSuccess(qrData);
                 return;
               } else {
-                console.log("QR code format not recognized:", qrData);
-                setError(`Invalid QR code. Expected pet profile, found: ${qrData.type || 'unknown'}`);
-                setTimeout(() => setError(null), 3000);
+                console.log("QR code validation failed:", {
+                  type: qrData.type,
+                  petId: qrData.petId,
+                  ownerId: qrData.ownerId,
+                  hasRequiredFields: !!(qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId)
+                });
+                // Only show error after a few failed attempts to avoid spam
+                setTimeout(() => {
+                  setError(`Invalid QR code. Expected pet profile, found: ${qrData.type || 'unknown'}`);
+                  setTimeout(() => setError(null), 2000);
+                }, 1000);
               }
             } catch (e) {
-              console.error("QR parsing error:", e);
-              setError('Invalid QR code format. Please scan a valid pet profile QR code.');
-              setTimeout(() => setError(null), 3000);
+              console.error("QR parsing error:", e, "Raw data:", code.data);
+              // Only show error after parsing failure, not continuously
+              setTimeout(() => {
+                setError('Invalid QR code format. Please scan a valid pet profile QR code.');
+                setTimeout(() => setError(null), 2000);
+              }, 1000);
             }
           }
         } catch (err) {
