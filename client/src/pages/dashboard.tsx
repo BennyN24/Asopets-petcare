@@ -17,6 +17,7 @@ import QuickActions from "@/components/quick-actions";
 import VetClinics from "@/components/vet-clinics";
 import QRScanner from "@/components/qr-scanner";
 import ScannedPetViewer from "@/components/scanned-pet-viewer";
+import MedicationReminderManager from "@/components/medication-reminder-manager";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
 export default function Dashboard() {
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = React.useState("overview");
   const [showVetClinics, setShowVetClinics] = React.useState(false);
   const [showQRScanner, setShowQRScanner] = React.useState(false);
+  const [showNotifications, setShowNotifications] = React.useState(false);
   const [scannedPetData, setScannedPetData] = React.useState<any>(null);
   const [scannedPets, setScannedPets] = React.useState<any[]>([]);
 
@@ -120,6 +122,19 @@ export default function Dashboard() {
                 <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                   {totalNotifications > 9 ? '9+' : totalNotifications}
                 </div>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowNotifications(true)}
+              className="relative"
+            >
+              <Bell className="w-4 h-4" />
+              {totalNotifications > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {totalNotifications > 9 ? '9+' : totalNotifications}
+                </span>
               )}
             </Button>
           </div>
@@ -300,6 +315,10 @@ export default function Dashboard() {
         />
       )}
 
+      <MedicationReminderManager 
+        showDropdown={showNotifications}
+        onDropdownClose={() => setShowNotifications(false)}
+      />
       <BottomNavigation activeTab="home" />
     </div>
   );

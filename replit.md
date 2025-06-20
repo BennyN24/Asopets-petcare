@@ -296,6 +296,11 @@ Changelog:
   * Changed QR data type from "pet_complete" to "pet_profile" for proper recognition
   * Enhanced QR scanner with detailed logging and better error messages for debugging
   * Updated QR code content to include essential pet data (ID, owner, basic info) for scanning
+  * Created comprehensive notification dropdown system integrated with bell icon
+  * Added NotificationDropdown component with active reminder display and quick actions
+  * Moved MedicationReminderManager from global App to Dashboard with dropdown control
+  * Enhanced dashboard with notification bell button showing reminder count badge
+  * Fixed notification system to show reminders in proper dropdown when bell is clicked
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

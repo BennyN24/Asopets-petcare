@@ -4,13 +4,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import CuteNotification from "@/components/cute-notification";
+import NotificationDropdown from "@/components/notification-dropdown";
 import type { Reminder, Pet } from "@shared/schema";
 
 interface ReminderWithPet extends Reminder {
   pet: Pet;
 }
 
-export default function MedicationReminderManager() {
+interface MedicationReminderManagerProps {
+  showDropdown?: boolean;
+  onDropdownClose?: () => void;
+}
+
+export default function MedicationReminderManager({ 
+  showDropdown = false, 
+  onDropdownClose 
+}: MedicationReminderManagerProps) {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -162,6 +171,13 @@ export default function MedicationReminderManager() {
           +{activeReminders.length - 3} more reminders in your schedule
         </div>
       )}
+
+      {/* Notification Dropdown */}
+      <NotificationDropdown
+        reminders={reminders}
+        isOpen={showDropdown}
+        onClose={onDropdownClose || (() => {})}
+      />
     </div>
   );
 }

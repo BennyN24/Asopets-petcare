@@ -119,7 +119,6 @@ function App() {
         <OfflineIndicator />
         <Toaster />
         <Router />
-        <MedicationReminderManager />
       </QueryClientProvider>
     </ErrorBoundary>
   );
