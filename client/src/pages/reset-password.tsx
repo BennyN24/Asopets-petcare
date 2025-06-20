@@ -49,9 +49,14 @@ export default function ResetPassword() {
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenParam = urlParams.get("token");
+    console.log("Reset password page - URL search params:", window.location.search);
+    console.log("Reset password page - Token param:", tokenParam);
+    
     if (tokenParam) {
       setToken(tokenParam);
+      console.log("Token set successfully:", tokenParam);
     } else {
+      console.log("No token found in URL");
       toast({
         title: "Invalid reset link",
         description: "This password reset link is invalid or has expired.",
@@ -59,17 +64,27 @@ export default function ResetPassword() {
       });
       setTimeout(() => setLocation("/login"), 2000);
     }
-  }, []);
+  }, [toast, setLocation]);
 
   const onSubmit = async (data: ResetPasswordForm) => {
-    if (!token) return;
+    if (!token) {
+      toast({
+        title: "No token",
+        description: "Reset token is missing. Please use the link from your email.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
-      await apiRequest("POST", "/api/auth/reset-password", {
+      console.log("Submitting password reset with token:", token);
+      const response = await apiRequest("POST", "/api/auth/reset-password", {
         token,
         password: data.password,
       });
+      console.log("Password reset response:", response);
+      
       setIsSuccess(true);
       toast({
         title: "Password reset successful",
@@ -78,6 +93,7 @@ export default function ResetPassword() {
       });
       setTimeout(() => setLocation("/login"), 3000);
     } catch (error: any) {
+      console.error("Password reset error:", error);
       toast({
         title: "Reset failed",
         description:

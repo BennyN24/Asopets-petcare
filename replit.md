@@ -289,6 +289,9 @@ Changelog:
   * Added "Other Pets" section to dashboard for displaying scanned pet QR codes
   * Enhanced QR scanner to automatically detect and add pets to Other Pets list
   * Implemented persistence of scanned pet data in dashboard with view functionality
+  * Fixed password reset token validation issue with improved debugging and error handling
+  * Enhanced reset password page with better token detection and user feedback
+  * Updated BASE_URL handling for development environment to use localhost properly
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

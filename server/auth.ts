@@ -172,7 +172,10 @@ export const sendPasswordResetEmail = async (
   email: string,
   resetToken: string,
 ) => {
-  const baseUrl = process.env.BASE_URL || "https://asopets.com";
+  // Use current domain for reset links in development
+  const baseUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000' 
+    : (process.env.BASE_URL || "https://asopets.com");
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
   // Always log the password reset link for testing

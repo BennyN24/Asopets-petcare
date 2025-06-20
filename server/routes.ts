@@ -218,20 +218,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/reset-password', async (req: any, res) => {
     try {
       const { token, password } = req.body;
+      console.log("Password reset request - Token:", token, "Password length:", password?.length);
+      
       if (!token || !password) {
+        console.log("Missing token or password");
         return res.status(400).json({ message: "Token and password are required" });
       }
 
-      if (password.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      if (password.length < 8) {
+        console.log("Password too short");
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
       }
 
       // Find user by reset token
       const user = await storage.getUserByResetToken(token);
-      if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
-        return res.status(400).json({ message: "Invalid or expired reset token" });
+      console.log("User found by token:", user ? `${user.email} (${user.id})` : 'none');
+      
+      if (!user) {
+        console.log("No user found with reset token");
+        return res.status(400).json({ message: "Invalid reset token" });
+      }
+      
+      if (!user.passwordResetExpires) {
+        console.log("No expiration date set for reset token");
+        return res.status(400).json({ message: "Invalid reset token" });
+      }
+      
+      if (user.passwordResetExpires < new Date()) {
+        console.log("Reset token expired:", user.passwordResetExpires, "vs", new Date());
+        return res.status(400).json({ message: "Reset token has expired" });
       }
 
+      console.log("Updating password for user:", user.email);
       const passwordHash = await hashPassword(password);
       await storage.updateUser(user.id, {
         passwordHash,
@@ -239,6 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordResetExpires: null,
       });
 
+      console.log("Password reset successful for:", user.email);
       res.json({ message: "Password reset successful. You can now log in with your new password." });
     } catch (error) {
       console.error("Password reset error:", error);
