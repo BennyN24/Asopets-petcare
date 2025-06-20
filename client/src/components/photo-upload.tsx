@@ -31,11 +31,11 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
       return;
     }
 
-    // Validate file size (2MB limit for mobile compatibility)
-    if (file.size > 2 * 1024 * 1024) {
+    // Validate file size (8MB limit)
+    if (file.size > 8 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "Please select an image smaller than 2MB.",
+        description: "Please select an image smaller than 8MB.",
         variant: "destructive",
       });
       return;
@@ -69,8 +69,8 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
         
         ctx?.drawImage(img, 0, 0, width, height);
         
-        // Convert to base64 with compression
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        // Convert to base64 with aggressive compression for database storage
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
         setPreview(compressedDataUrl);
         onPhotoUploaded(compressedDataUrl);
         
@@ -195,7 +195,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                 </Button>
               </div>
               <p className="text-xs text-gray-400 mt-2">
-                Max file size: 5MB
+                Max file size: 8MB
               </p>
             </div>
           </CardContent>

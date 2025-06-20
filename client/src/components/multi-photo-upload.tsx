@@ -50,8 +50,8 @@ export default function MultiPhotoUpload({
         
         ctx?.drawImage(img, 0, 0, width, height);
         
-        // Convert to base64 with compression
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        // Convert to base64 with aggressive compression for database storage
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.4);
         resolve(compressedDataUrl);
       };
       
@@ -95,11 +95,11 @@ export default function MultiPhotoUpload({
           continue;
         }
 
-        // Validate file size (5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
+        // Validate file size (8MB limit)
+        if (file.size > 8 * 1024 * 1024) {
           toast({
             title: "File too large",
-            description: "Please select images smaller than 5MB.",
+            description: "Please select images smaller than 8MB.",
             variant: "destructive",
           });
           continue;

@@ -195,6 +195,41 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                         )}
                       </div>
 
+                      {/* Images preview */}
+                      {record.attachments && record.attachments.length > 0 && (
+                        <div className="mt-2">
+                          <div className="flex items-center gap-1 mb-2">
+                            <ImageIcon className="w-3 h-3 text-gray-500" />
+                            <span className="text-xs text-gray-500">{record.attachments.length} image{record.attachments.length > 1 ? 's' : ''}</span>
+                          </div>
+                          <div className="flex gap-2 flex-wrap">
+                            {record.attachments.slice(0, 3).map((attachment, idx) => (
+                              <div 
+                                key={idx}
+                                className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedRecord(record);
+                                  setAttachmentIndex(idx);
+                                  setShowAttachments(true);
+                                }}
+                              >
+                                <img
+                                  src={attachment}
+                                  alt={`Medical record attachment ${idx + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                {idx === 2 && record.attachments.length > 3 && (
+                                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                    <span className="text-white text-xs font-medium">+{record.attachments.length - 3}</span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {record.nextDueDate && (
                         <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
                           <Calendar className="w-3 h-3 inline mr-1" />
