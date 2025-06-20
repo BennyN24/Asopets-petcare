@@ -275,25 +275,7 @@ export default function MedicalRecordForm({
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="reminderSms"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value || false}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm">
-                              Send SMS reminder 1 hour before due date
-                            </FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
+
                   </div>
                 </div>
               </div>

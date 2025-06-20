@@ -284,6 +284,7 @@ Changelog:
   * Server configured with 10MB payload limits to support large image uploads
   * Fixed duplicate veterinarian field in grooming forms by implementing conditional field rendering
   * Enhanced medical record form to use context-appropriate labels (Groomer Name vs Veterinarian/Clinic)
+  * Temporarily removed SMS reminder option from medical record forms (to be implemented in future update)
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
@@ -354,4 +355,12 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
+```
+
+## Future Feature Roadmap
+
+```
+- SMS reminder notifications for medical records (1 hour before due date)
+- Enhanced notification system with SMS integration
+- Advanced reminder customization options
 ```
