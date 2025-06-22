@@ -4,7 +4,7 @@ import jsQR from "jsqr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { QrCode, Camera, X } from "lucide-react";
+import { QrCode, Camera, X, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface QRScannerProps {
@@ -18,6 +18,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   const [stream, setStream] = React.useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -162,6 +163,93 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     setIsScanning(false);
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError("Please select an image file");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            setError("Failed to process image");
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+          if (code) {
+            console.log("QR Code found in uploaded image:", code.data);
+            
+            try {
+              const qrData = JSON.parse(code.data);
+              console.log("Parsed QR data from image:", qrData);
+              
+              // Check for pet_profile type with required fields
+              if (qrData.type === 'pet_profile' && (qrData.petId || qrData.id)) {
+                console.log("Valid pet QR code detected in uploaded image!");
+                
+                // Normalize the data structure
+                const normalizedData = {
+                  type: 'pet_profile',
+                  petId: qrData.petId || qrData.id,
+                  ownerId: qrData.ownerId || qrData.userId,
+                  name: qrData.name || qrData.petName,
+                  petName: qrData.petName || qrData.name,
+                  category: qrData.category,
+                  breed: qrData.breed,
+                  dateOfBirth: qrData.dateOfBirth,
+                  age: qrData.age,
+                  microchipId: qrData.microchipId,
+                  birthmarks: qrData.birthmarks,
+                  medicalRecordCount: qrData.medicalRecordCount || 0,
+                  lastUpdated: qrData.lastUpdated || qrData.timestamp,
+                  owner: qrData.owner
+                };
+                
+                toast({
+                  title: "Pet QR Code Found!",
+                  description: `Found ${normalizedData.name || 'pet'} profile from uploaded image`,
+                });
+                onScanSuccess(normalizedData);
+                return;
+              } else {
+                setError("Invalid pet QR code in the uploaded image");
+              }
+            } catch (parseError) {
+              console.error("Failed to parse QR data from image:", parseError);
+              setError("Invalid QR code format in the uploaded image");
+            }
+          } else {
+            setError("No QR code found in the uploaded image");
+          }
+        } catch (err) {
+          console.error("Error processing uploaded image:", err);
+          setError("Failed to process the uploaded image");
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md">
@@ -183,10 +271,25 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 Scan a pet's QR code to view their profile and medical records.
               </p>
               
-              <Button onClick={startCamera} className="w-full">
-                <Camera className="w-4 h-4 mr-2" />
-                Start Camera
-              </Button>
+              <div className="grid grid-cols-1 gap-3">
+                <Button onClick={startCamera} className="w-full">
+                  <Camera className="w-4 h-4 mr-2" />
+                  Start Camera
+                </Button>
+                
+                <Button onClick={handleUploadClick} variant="outline" className="w-full">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload QR Image
+                </Button>
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
           ) : (
             <div className="space-y-4">
