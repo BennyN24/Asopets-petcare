@@ -19,10 +19,11 @@ interface GoogleMapProps {
   userLocation: { lat: number; lng: number } | null;
   onClinicSelect?: (clinic: VetClinic) => void;
   onNearbyPlacesFound?: (places: PlaceResult[]) => void;
+  onMapLoaded?: (loaded: boolean) => void;
   className?: string;
 }
 
-export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNearbyPlacesFound, className }: GoogleMapProps) {
+export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNearbyPlacesFound, onMapLoaded, className }: GoogleMapProps) {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const [map, setMap] = React.useState<any>(null);
   const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
@@ -78,15 +79,36 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
         window.initMap = () => {
           console.log("Google Maps initialized via callback");
           setIsLoaded(true);
+          onMapLoaded?.(true);
         };
         
         script.onerror = (error) => {
           console.error("Failed to load Google Maps API:", error);
           toast({
             title: "Map Loading Error",
-            description: "Failed to load Google Maps. Switching to simple map view.",
+            description: "Failed to load Google Maps. Check API key and quotas.",
             variant: "destructive",
           });
+        };
+        
+        // Set a timeout for loading
+        const loadTimeout = setTimeout(() => {
+          if (!window.google) {
+            console.warn("Google Maps loading timeout");
+            toast({
+              title: "Map Loading Timeout",
+              description: "Google Maps is taking too long to load. Try refreshing.",
+              variant: "destructive",
+            });
+          }
+        }, 10000);
+        
+        script.onload = () => {
+          clearTimeout(loadTimeout);
+          if (window.google) {
+            console.log("Google Maps script loaded successfully");
+            // The callback will handle setting isLoaded
+          }
         };
         
         document.head.appendChild(script);
@@ -268,7 +290,8 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
       <div className={`${className} flex items-center justify-center bg-gray-100 rounded-lg`}>
         <div className="text-center p-8">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading map...</p>
+          <p className="text-gray-600">Loading Google Maps...</p>
+          <p className="text-xs text-gray-500 mt-2">This may take a few seconds</p>
         </div>
       </div>
     );

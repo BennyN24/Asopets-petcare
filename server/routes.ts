@@ -760,8 +760,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Google Maps configuration endpoint
   app.get("/api/google-maps-config", isAuthenticated, (req: any, res) => {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    console.log("Google Maps config requested, API key available:", !!apiKey);
     res.json({
-      apiKey: process.env.GOOGLE_MAPS_API_KEY || null
+      apiKey: apiKey || null
     });
   });
 
@@ -782,6 +784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Enhance with Google Places data if API key is available and we have few results
         if (process.env.GOOGLE_MAPS_API_KEY && clinics.length < 5) {
           try {
+            console.log("Attempting to enhance results with Google Places API");
             const { searchNearbyVetClinics } = await import('./google-places');
             const googleClinics = await searchNearbyVetClinics(
               parseFloat(lat), 
@@ -789,9 +792,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               (radius ? parseFloat(radius) : 25) * 1000 // Convert km to meters
             );
             
+            // Filter out duplicates based on name similarity
+            const uniqueGoogleClinics = googleClinics.filter(googleClinic => {
+              return !clinics.some(dbClinic => 
+                dbClinic.name.toLowerCase().includes(googleClinic.name.toLowerCase()) ||
+                googleClinic.name.toLowerCase().includes(dbClinic.name.toLowerCase())
+              );
+            });
+            
             // Merge Google Places results with database results
-            const allClinics = [...clinics, ...googleClinics];
-            console.log(`Found ${clinics.length} database clinics and ${googleClinics.length} Google Places clinics`);
+            const allClinics = [...clinics, ...uniqueGoogleClinics];
+            console.log(`Found ${clinics.length} database clinics and ${uniqueGoogleClinics.length} unique Google Places clinics`);
             
             res.json(allClinics);
             return;

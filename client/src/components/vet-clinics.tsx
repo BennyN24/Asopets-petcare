@@ -12,9 +12,10 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertClinicRatingSchema, type VetClinic, type InsertClinicRating } from "@shared/schema";
-import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar, Map } from "lucide-react";
+import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar, Map, RefreshCw } from "lucide-react";
 import GoogleMap from "./google-map";
 import SimpleMap from "./simple-map";
+import MapDebugPanel from "./map-debug-panel";
 
 interface VetClinicsProps {
   onRatingAdded?: (clinicId: number, medicalRecordId?: number) => void;
@@ -120,18 +121,24 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
   const [showMap, setShowMap] = React.useState(false);
   const [useGoogleMaps, setUseGoogleMaps] = React.useState(true);
   const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = React.useState(false);
+  const [showDebugPanel, setShowDebugPanel] = React.useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Get user location with high accuracy
-  React.useEffect(() => {
+  const getCurrentLocation = React.useCallback(() => {
     if (navigator.geolocation) {
+      console.log("Getting current location...");
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log("Location obtained:", position.coords);
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
+          setIsRefreshing(false);
         },
         (error) => {
           console.log("Location access error:", error);
@@ -140,15 +147,26 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
             lat: 14.5995,
             lng: 120.9842,
           });
+          setIsRefreshing(false);
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 minutes
+          timeout: 15000,
+          maximumAge: 60000 // 1 minute for refresh
         }
       );
     }
   }, []);
+
+  React.useEffect(() => {
+    getCurrentLocation();
+  }, [getCurrentLocation]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    getCurrentLocation();
+    queryClient.invalidateQueries({ queryKey: ["/api/vet-clinics"] });
+  };
 
   // Fetch vet clinics
   const { data: clinics = [], isLoading } = useQuery({
@@ -274,6 +292,15 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
               <DialogTitle>Local Veterinary Clinics</DialogTitle>
               <div className="flex gap-2">
                 <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  {isRefreshing ? "Refreshing..." : "Refresh"}
+                </Button>
+                <Button
                   variant={showMap ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowMap(!showMap)}
@@ -282,13 +309,22 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                   {showMap ? "List View" : "Map View"}
                 </Button>
                 {showMap && (
-                  <Button
-                    variant={useGoogleMaps ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setUseGoogleMaps(!useGoogleMaps)}
-                  >
-                    {useGoogleMaps ? "Simple Map" : "Google Maps"}
-                  </Button>
+                  <>
+                    <Button
+                      variant={useGoogleMaps ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setUseGoogleMaps(!useGoogleMaps)}
+                    >
+                      {useGoogleMaps ? "Simple Map" : "Google Maps"}
+                    </Button>
+                    <Button
+                      variant={showDebugPanel ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowDebugPanel(!showDebugPanel)}
+                    >
+                      Debug
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
@@ -299,25 +335,36 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : showMap ? (
-            <div className="h-96">
-              {useGoogleMaps ? (
-                <GoogleMap
-                  clinics={clinics}
+            <div className="space-y-4">
+              {showDebugPanel && (
+                <MapDebugPanel
                   userLocation={userLocation}
-                  onClinicSelect={setSelectedClinic}
-                  onNearbyPlacesFound={(places) => {
-                    console.log("Google Places found:", places.length, "nearby clinics");
-                  }}
-                  className="h-full"
-                />
-              ) : (
-                <SimpleMap
-                  clinics={clinics}
-                  userLocation={userLocation}
-                  onClinicSelect={setSelectedClinic}
-                  className="h-full overflow-y-auto"
+                  clinicsCount={clinics.length}
+                  googleMapsLoaded={googleMapsLoaded}
+                  onLocationRefresh={handleRefresh}
                 />
               )}
+              <div className="h-96">
+                {useGoogleMaps ? (
+                  <GoogleMap
+                    clinics={clinics}
+                    userLocation={userLocation}
+                    onClinicSelect={setSelectedClinic}
+                    onNearbyPlacesFound={(places) => {
+                      console.log("Google Places found:", places.length, "nearby clinics");
+                    }}
+                    onMapLoaded={setGoogleMapsLoaded}
+                    className="h-full"
+                  />
+                ) : (
+                  <SimpleMap
+                    clinics={clinics}
+                    userLocation={userLocation}
+                    onClinicSelect={setSelectedClinic}
+                    className="h-full overflow-y-auto"
+                  />
+                )}
+              </div>
             </div>
           ) : (
             <div className="grid gap-4">
