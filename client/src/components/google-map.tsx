@@ -32,111 +32,175 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
   // Load Google Maps API
   React.useEffect(() => {
     if (window.google) {
+      console.log("Google Maps already loaded");
       setIsLoaded(true);
       return;
     }
 
-    // Note: API key should be set as VITE_GOOGLE_MAPS_API_KEY in environment
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      console.error("Google Maps API key not found. Please set VITE_GOOGLE_MAPS_API_KEY");
-      toast({
-        title: "Configuration Error",
-        description: "Google Maps API key not configured. Using basic location services.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Fetch API key from server endpoint
+    const loadGoogleMaps = async () => {
+      try {
+        console.log("Fetching Google Maps configuration...");
+        const response = await fetch('/api/google-maps-config');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Google Maps config response:", data);
+        
+        if (!data.apiKey) {
+          console.error("Google Maps API key not available from server");
+          toast({
+            title: "Configuration Error", 
+            description: "Google Maps API key not configured. Using fallback map view.",
+            variant: "destructive",
+          });
+          return;
+        }
 
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setIsLoaded(true);
-    script.onerror = () => {
-      console.error("Failed to load Google Maps API");
-      toast({
-        title: "Map Error",
-        description: "Failed to load Google Maps. Please check your internet connection.",
-        variant: "destructive",
-      });
-    };
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
+        console.log("Loading Google Maps with API key:", data.apiKey.substring(0, 10) + "...");
+        
+        // Check if script already exists
+        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+        if (existingScript) {
+          console.log("Google Maps script already exists, removing...");
+          existingScript.remove();
+        }
+        
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places&callback=initMap`;
+        script.async = true;
+        script.defer = true;
+        
+        // Global callback for Google Maps
+        window.initMap = () => {
+          console.log("Google Maps initialized via callback");
+          setIsLoaded(true);
+        };
+        
+        script.onerror = (error) => {
+          console.error("Failed to load Google Maps API:", error);
+          toast({
+            title: "Map Loading Error",
+            description: "Failed to load Google Maps. Switching to simple map view.",
+            variant: "destructive",
+          });
+        };
+        
+        document.head.appendChild(script);
+        console.log("Google Maps script added to document");
+        
+      } catch (error) {
+        console.error("Error fetching Google Maps config:", error);
+        toast({
+          title: "Configuration Error",
+          description: "Unable to load Google Maps. Using fallback view.",
+          variant: "destructive",
+        });
       }
     };
+
+    loadGoogleMaps();
   }, [toast]);
 
   // Initialize map
   React.useEffect(() => {
-    if (!isLoaded || !mapRef.current || !userLocation) return;
-
-    const mapInstance = new window.google.maps.Map(mapRef.current, {
-      center: userLocation,
-      zoom: 13,
-      styles: [
-        {
-          featureType: "poi.medical",
-          elementType: "geometry",
-          stylers: [{ color: "#ff6b6b" }]
-        }
-      ]
-    });
-
-    setMap(mapInstance);
-
-    // Initialize Google Places service
-    const placesService = GooglePlacesService.getInstance();
-    placesService.initialize(mapInstance);
-
-    // Search for nearby vet clinics using Google Places
-    if (onNearbyPlacesFound) {
-      placesService.searchNearbyVetClinics(userLocation, 25000)
-        .then(places => {
-          console.log("Found nearby vet clinics from Google Places:", places);
-          onNearbyPlacesFound(places);
-        })
-        .catch(error => {
-          console.log("Google Places search error:", error);
-        });
+    if (!isLoaded || !mapRef.current || !userLocation) {
+      console.log("Map initialization skipped:", { isLoaded, hasMapRef: !!mapRef.current, userLocation });
+      return;
     }
 
-    // Add user location marker
-    new window.google.maps.Marker({
-      position: userLocation,
-      map: mapInstance,
-      title: "Your Location",
-      icon: {
-        url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="8" fill="#3B82F6" stroke="#ffffff" stroke-width="2"/>
-            <circle cx="12" cy="12" r="3" fill="#ffffff"/>
-          </svg>
-        `),
-        scaledSize: new window.google.maps.Size(24, 24),
+    console.log("Initializing Google Map at location:", userLocation);
+
+    try {
+      const mapInstance = new window.google.maps.Map(mapRef.current, {
+        center: userLocation,
+        zoom: 13,
+        styles: [
+          {
+            featureType: "poi.medical",
+            elementType: "geometry",
+            stylers: [{ color: "#ff6b6b" }]
+          }
+        ]
+      });
+
+      setMap(mapInstance);
+      console.log("Map instance created successfully");
+
+      // Initialize Google Places service
+      const placesService = GooglePlacesService.getInstance();
+      placesService.initialize(mapInstance);
+
+      // Search for nearby vet clinics using Google Places
+      if (onNearbyPlacesFound) {
+        placesService.searchNearbyVetClinics(userLocation, 25000)
+          .then(places => {
+            console.log("Found nearby vet clinics from Google Places:", places);
+            onNearbyPlacesFound(places);
+          })
+          .catch(error => {
+            console.log("Google Places search error:", error);
+          });
       }
-    });
-  }, [isLoaded, userLocation]);
+
+      // Add user location marker
+      const userMarker = new window.google.maps.Marker({
+        position: userLocation,
+        map: mapInstance,
+        title: "Your Location",
+        icon: {
+          url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="8" fill="#3B82F6" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+            </svg>
+          `),
+          scaledSize: new window.google.maps.Size(24, 24),
+        }
+      });
+
+      console.log("User location marker added");
+    } catch (error) {
+      console.error("Error initializing Google Map:", error);
+      toast({
+        title: "Map Error",
+        description: "Failed to initialize map. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [isLoaded, userLocation, onNearbyPlacesFound, toast]);
 
   // Add clinic markers
   React.useEffect(() => {
-    if (!map || !clinics.length) return;
+    if (!map || !clinics.length) {
+      console.log("Clinic markers skipped:", { hasMap: !!map, clinicsCount: clinics.length });
+      return;
+    }
+
+    console.log("Adding clinic markers for", clinics.length, "clinics");
 
     const bounds = new window.google.maps.LatLngBounds();
     if (userLocation) {
       bounds.extend(userLocation);
     }
 
-    clinics.forEach((clinic) => {
-      if (!clinic.latitude || !clinic.longitude) return;
+    let validClinicCount = 0;
+
+    clinics.forEach((clinic, index) => {
+      if (!clinic.latitude || !clinic.longitude) {
+        console.log(`Clinic ${index} missing coordinates:`, clinic.name);
+        return;
+      }
 
       const position = {
         lat: parseFloat(clinic.latitude),
         lng: parseFloat(clinic.longitude)
       };
+
+      console.log(`Adding marker for ${clinic.name} at:`, position);
 
       const marker = new window.google.maps.Marker({
         position,
@@ -154,14 +218,17 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
       });
 
       bounds.extend(position);
+      validClinicCount++;
 
       marker.addListener('click', () => {
+        console.log("Clinic marker clicked:", clinic.name);
         setSelectedClinic(clinic);
         onClinicSelect?.(clinic);
       });
     });
 
-    if (clinics.length > 0) {
+    if (validClinicCount > 0) {
+      console.log("Fitting bounds for", validClinicCount, "valid clinics");
       map.fitBounds(bounds);
       const zoom = map.getZoom();
       if (zoom > 15) map.setZoom(15);

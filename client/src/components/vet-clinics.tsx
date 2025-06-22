@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertClinicRatingSchema, type VetClinic, type InsertClinicRating } from "@shared/schema";
 import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar, Map } from "lucide-react";
 import GoogleMap from "./google-map";
+import SimpleMap from "./simple-map";
 
 interface VetClinicsProps {
   onRatingAdded?: (clinicId: number, medicalRecordId?: number) => void;
@@ -117,6 +118,7 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
   const [showRatingForm, setShowRatingForm] = React.useState(false);
   const [showReviews, setShowReviews] = React.useState<{ [key: number]: boolean }>({});
   const [showMap, setShowMap] = React.useState(false);
+  const [useGoogleMaps, setUseGoogleMaps] = React.useState(true);
   const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -279,6 +281,15 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                   <Map className="w-4 h-4 mr-2" />
                   {showMap ? "List View" : "Map View"}
                 </Button>
+                {showMap && (
+                  <Button
+                    variant={useGoogleMaps ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUseGoogleMaps(!useGoogleMaps)}
+                  >
+                    {useGoogleMaps ? "Simple Map" : "Google Maps"}
+                  </Button>
+                )}
               </div>
             </div>
           </DialogHeader>
@@ -289,15 +300,24 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
             </div>
           ) : showMap ? (
             <div className="h-96">
-              <GoogleMap
-                clinics={clinics}
-                userLocation={userLocation}
-                onClinicSelect={setSelectedClinic}
-                onNearbyPlacesFound={(places) => {
-                  console.log("Google Places found:", places.length, "nearby clinics");
-                }}
-                className="h-full"
-              />
+              {useGoogleMaps ? (
+                <GoogleMap
+                  clinics={clinics}
+                  userLocation={userLocation}
+                  onClinicSelect={setSelectedClinic}
+                  onNearbyPlacesFound={(places) => {
+                    console.log("Google Places found:", places.length, "nearby clinics");
+                  }}
+                  className="h-full"
+                />
+              ) : (
+                <SimpleMap
+                  clinics={clinics}
+                  userLocation={userLocation}
+                  onClinicSelect={setSelectedClinic}
+                  className="h-full overflow-y-auto"
+                />
+              )}
             </div>
           ) : (
             <div className="grid gap-4">

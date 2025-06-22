@@ -758,6 +758,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Google Maps configuration endpoint
+  app.get("/api/google-maps-config", isAuthenticated, (req: any, res) => {
+    res.json({
+      apiKey: process.env.GOOGLE_MAPS_API_KEY || null
+    });
+  });
+
   // Vet clinic routes with Google Places integration
   app.get("/api/vet-clinics", isAuthenticated, async (req: any, res) => {
     try {
