@@ -34,6 +34,8 @@ import SurgeryForm from "@/pages/surgery-form";
 import CheckupForm from "@/pages/checkup-form";
 import LabTestForm from "@/pages/lab-test-form";
 import GroomingForm from "@/pages/grooming-form";
+import VetClinicsPage from "@/pages/vet-clinics";
+import QRScannerPage from "@/pages/qr-scanner";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -78,6 +80,8 @@ function Router() {
           <Route path="/pet/:id/checkup" component={CheckupForm} />
           <Route path="/pet/:id/lab-test" component={LabTestForm} />
           <Route path="/pet/:id/grooming" component={GroomingForm} />
+          <Route path="/vet-clinics" component={VetClinicsPage} />
+          <Route path="/qr-scanner" component={QRScannerPage} />
         </>
       )}
       

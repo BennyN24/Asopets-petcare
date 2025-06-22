@@ -330,6 +330,9 @@ Changelog:
   * Created collapsible filter controls with visual indicators showing filtered vs total records
   * Enhanced user experience with smart result summaries and empty state handling
   * Added quick filter reset options and improved record type display formatting
+  * Converted vet clinics from dialog to standalone mobile-responsive page
+  * Enhanced vet clinics page with improved mobile layout and touch-friendly controls
+  * Added proper navigation flow from pet profile to dedicated vet clinics page
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
