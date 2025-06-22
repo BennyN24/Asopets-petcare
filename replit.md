@@ -333,6 +333,7 @@ Changelog:
   * Converted vet clinics from dialog to standalone mobile-responsive page
   * Enhanced vet clinics page with improved mobile layout and touch-friendly controls
   * Added proper navigation flow from pet profile to dedicated vet clinics page
+  * Removed debug controls from vet clinics page for cleaner user interface
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

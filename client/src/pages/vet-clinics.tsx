@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import GoogleMap from "@/components/google-map";
 import SimpleMap from "@/components/simple-map";
-import MapDebugPanel from "@/components/map-debug-panel";
+
 import ClinicReviews from "@/components/clinic-reviews";
 import type { VetClinic, InsertClinicRating } from "@shared/schema";
 
@@ -34,7 +34,7 @@ export default function VetClinicsPage() {
   const [showMap, setShowMap] = React.useState(false);
   const [useGoogleMaps, setUseGoogleMaps] = React.useState(true);
   const [googleMapsLoaded, setGoogleMapsLoaded] = React.useState(false);
-  const [showDebugPanel, setShowDebugPanel] = React.useState(false);
+
   const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
   const [showRatingForm, setShowRatingForm] = React.useState(false);
   const [showReviews, setShowReviews] = React.useState<Record<number, boolean>>({});
@@ -236,14 +236,6 @@ export default function VetClinicsPage() {
             >
               {useGoogleMaps ? "Simple Map" : "Google Maps"}
             </Button>
-            <Button
-              variant={showDebugPanel ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowDebugPanel(!showDebugPanel)}
-              className="flex-shrink-0"
-            >
-              Debug
-            </Button>
           </div>
         )}
       </div>
@@ -256,14 +248,6 @@ export default function VetClinicsPage() {
           </div>
         ) : showMap ? (
           <div className="space-y-4">
-            {showDebugPanel && (
-              <MapDebugPanel
-                userLocation={userLocation}
-                clinicsCount={clinics.length}
-                googleMapsLoaded={googleMapsLoaded}
-                onLocationRefresh={handleRefresh}
-              />
-            )}
             <div className="h-80 md:h-96 rounded-lg overflow-hidden border">
               {useGoogleMaps ? (
                 <GoogleMap
