@@ -123,9 +123,6 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
         } catch (err) {
           console.error("QR detection error:", err);
         }
-        } catch (err) {
-          console.error("QR detection error:", err);
-        }
       }
 
       if (isScanning) {
