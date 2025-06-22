@@ -31,6 +31,23 @@ export default function Dashboard() {
   const [scannedPetData, setScannedPetData] = React.useState<any>(null);
   const [scannedPets, setScannedPets] = React.useState<any[]>([]);
 
+  // Load scanned pets from localStorage on mount
+  React.useEffect(() => {
+    const savedScannedPets = localStorage.getItem('asopets-scanned-pets');
+    if (savedScannedPets) {
+      try {
+        setScannedPets(JSON.parse(savedScannedPets));
+      } catch (error) {
+        console.error('Failed to parse saved scanned pets:', error);
+      }
+    }
+  }, []);
+
+  // Save scanned pets to localStorage whenever it changes
+  React.useEffect(() => {
+    localStorage.setItem('asopets-scanned-pets', JSON.stringify(scannedPets));
+  }, [scannedPets]);
+
   // Redirect to login if not authenticated
   React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -104,15 +121,6 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center space-x-3">
             <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 p-2"
-              onClick={() => setShowQRScanner(true)}
-            >
-              <QrCode className="w-5 h-5" />
-            </Button>
-            
-            <Button
               variant="outline"
               size="sm"
               onClick={() => setShowNotifications(true)}
@@ -153,13 +161,20 @@ export default function Dashboard() {
                 />
               ))}
               {/* Add Pet Card */}
-
               <div
                 className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
                 onClick={() => setLocation("/add-pet")}
               >
                 <Plus className="text-gray-400 text-2xl mb-2" />
                 <p className="text-gray-500 text-sm font-medium">Add Pet</p>
+              </div>
+              {/* QR Scanner Card */}
+              <div
+                className="bg-blue-50 p-4 rounded-xl border-2 border-dashed border-blue-300 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
+                onClick={() => setShowQRScanner(true)}
+              >
+                <QrCode className="text-blue-400 text-2xl mb-2" />
+                <p className="text-blue-500 text-sm font-medium">Scan Pet QR</p>
               </div>
             </div>
             {/* Quick Actions */}
@@ -275,22 +290,40 @@ export default function Dashboard() {
         <QRScanner 
           onClose={() => setShowQRScanner(false)}
           onScanSuccess={(data) => {
+            console.log("QR Scanner - Raw scanned data:", data);
             setShowQRScanner(false);
-            if (data.type === "pet_profile") {
+            
+            if (data && data.type === "pet_profile" && data.petId) {
               // Add to scanned pets list if not already present
               const exists = scannedPets.some(pet => pet.petId === data.petId);
               if (!exists) {
-                setScannedPets(prev => [...prev, { ...data, scannedAt: new Date().toISOString() }]);
+                const scannedPet = {
+                  ...data,
+                  scannedAt: new Date().toISOString()
+                };
+                console.log("Adding new scanned pet:", scannedPet);
+                setScannedPets(prev => {
+                  const updated = [...prev, scannedPet];
+                  console.log("Updated scanned pets list:", updated);
+                  return updated;
+                });
                 toast({
                   title: "Pet Profile Scanned",
-                  description: `Added ${data.petName} to Other Pets section`,
+                  description: `Added ${data.name || data.petName || 'pet'} to Other Pets section`,
                 });
               } else {
                 toast({
                   title: "Pet Already Scanned",
-                  description: `${data.petName} is already in your Other Pets list`,
+                  description: `${data.name || data.petName || 'Pet'} is already in your Other Pets list`,
                 });
               }
+            } else {
+              console.error("Invalid QR data received:", data);
+              toast({
+                title: "Invalid QR Code",
+                description: "This QR code is not a valid pet profile",
+                variant: "destructive",
+              });
             }
           }}
         />

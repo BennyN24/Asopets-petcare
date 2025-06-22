@@ -95,23 +95,44 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
               });
               
               // Check for pet_profile type with required fields
-              if (qrData.type === 'pet_profile' && qrData.petId && qrData.ownerId) {
+              if (qrData.type === 'pet_profile' && (qrData.petId || qrData.id)) {
                 console.log("✅ Valid pet QR code detected successfully!");
+                
+                // Normalize the data structure
+                const normalizedData = {
+                  type: 'pet_profile',
+                  petId: qrData.petId || qrData.id,
+                  ownerId: qrData.ownerId || qrData.userId,
+                  name: qrData.name || qrData.petName,
+                  petName: qrData.petName || qrData.name,
+                  category: qrData.category,
+                  breed: qrData.breed,
+                  dateOfBirth: qrData.dateOfBirth,
+                  age: qrData.age,
+                  microchipId: qrData.microchipId,
+                  birthmarks: qrData.birthmarks,
+                  medicalRecordCount: qrData.medicalRecordCount || 0,
+                  lastUpdated: qrData.lastUpdated || qrData.timestamp,
+                  owner: qrData.owner
+                };
+                
+                console.log("Normalized QR data:", normalizedData);
+                
                 toast({
                   title: "Pet QR Code Found!",
-                  description: `Found ${qrData.name || qrData.petName || 'pet'} profile with ${qrData.medicalRecordCount || 0} records`,
+                  description: `Found ${normalizedData.name || 'pet'} profile with ${normalizedData.medicalRecordCount} records`,
                 });
                 stopCamera();
-                onScanSuccess(qrData);
+                onScanSuccess(normalizedData);
                 return;
               } else {
                 console.log("❌ QR code validation failed:", {
                   typeMatch: qrData.type === 'pet_profile',
-                  hasPetId: !!qrData.petId,
-                  hasOwnerId: !!qrData.ownerId,
+                  hasPetId: !!(qrData.petId || qrData.id),
+                  hasOwnerId: !!(qrData.ownerId || qrData.userId),
                   actualType: qrData.type,
-                  actualPetId: qrData.petId,
-                  actualOwnerId: qrData.ownerId
+                  actualPetId: qrData.petId || qrData.id,
+                  actualOwnerId: qrData.ownerId || qrData.userId
                 });
               }
             } catch (parseError) {
