@@ -11,15 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Camera, Image, Dog, Cat, Bird, Rabbit, Heart, X } from "lucide-react";
+import { ArrowLeft, Camera, Image, Dog, Cat, Bird, Rabbit, Heart, Horse, X } from "lucide-react";
 
 const petCategories: { value: PetCategory; label: string; icon: any }[] = [
   { value: "dog", label: "Dogs", icon: Dog },
   { value: "cat", label: "Cats", icon: Cat },
   { value: "bird", label: "Birds", icon: Bird },
   { value: "rabbit", label: "Rabbits", icon: Rabbit },
-  { value: "horse", label: "Horses", icon: Heart },
-  { value: "exotic", label: "Exotic", icon: Heart },
+  { value: "horse", label: "Horses", icon: Horse },
+  { value: "exotic", label: "Exotic", icon: () => <span className="text-lg">🦎</span> },
   { value: "other", label: "Others", icon: Heart },
 ];
 

@@ -217,7 +217,7 @@ export default function DashboardInsights({ pets, allMedicalRecords, reminders }
             <CardContent>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  ${totalYearlyCost.toFixed(2)}
+                  {totalYearlyCost.toFixed(2)}
                 </div>
                 <div className="text-xs text-gray-600">
                   {yearlyRecords.length} procedures in {now.getFullYear()}
