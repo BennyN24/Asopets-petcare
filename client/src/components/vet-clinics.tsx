@@ -295,12 +295,6 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                 onClinicSelect={setSelectedClinic}
                 onNearbyPlacesFound={(places) => {
                   console.log("Google Places found:", places.length, "nearby clinics");
-                  if (places.length > 0) {
-                    toast({
-                      title: "Enhanced Results",
-                      description: `Found ${places.length} additional clinics via Google Places`,
-                    });
-                  }
                 }}
                 className="h-full"
               />

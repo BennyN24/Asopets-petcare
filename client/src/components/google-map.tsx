@@ -36,9 +36,15 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
       return;
     }
 
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
+    // Note: API key should be set as VITE_GOOGLE_MAPS_API_KEY in environment
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
-      console.error("Google Maps API key not found");
+      console.error("Google Maps API key not found. Please set VITE_GOOGLE_MAPS_API_KEY");
+      toast({
+        title: "Configuration Error",
+        description: "Google Maps API key not configured. Using basic location services.",
+        variant: "destructive",
+      });
       return;
     }
 

@@ -762,19 +762,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/vet-clinics", isAuthenticated, async (req: any, res) => {
     try {
       const { lat, lng, radius } = req.query;
-      let clinics;
+      let clinics = [];
       
       if (lat && lng) {
+        // Get clinics from database
         clinics = await storage.getVetClinicsByLocation(
           parseFloat(lat), 
           parseFloat(lng), 
           radius ? parseFloat(radius) : 25 // Default 25km radius
         );
         
-        // Enhance with Google Places data if available
+        // Enhance with Google Places data if API key is available and we have few results
         if (process.env.GOOGLE_MAPS_API_KEY && clinics.length < 5) {
-          // Could fetch additional clinics from Google Places API here
-          console.log("Could enhance with Google Places API for more clinics");
+          try {
+            const { searchNearbyVetClinics } = await import('./google-places');
+            const googleClinics = await searchNearbyVetClinics(
+              parseFloat(lat), 
+              parseFloat(lng), 
+              (radius ? parseFloat(radius) : 25) * 1000 // Convert km to meters
+            );
+            
+            // Merge Google Places results with database results
+            const allClinics = [...clinics, ...googleClinics];
+            console.log(`Found ${clinics.length} database clinics and ${googleClinics.length} Google Places clinics`);
+            
+            res.json(allClinics);
+            return;
+          } catch (error) {
+            console.log("Google Places integration error:", error);
+            // Fall back to database-only results
+          }
         }
       } else {
         // Return all clinics if no location provided
