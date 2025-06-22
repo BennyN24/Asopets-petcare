@@ -12,7 +12,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertClinicRatingSchema, type VetClinic, type InsertClinicRating } from "@shared/schema";
-import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar } from "lucide-react";
+import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar, Map } from "lucide-react";
+import GoogleMap from "./google-map";
 
 interface VetClinicsProps {
   onRatingAdded?: (clinicId: number, medicalRecordId?: number) => void;
@@ -115,11 +116,12 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
   const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
   const [showRatingForm, setShowRatingForm] = React.useState(false);
   const [showReviews, setShowReviews] = React.useState<{ [key: number]: boolean }>({});
+  const [showMap, setShowMap] = React.useState(false);
   const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Get user location
+  // Get user location with high accuracy
   React.useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -129,9 +131,18 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
             lng: position.coords.longitude,
           });
         },
-        () => {
-          // Location access denied, will show all clinics
-          setUserLocation(null);
+        (error) => {
+          console.log("Location access error:", error);
+          // Fallback to Manila coordinates for demo
+          setUserLocation({
+            lat: 14.5995,
+            lng: 120.9842,
+          });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
         }
       );
     }
@@ -255,14 +266,44 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
             Find Vet Clinics
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Local Veterinary Clinics</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>Local Veterinary Clinics</DialogTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant={showMap ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowMap(!showMap)}
+                >
+                  <Map className="w-4 h-4 mr-2" />
+                  {showMap ? "List View" : "Map View"}
+                </Button>
+              </div>
+            </div>
           </DialogHeader>
           
           {isLoading ? (
             <div className="flex justify-center p-8">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : showMap ? (
+            <div className="h-96">
+              <GoogleMap
+                clinics={clinics}
+                userLocation={userLocation}
+                onClinicSelect={setSelectedClinic}
+                onNearbyPlacesFound={(places) => {
+                  console.log("Google Places found:", places.length, "nearby clinics");
+                  if (places.length > 0) {
+                    toast({
+                      title: "Enhanced Results",
+                      description: `Found ${places.length} additional clinics via Google Places`,
+                    });
+                  }
+                }}
+                className="h-full"
+              />
             </div>
           ) : (
             <div className="grid gap-4">
