@@ -10,7 +10,7 @@ import HealthSummaryCard from "@/components/health-summary-card";
 import MedicalTimeline from "@/components/medical-timeline";
 import QRCodeGenerator from "@/components/qr-code-generator";
 import PetEditForm from "@/components/pet-edit-form";
-import VetClinics from "@/components/vet-clinics";
+
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
 
 export default function PetProfile() {
@@ -150,10 +150,9 @@ export default function PetProfile() {
 
       <div className="p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="records">Records</TabsTrigger>
-            <TabsTrigger value="vet-clinics">Vets</TabsTrigger>
             <TabsTrigger value="qr">QR Code</TabsTrigger>
             <TabsTrigger value="info">Pet Info</TabsTrigger>
           </TabsList>
@@ -258,7 +257,7 @@ export default function PetProfile() {
 
                   <button 
                     className="bg-white p-3 rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all"
-                    onClick={() => setActiveTab('vet-clinics')}
+                    onClick={() => setLocation('/vet-clinics')}
                   >
                     <div className="text-center">
                       <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -274,10 +273,6 @@ export default function PetProfile() {
           
           <TabsContent value="records" className="mt-6">
             <MedicalTimeline petId={petId} medicalRecords={medicalRecords} />
-          </TabsContent>
-          
-          <TabsContent value="vet-clinics" className="mt-6">
-            <VetClinics />
           </TabsContent>
           
           <TabsContent value="qr" className="mt-6 space-y-4">
