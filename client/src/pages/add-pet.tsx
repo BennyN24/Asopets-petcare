@@ -11,16 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Camera, Image, Dog, Cat, Bird, Rabbit, Heart, X } from "lucide-react";
+import { ArrowLeft, Camera, Image, X } from "lucide-react";
 
 const petCategories: { value: PetCategory; label: string; icon: any }[] = [
-  { value: "dog", label: "Dogs", icon: Dog },
-  { value: "cat", label: "Cats", icon: Cat },
-  { value: "bird", label: "Birds", icon: Bird },
-  { value: "rabbit", label: "Rabbits", icon: Rabbit },
+  { value: "dog", label: "Dogs", icon: () => <span className="text-lg">🐕</span> },
+  { value: "cat", label: "Cats", icon: () => <span className="text-lg">🐱</span> },
+  { value: "bird", label: "Birds", icon: () => <span className="text-lg">🐦</span> },
+  { value: "rabbit", label: "Rabbits", icon: () => <span className="text-lg">🐰</span> },
   { value: "horse", label: "Horses", icon: () => <span className="text-lg">🐴</span> },
   { value: "exotic", label: "Exotic", icon: () => <span className="text-lg">🦎</span> },
-  { value: "other", label: "Others", icon: Heart },
+  { value: "other", label: "Others", icon: () => <span className="text-lg">❤️</span> },
 ];
 
 export default function AddPet() {

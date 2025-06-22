@@ -11,17 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertPetSchema, type Pet, type InsertPet, type PetCategory } from "@shared/schema";
-import { Edit3, Dog, Cat, Bird, Rabbit, Heart } from "lucide-react";
+import { Edit3 } from "lucide-react";
 import PhotoUpload from "./photo-upload";
 
 const petCategories: { value: PetCategory; label: string; icon: any }[] = [
-  { value: "dog", label: "Dog", icon: Dog },
-  { value: "cat", label: "Cat", icon: Cat },
-  { value: "bird", label: "Bird", icon: Bird },
-  { value: "rabbit", label: "Rabbit", icon: Rabbit },
+  { value: "dog", label: "Dog", icon: () => <span className="text-sm">🐕</span> },
+  { value: "cat", label: "Cat", icon: () => <span className="text-sm">🐱</span> },
+  { value: "bird", label: "Bird", icon: () => <span className="text-sm">🐦</span> },
+  { value: "rabbit", label: "Rabbit", icon: () => <span className="text-sm">🐰</span> },
   { value: "horse", label: "Horse", icon: () => <span className="text-sm">🐴</span> },
   { value: "exotic", label: "Exotic", icon: () => <span className="text-sm">🦎</span> },
-  { value: "other", label: "Other", icon: Heart },
+  { value: "other", label: "Other", icon: () => <span className="text-sm">❤️</span> },
 ];
 
 interface PetEditFormProps {
