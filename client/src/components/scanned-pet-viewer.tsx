@@ -6,19 +6,20 @@ import { format } from "date-fns";
 
 interface ScannedPetData {
   type: string;
-  pet: {
-    id: number;
-    name: string;
-    category: string;
-    breed?: string;
-    age?: number;
-    dateOfBirth?: string;
-    imageUrl?: string;
-    microchipId?: string;
-    medicalConditions?: string;
-    allergies?: string;
-  };
-  owner: {
+  petId: number | string;
+  ownerId?: string;
+  name?: string;
+  petName?: string;
+  category?: string;
+  breed?: string;
+  age?: number;
+  dateOfBirth?: string;
+  imageUrl?: string;
+  microchipId?: string;
+  birthmarks?: string;
+  medicalRecordCount?: number;
+  lastUpdated?: string;
+  owner?: {
     name: string;
     phone?: string;
     email?: string;
@@ -44,13 +45,16 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
     other: "bg-gray-100 text-gray-800"
   };
 
+  const petName = data.name || data.petName || 'Unknown Pet';
+  const petCategory = data.category || 'other';
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start">
             <CardTitle className="flex items-center">
-              <Heart className="w-5 h-5 mr-2 text-red-500" />
+              <Heart className="w-5 h-5 mr-2 text-primary" />
               Pet Profile
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={onClose}>
@@ -59,92 +63,154 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Pet Info */}
-          <div className="text-center space-y-2">
-            {data.pet.imageUrl && (
-              <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gray-200">
-                <img 
-                  src={data.pet.imageUrl} 
-                  alt={data.pet.name}
-                  className="w-full h-full object-cover"
-                />
+          <div className="text-center">
+            {data.imageUrl ? (
+              <img
+                src={data.imageUrl}
+                alt={petName}
+                className="w-20 h-20 rounded-full mx-auto object-cover"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
+                <span className="text-2xl">🐾</span>
               </div>
             )}
-            <h3 className="text-xl font-bold text-gray-800">{data.pet.name}</h3>
-            <div className="flex justify-center space-x-2">
-              <Badge className={categoryColors[data.pet.category as keyof typeof categoryColors]}>
-                {data.pet.category.charAt(0).toUpperCase() + data.pet.category.slice(1)}
-              </Badge>
-              {data.pet.breed && (
-                <Badge variant="outline">{data.pet.breed}</Badge>
-              )}
-            </div>
-            {data.pet.age && (
-              <div className="flex items-center justify-center text-sm text-gray-600">
-                <Calendar className="w-4 h-4 mr-1" />
-                {Math.floor(data.pet.age / 12)} years {data.pet.age % 12} months
-              </div>
-            )}
-            {data.pet.dateOfBirth && (
-              <div className="text-sm text-gray-500">
-                Born: {format(new Date(data.pet.dateOfBirth), "MMM dd, yyyy")}
-              </div>
-            )}
+            <h3 className="text-lg font-semibold mt-3">{petName}</h3>
+            <Badge 
+              className={`mt-1 ${categoryColors[petCategory as keyof typeof categoryColors] || categoryColors.other}`}
+            >
+              {petCategory}
+            </Badge>
           </div>
 
-          {/* Medical Information */}
-          {(data.pet.medicalConditions || data.pet.allergies || data.pet.microchipId) && (
-            <div className="border-t pt-4 space-y-3">
-              <h4 className="font-semibold text-gray-700 flex items-center">
-                <Heart className="w-4 h-4 mr-2 text-red-500" />
-                Medical Information
-              </h4>
-              
-              {data.pet.microchipId && (
-                <div className="text-sm">
-                  <span className="font-medium text-gray-700">Microchip ID:</span>
-                  <span className="ml-2 text-gray-900 font-mono">{data.pet.microchipId}</span>
-                </div>
-              )}
-              
-              {data.pet.medicalConditions && (
-                <div className="bg-yellow-50 p-3 rounded-lg">
-                  <div className="flex items-center mb-1">
-                    <AlertTriangle className="w-4 h-4 text-yellow-600 mr-2" />
-                    <span className="font-medium text-yellow-800">Medical Conditions</span>
+          {/* Pet Details */}
+          <div className="space-y-3">
+            <div className="border-t pt-3">
+              <h4 className="font-medium text-gray-900 mb-2">Pet Information</h4>
+              <div className="space-y-2 text-sm">
+                {data.breed && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Breed:</span>
+                    <span className="font-medium">{data.breed}</span>
                   </div>
-                  <p className="text-sm text-yellow-700">{data.pet.medicalConditions}</p>
-                </div>
-              )}
-              
-              {data.pet.allergies && (
-                <div className="bg-red-50 p-3 rounded-lg">
-                  <div className="flex items-center mb-1">
-                    <AlertTriangle className="w-4 h-4 text-red-600 mr-2" />
-                    <span className="font-medium text-red-800">Allergies</span>
+                )}
+                {data.age && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Age:</span>
+                    <span className="font-medium">{data.age} months</span>
                   </div>
-                  <p className="text-sm text-red-700 font-medium">{data.pet.allergies}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Owner Info */}
-          <div className="border-t pt-4 space-y-3">
-            <h4 className="font-semibold text-gray-700 flex items-center">
-              <User className="w-4 h-4 mr-2" />
-              Owner Information
-            </h4>
-            
-            <div className="space-y-3">
-              <div>
-                <span className="font-medium text-gray-700">Name:</span>
-                <span className="ml-2 text-gray-900">{data.owner.name}</span>
+                )}
+                {data.dateOfBirth && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Born:</span>
+                    <span className="font-medium">
+                      {format(new Date(data.dateOfBirth), 'MMM dd, yyyy')}
+                    </span>
+                  </div>
+                )}
+                {data.microchipId && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Microchip:</span>
+                    <span className="font-medium font-mono text-xs">{data.microchipId}</span>
+                  </div>
+                )}
+                {data.medicalRecordCount !== undefined && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Medical Records:</span>
+                    <span className="font-medium">{data.medicalRecordCount}</span>
+                  </div>
+                )}
               </div>
-              
-              {data.owner.phone && (
-                <div className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2 text-green-600" />
+            </div>
+
+            {/* Owner Information */}
+            {data.owner && (
+              <div className="border-t pt-3">
+                <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                  <User className="w-4 h-4 mr-1" />
+                  Owner Information
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Name:</span>
+                    <span className="font-medium">{data.owner.name}</span>
+                  </div>
+                  {data.owner.phone && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Phone:</span>
+                      <a href={`tel:${data.owner.phone}`} className="font-medium text-blue-600 hover:underline flex items-center">
+                        <Phone className="w-3 h-3 mr-1" />
+                        {data.owner.phone}
+                      </a>
+                    </div>
+                  )}
+                  {data.owner.email && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Email:</span>
+                      <a href={`mailto:${data.owner.email}`} className="font-medium text-blue-600 hover:underline flex items-center">
+                        <Mail className="w-3 h-3 mr-1" />
+                        {data.owner.email}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Emergency Contact */}
+            {data.owner && (data.owner.emergencyContact || data.owner.emergencyPhone) && (
+              <div className="border-t pt-3">
+                <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                  <AlertTriangle className="w-4 h-4 mr-1 text-red-500" />
+                  Emergency Contact
+                </h4>
+                <div className="space-y-2 text-sm">
+                  {data.owner.emergencyContact && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Name:</span>
+                      <span className="font-medium">{data.owner.emergencyContact}</span>
+                    </div>
+                  )}
+                  {data.owner.emergencyPhone && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Phone:</span>
+                      <a href={`tel:${data.owner.emergencyPhone}`} className="font-medium text-red-600 hover:underline flex items-center">
+                        <Phone className="w-3 h-3 mr-1" />
+                        {data.owner.emergencyPhone}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Additional Information */}
+            {data.birthmarks && (
+              <div className="border-t pt-3">
+                <h4 className="font-medium text-gray-900 mb-2">Additional Information</h4>
+                <div className="text-sm">
+                  <span className="text-gray-600 block">Birthmarks/Notes:</span>
+                  <span className="font-medium">{data.birthmarks}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Scan Information */}
+            <div className="border-t pt-3">
+              <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                <Calendar className="w-4 h-4 mr-1" />
+                Scan Information
+              </h4>
+              <div className="text-sm text-gray-600">
+                Scanned on {format(new Date(data.scannedAt), 'MMM dd, yyyy \'at\' h:mm a')}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
                   <span className="font-medium text-gray-700">Phone:</span>
                   <a href={`tel:${data.owner.phone}`} className="ml-2 text-blue-600 hover:underline">
                     {data.owner.phone}

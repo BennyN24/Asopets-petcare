@@ -342,6 +342,8 @@ Changelog:
   * Added proper icons for Horse (horse emoji) and Exotic (lizard emoji) pet categories in Add Pet and Edit Pet forms
   * Made all pet category icons consistent by converting to emoji-based visual style across all categories
   * Added Upload QR Image button to QR scanner allowing users to upload and analyze QR code images alongside camera scanning
+  * Moved Quick Actions below Other Pets section for better layout organization
+  * Fixed Other Pets section data structure compatibility with ScannedPetViewer component
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

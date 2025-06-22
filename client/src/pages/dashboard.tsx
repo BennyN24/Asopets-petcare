@@ -177,8 +177,6 @@ export default function Dashboard() {
                 <p className="text-blue-500 text-sm font-medium">Scan Pet QR</p>
               </div>
             </div>
-            {/* Quick Actions */}
-            <QuickActions onFindClinics={() => setShowVetClinics(true)} />
 
             {/* Overdue Reminders Alert */}
             {overdueReminders.length > 0 && (
@@ -242,7 +240,11 @@ export default function Dashboard() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setScannedPetData(pet)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log("Opening scanned pet viewer for:", pet);
+                              setScannedPetData(pet);
+                            }}
                             className="text-primary hover:text-primary/80 text-[#333333]"
                           >
                             View
@@ -254,6 +256,9 @@ export default function Dashboard() {
                 </div>
               </>
             )}
+
+            {/* Quick Actions - moved below Other Pets */}
+            <QuickActions onFindClinics={() => setShowVetClinics(true)} />
           </TabsContent>
 
           <TabsContent value="insights" className="mt-6">
