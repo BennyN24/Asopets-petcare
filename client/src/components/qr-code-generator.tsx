@@ -24,6 +24,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
       petId: pet.id,
       ownerId: pet.userId,
       name: pet.name,
+      petName: pet.name, // Add alias for compatibility
       category: pet.category,
       breed: pet.breed,
       dateOfBirth: pet.dateOfBirth,
@@ -34,6 +35,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
       lastUpdated: new Date().toISOString(),
       timestamp: new Date().toISOString(),
     };
+    console.log("Generated QR data for pet:", petData);
     return JSON.stringify(petData);
   };
 
@@ -42,13 +44,13 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     try {
       const qrData = generateQRData();
       const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
-        width: 256,
-        margin: 2,
+        width: 300,
+        margin: 4,
         color: {
           dark: '#000000',
           light: '#FFFFFF'
         },
-        errorCorrectionLevel: 'M'
+        errorCorrectionLevel: 'H' // Higher error correction for better scanning
       });
       setQrCodeUrl(qrCodeDataUrl);
     } catch (error) {

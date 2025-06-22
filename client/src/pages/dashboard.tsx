@@ -116,7 +116,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => setShowNotifications(true)}
-              className="relative"
+              className="relative text-[#333333]"
             >
               <Bell className="w-4 h-4" />
               {totalNotifications > 0 && (
@@ -228,7 +228,7 @@ export default function Dashboard() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setScannedPetData(pet)}
-                            className="text-primary hover:text-primary/80 text-[#000]"
+                            className="text-primary hover:text-primary/80 text-[#333333]"
                           >
                             View
                           </Button>

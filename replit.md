@@ -306,6 +306,10 @@ Changelog:
   * Updated camera resolution settings for better QR code recognition
   * Added comprehensive logging to debug QR code scanning issues
   * Fixed QR scanner to properly detect generated pet profile QR codes
+  * Enhanced QR generation with better error correction (Level H) and larger size for improved scanning
+  * Added comprehensive debugging logs to QR scanner for better detection troubleshooting
+  * Optimized camera resolution and scan interval for more reliable QR code recognition
+  * Added petName alias in QR data for better compatibility between generator and scanner
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
