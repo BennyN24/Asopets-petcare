@@ -2,6 +2,7 @@ import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Calendar, 
@@ -16,14 +17,17 @@ import {
   Image as ImageIcon,
   Trash2,
   Eye,
-  Camera
+  Camera,
+  Filter,
+  SortAsc,
+  SortDesc
 } from "lucide-react";
 import MedicalAttachmentViewer from "@/components/medical-attachment-viewer";
 import { format, isValid } from "date-fns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { MedicalRecord } from "@shared/schema";
+import type { MedicalRecord, MedicalRecordType } from "@shared/schema";
 
 interface MedicalTimelineProps {
   petId: number;
@@ -37,6 +41,12 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [showAttachments, setShowAttachments] = React.useState(false);
   const [attachmentIndex, setAttachmentIndex] = React.useState(0);
+  
+  // Filter and sort states
+  const [filterType, setFilterType] = React.useState<MedicalRecordType | 'all'>('all');
+  const [sortBy, setSortBy] = React.useState<'date' | 'type' | 'cost'>('date');
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
+  const [showFilters, setShowFilters] = React.useState(false);
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
@@ -104,6 +114,49 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
     setIsDialogOpen(true);
   };
 
+  // Filter and sort records
+  const filteredAndSortedRecords = React.useMemo(() => {
+    let filtered = medicalRecords;
+    
+    // Apply type filter
+    if (filterType !== 'all') {
+      filtered = filtered.filter(record => record.type === filterType);
+    }
+    
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'date':
+          comparison = new Date(a.dateAdministered).getTime() - new Date(b.dateAdministered).getTime();
+          break;
+        case 'type':
+          comparison = a.type.localeCompare(b.type);
+          break;
+        case 'cost':
+          const costA = parseFloat(a.cost || '0');
+          const costB = parseFloat(b.cost || '0');
+          comparison = costA - costB;
+          break;
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+    
+    return sorted;
+  }, [medicalRecords, filterType, sortBy, sortOrder]);
+
+  // Get unique record types for filter options
+  const availableTypes = React.useMemo(() => {
+    const types = new Set(medicalRecords.map(record => record.type));
+    return Array.from(types).sort();
+  }, [medicalRecords]);
+
+  const toggleSortOrder = () => {
+    setSortOrder(current => current === 'asc' ? 'desc' : 'asc');
+  };
+
   if (medicalRecords.length === 0) {
     return (
       <Card>
@@ -118,24 +171,115 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
     );
   }
 
-  // Sort records by date (newest first)
-  const sortedRecords = [...medicalRecords].sort(
-    (a, b) => new Date(b.dateAdministered).getTime() - new Date(a.dateAdministered).getTime()
-  );
-
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">Medical History</h3>
-        <span className="text-sm text-gray-500">{medicalRecords.length} records</span>
+      {/* Filter and Sort Controls */}
+      <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900">Medical History</h3>
+            <span className="text-sm text-gray-500">({filteredAndSortedRecords.length}/{medicalRecords.length})</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            {showFilters ? 'Hide' : 'Show'} Filters
+          </Button>
+        </div>
+        
+        {showFilters && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Type Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Filter by Type</label>
+              <Select value={filterType} onValueChange={(value) => setFilterType(value as MedicalRecordType | 'all')}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {availableTypes.map(type => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Sort By */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Sort by</label>
+              <Select value={sortBy} onValueChange={(value) => setSortBy(value as 'date' | 'type' | 'cost')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date">Date</SelectItem>
+                  <SelectItem value="type">Type</SelectItem>
+                  <SelectItem value="cost">Cost</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Sort Order */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Sort Order</label>
+              <Button
+                variant="outline"
+                onClick={toggleSortOrder}
+                className="w-full justify-start"
+              >
+                {sortOrder === 'desc' ? (
+                  <SortDesc className="w-4 h-4 mr-2" />
+                ) : (
+                  <SortAsc className="w-4 h-4 mr-2" />
+                )}
+                {sortBy === 'date' 
+                  ? (sortOrder === 'desc' ? 'Newest First' : 'Oldest First')
+                  : (sortOrder === 'desc' ? 'Z to A' : 'A to Z')
+                }
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Results Summary */}
+      {filterType !== 'all' && (
+        <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+          Showing {filteredAndSortedRecords.length} {filterType.replace('-', ' ')} record{filteredAndSortedRecords.length !== 1 ? 's' : ''} 
+          {filteredAndSortedRecords.length < medicalRecords.length && (
+            <span> out of {medicalRecords.length} total</span>
+          )}
+        </div>
+      )}
+
+      {/* No filtered results */}
+      {filteredAndSortedRecords.length === 0 && filterType !== 'all' && (
+        <div className="text-center py-8 bg-gray-50 rounded-lg">
+          <Stethoscope className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-600 mb-2">No {filterType.replace('-', ' ')} records found</h3>
+          <p className="text-gray-500">Try adjusting your filters or add new records.</p>
+          <Button
+            variant="outline"
+            onClick={() => setFilterType('all')}
+            className="mt-4"
+          >
+            Show All Records
+          </Button>
+        </div>
+      )}
 
       <div className="relative">
         {/* Timeline line */}
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
         
         <div className="space-y-6">
-          {sortedRecords.map((record, index) => (
+          {filteredAndSortedRecords.map((record, index) => (
             <div key={record.id} className="relative">
               {/* Timeline dot */}
               <div className={`absolute left-4 w-4 h-4 rounded-full border-2 border-white ${
