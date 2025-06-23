@@ -542,8 +542,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
+      // Delete pet and all associated records (this will cascade delete)
       await storage.deletePet(petId);
-      res.status(204).send();
+      
+      res.json({ message: 'Pet and all associated records deleted successfully' });
     } catch (error) {
       console.error("Error deleting pet:", error);
       res.status(500).json({ message: "Failed to delete pet" });

@@ -1,14 +1,16 @@
 import React, { memo } from "react";
 import { useLocation } from "wouter";
 import type { Pet, Reminder } from "@shared/schema";
-import { Dog, Cat, Bird, Rabbit, Heart } from "lucide-react";
+import { Dog, Cat, Bird, Rabbit, Heart, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PetCardProps {
   pet: Pet;
   reminders: Reminder[];
+  onDelete?: (pet: Pet) => void;
 }
 
-export default React.memo(function PetCard({ pet, reminders }: PetCardProps) {
+export default React.memo(function PetCard({ pet, reminders, onDelete }: PetCardProps) {
   const [, setLocation] = useLocation();
   
   const handleCardClick = () => {
@@ -32,21 +34,36 @@ export default React.memo(function PetCard({ pet, reminders }: PetCardProps) {
 
   return (
     <div 
-      className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative cursor-pointer hover:shadow-md transition-shadow"
-      onClick={handleCardClick}
+      className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative hover:shadow-md transition-shadow"
     >
-      {/* Pet Image or Icon */}
-      {pet.imageUrl ? (
-        <img 
-          src={pet.imageUrl} 
-          alt={pet.name}
-          className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
-        />
-      ) : (
-        <div className="w-16 h-16 rounded-full mx-auto mb-3 bg-gray-100 flex items-center justify-center">
-          {getCategoryIcon(pet.category)}
-        </div>
+      {/* Delete Button */}
+      {onDelete && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(pet);
+          }}
+          className="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-50 p-1 h-8 w-8"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
       )}
+
+      {/* Pet Image or Icon */}
+      <div onClick={handleCardClick} className="cursor-pointer">
+        {pet.imageUrl ? (
+          <img 
+            src={pet.imageUrl} 
+            alt={pet.name}
+            className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full mx-auto mb-3 bg-gray-100 flex items-center justify-center">
+            {getCategoryIcon(pet.category)}
+          </div>
+        )}
       
       <h3 className="text-center font-semibold text-gray-900">{pet.name}</h3>
       <p className="text-center text-xs text-gray-500 mb-2">

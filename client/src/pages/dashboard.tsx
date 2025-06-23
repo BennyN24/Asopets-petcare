@@ -7,7 +7,18 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode } from "lucide-react";
+import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode, Trash2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { PageLoader } from "@/components/loading-spinner";
 import PetCard from "@/components/pet-card";
 import DashboardInsights from "@/components/dashboard-insights";
@@ -24,12 +35,14 @@ export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = React.useState("overview");
   const [showVetClinics, setShowVetClinics] = React.useState(false);
   const [showQRScanner, setShowQRScanner] = React.useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [scannedPetData, setScannedPetData] = React.useState<any>(null);
   const [scannedPets, setScannedPets] = React.useState<any[]>([]);
+  const [petToDelete, setPetToDelete] = React.useState<Pet | null>(null);
 
   // Load scanned pets from localStorage on mount
   React.useEffect(() => {
@@ -102,6 +115,37 @@ export default function Dashboard() {
 
   const allMedicalRecords = allMedicalRecordsQueries.data || [];
 
+  // Delete pet mutation
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: number) => {
+      const response = await fetch(`/api/pets/${petId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete pet');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Pet Deleted",
+        description: "Pet and all associated records have been permanently deleted.",
+      });
+      // Invalidate and refetch pets data
+      queryClient.invalidateQueries({ queryKey: ['/api/pets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/reminders'] });
+      setPetToDelete(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete pet. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (isLoading || petsLoading) {
     return <PageLoader />;
   }
@@ -158,6 +202,7 @@ export default function Dashboard() {
                   key={pet.id}
                   pet={pet}
                   reminders={reminders.filter((r) => r.petId === pet.id)}
+                  onDelete={(pet) => setPetToDelete(pet)}
                 />
               ))}
               {/* Add Pet Card */}

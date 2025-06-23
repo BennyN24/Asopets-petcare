@@ -209,7 +209,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePet(id: number): Promise<void> {
-    await db.delete(pets).where(eq(pets.id, id));
+    try {
+      // Start a transaction to ensure all related data is deleted consistently
+      await db.transaction(async (tx) => {
+        // Delete all reminders for this pet
+        await tx.delete(reminders).where(eq(reminders.petId, id));
+        
+        // Delete all medical records for this pet  
+        await tx.delete(medicalRecords).where(eq(medicalRecords.petId, id));
+        
+        // Finally delete the pet
+        const results = await tx.delete(pets).where(eq(pets.id, id));
+        if (results.length === 0) {
+          throw new Error('Pet not found');
+        }
+      });
+    } catch (error) {
+      console.error('Error deleting pet and associated records:', error);
+      throw error;
+    }
   }
 
   // Medical record operations
