@@ -40,7 +40,7 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
     req.isAuthenticated() &&
     req.user &&
     req.user.claims &&
-    req.user.claims.sub
+    req.user.id
   ) {
     return next();
   }

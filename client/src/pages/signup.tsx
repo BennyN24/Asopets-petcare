@@ -246,7 +246,7 @@ export default function Signup() {
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
                 <button
-                  onClick={() => setLocation("/")}
+                  onClick={() => setLocation("/login")}
                   className="text-primary font-medium hover:underline"
                 >
                   Sign in here

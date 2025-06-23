@@ -2,7 +2,6 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
 import { storage } from "./storage";
-import { setupAuth as setupReplitAuth, isAuthenticated as replitIsAuthenticated } from "./replitAuth";
 import { setupAuth, isAuthenticated, hashPassword, verifyPassword, generateToken, generateUserId, sendConfirmationEmail, sendPasswordResetEmail } from "./auth";
 import { z } from "zod";
 import { 
@@ -27,7 +26,6 @@ const loginSchema = z.object({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
-  await setupReplitAuth(app);
 
   // Email/Password Authentication Routes
   app.post('/api/auth/signup', async (req: any, res) => {
@@ -386,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pet routes with pagination and size limits
   app.get("/api/pets", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -425,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verify ownership
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (pet.userId !== userId) {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -439,7 +437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pets", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -458,7 +456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pets/:id", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.id);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -531,7 +529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/pets/:id", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.id);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -556,7 +554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/:petId/medical-records", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -578,7 +576,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/pets/:petId/medical-records", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -613,7 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/medical-records/:id", isAuthenticated, async (req: any, res) => {
     try {
       const recordId = parseInt(req.params.id);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -644,7 +642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/medical-records/:id", isAuthenticated, async (req: any, res) => {
     try {
       const recordId = parseInt(req.params.id);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -671,7 +669,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reminder routes
   app.get("/api/reminders", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -685,7 +683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reminders/with-pets", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -709,7 +707,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reminders/overdue", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -724,7 +722,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/:petId/reminders", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -746,7 +744,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/reminders/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
       const reminderId = parseInt(req.params.id);
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -865,7 +863,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/clinic-ratings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -884,7 +882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/my-clinic-ratings", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session.userId || (req.user?.claims?.sub);
+      const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -914,7 +912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subject: `[ASOPETS Support] ${subject}`,
         text: `
 Support Request from: ${userName} (${userEmail})
-User ID: ${req.user?.claims?.sub || 'Unknown'}
+User ID: ${req.user.id || 'Unknown'}
 
 Subject: ${subject}
 
@@ -934,7 +932,7 @@ Reply directly to this email to respond to the user.
   <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
     <p><strong>From:</strong> ${userName}</p>
     <p><strong>Email:</strong> ${userEmail}</p>
-    <p><strong>User ID:</strong> ${req.user?.claims?.sub || 'Unknown'}</p>
+    <p><strong>User ID:</strong> ${req.user.id || 'Unknown'}</p>
     <p><strong>Subject:</strong> ${subject}</p>
   </div>
   
