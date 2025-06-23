@@ -138,13 +138,19 @@ export default function PetProfile() {
               <p className="text-green-100 text-sm">{pet.breed}</p>
             </div>
           </div>
-          {pet.imageUrl && (
-            <img 
-              src={pet.imageUrl} 
-              alt={pet.name}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-          )}
+          <div className="relative">
+            {pet.imageUrl ? (
+              <img 
+                src={pet.imageUrl} 
+                alt={pet.name}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <span className="text-lg">🐾</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
