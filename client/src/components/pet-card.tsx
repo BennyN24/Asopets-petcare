@@ -64,18 +64,29 @@ export default React.memo(function PetCard({ pet, reminders, onDelete }: PetCard
             {getCategoryIcon(pet.category)}
           </div>
         )}
-      
-      <h3 className="text-center font-semibold text-gray-900">{pet.name}</h3>
-      <p className="text-center text-xs text-gray-500 mb-2">
-        {pet.breed || pet.category.charAt(0).toUpperCase() + pet.category.slice(1)}
-      </p>
-      
-      {/* Notification Badge */}
-      {totalNotifications > 0 && (
-        <div className={`notification-badge ${overdueCount > 0 ? 'danger' : 'warning'}`}>
-          {totalNotifications}
+
+        {/* Pet Info */}
+        <div className="text-center">
+          <h3 className="font-semibold text-gray-900 text-sm mb-1">{pet.name}</h3>
+          <p className="text-xs text-gray-600 mb-2">{pet.breed}</p>
+          
+          {/* Notifications Badge */}
+          {totalNotifications > 0 && (
+            <div className="flex items-center justify-center space-x-1">
+              {overdueCount > 0 && (
+                <span className="status-badge overdue">
+                  {overdueCount} overdue
+                </span>
+              )}
+              {upcomingCount > 0 && (
+                <span className="status-badge upcoming">
+                  {upcomingCount} upcoming
+                </span>
+              )}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 });
