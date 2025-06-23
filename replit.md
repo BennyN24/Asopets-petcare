@@ -344,6 +344,10 @@ Changelog:
   * Added Upload QR Image button to QR scanner allowing users to upload and analyze QR code images alongside camera scanning
   * Moved Quick Actions below Other Pets section for better layout organization
   * Fixed Other Pets section data structure compatibility with ScannedPetViewer component
+  * Added medical records display functionality to scanned pet viewer with recent records preview
+  * Optimized QR scanner with enhanced data normalization, processing states, and error handling
+  * Enhanced QR code generation with larger modules and higher error correction for better mobile scanning
+  * Improved QR scanner performance with processing indicators and better image handling
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
