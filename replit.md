@@ -348,6 +348,10 @@ Changelog:
   * Optimized QR scanner with enhanced data normalization, processing states, and error handling
   * Enhanced QR code generation with larger modules and higher error correction for better mobile scanning
   * Improved QR scanner performance with processing indicators and better image handling
+  * Fixed date parsing errors in scanned pet viewer with proper null checks
+  * Added pet owner information display in both scanned pet cards and viewer
+  * Implemented delete functionality for scanned pets with localStorage management
+  * Made scanned pet cards fully clickable instead of requiring separate view button
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

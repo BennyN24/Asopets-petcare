@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, User, Phone, Mail, MapPin, Heart, Calendar, AlertTriangle, FileText, Activity } from "lucide-react";
+import { X, User, Phone, Mail, MapPin, Heart, Calendar, AlertTriangle, FileText, Activity, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 
@@ -44,9 +44,10 @@ interface MedicalRecord {
 interface ScannedPetViewerProps {
   data: ScannedPetData;
   onClose: () => void;
+  onDelete?: (petData: ScannedPetData) => void;
 }
 
-export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProps) {
+export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPetViewerProps) {
   const categoryColors = {
     dog: "bg-blue-100 text-blue-800",
     cat: "bg-purple-100 text-purple-800", 
@@ -82,13 +83,32 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <div className="flex justify-between items-start">
-            <CardTitle className="flex items-center">
-              <Heart className="w-5 h-5 mr-2 text-primary" />
-              Pet Profile
-            </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-4 h-4" />
-            </Button>
+            <div>
+              <CardTitle className="flex items-center">
+                <Heart className="w-5 h-5 mr-2 text-primary" />
+                Pet Profile
+              </CardTitle>
+              {data.owner && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Owner: {data.owner.name}
+                </p>
+              )}
+            </div>
+            <div className="flex space-x-1">
+              {onDelete && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => onDelete(data)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={onClose}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -246,7 +266,7 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
                               {record.type}
                             </Badge>
                             <span className="text-xs text-gray-600">
-                              {format(new Date(record.date), 'MMM dd, yyyy')}
+                              {record.date ? format(new Date(record.date), 'MMM dd, yyyy') : 'No date'}
                             </span>
                           </div>
                         </div>
@@ -281,7 +301,7 @@ export default function ScannedPetViewer({ data, onClose }: ScannedPetViewerProp
                 Scan Information
               </h4>
               <div className="text-sm text-gray-600">
-                Scanned on {format(new Date(data.scannedAt), 'MMM dd, yyyy \'at\' h:mm a')}
+                Scanned on {data.scannedAt ? format(new Date(data.scannedAt), 'MMM dd, yyyy \'at\' h:mm a') : 'Unknown date'}
               </div>
             </div>
           </div>
