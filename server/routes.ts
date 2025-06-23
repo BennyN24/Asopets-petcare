@@ -24,10 +24,20 @@ const loginSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
+  // Auth middleware - Email/Password authentication only
   await setupAuth(app);
+  
+  // Add comprehensive error logging for authentication routes
+  app.use((req, res, next) => {
+    if (req.path.includes('/api/auth') || req.path.includes('/api/login') || req.path.includes('/api/replit')) {
+      console.log(`[AUTH-DEBUG] ${req.method} ${req.path} - Session ID: ${req.sessionID} - User ID: ${req.session?.userId || 'none'}`);
+    }
+    next();
+  });
 
   // Email/Password Authentication Routes
+  console.log('[AUTH-SETUP] Setting up email/password authentication routes');
+  
   app.post('/api/auth/signup', async (req: any, res) => {
     try {
       const userData = signupSchema.parse(req.body);

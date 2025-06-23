@@ -29,21 +29,26 @@ export function getSession() {
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
+  console.log(`[AUTH-DEBUG] Checking authentication for ${req.method} ${req.path} - Session ID: ${req.sessionID}`);
+  
   if (!req.session || !req.session.userId) {
+    console.log(`[AUTH-DEBUG] No session or user ID found - Session exists: ${!!req.session}, User ID: ${req.session?.userId || 'none'}`);
     return res.status(401).json({ message: "Unauthorized" });
   }
   
   try {
     const user = await storage.getUser(req.session.userId);
     if (!user) {
+      console.log(`[AUTH-DEBUG] User not found in database for ID: ${req.session.userId}`);
       req.session.destroy(() => {});
       return res.status(401).json({ message: "Unauthorized" });
     }
     
     req.user = user;
+    console.log(`[AUTH-DEBUG] Authentication successful for user: ${user.id} (${user.email})`);
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
+    console.error("[AUTH-DEBUG] Authentication error:", error);
     req.session.destroy(() => {});
     return res.status(401).json({ message: "Unauthorized" });
   }

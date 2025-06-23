@@ -144,14 +144,14 @@ export async function setupAuth(app: Express) {
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
-  // Add fallback routes in case OIDC configuration fails
-  app.get("/api/login", (req, res, next) => {
+  // Replit Auth login endpoint - only enabled if OIDC is configured
+  app.get("/api/replit-login", (req, res, next) => {
     if (!config) {
       console.log('[AUTH] OIDC not configured, redirecting to login page');
-      return res.redirect("/login?error=auth_not_configured");
+      return res.redirect("/login?error=replit_auth_not_configured");
     }
     
-    console.log(`[AUTH] Login attempt for hostname: ${req.hostname}`);
+    console.log(`[AUTH] Replit login attempt for hostname: ${req.hostname}`);
     
     // Check if strategy exists for this hostname
     const strategyName = `replitauth:${req.hostname}`;
