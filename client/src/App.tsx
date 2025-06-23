@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -46,7 +46,7 @@ function Router() {
   console.log('Current location:', window.location.pathname);
 
   // Add route debugging
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('Route changed to:', window.location.pathname, { 
       isAuthenticated, 
       isLoading, 

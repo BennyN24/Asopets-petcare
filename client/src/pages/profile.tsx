@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -114,7 +114,7 @@ export default function Profile() {
   });
 
   // Initialize profile data when user loads
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       const userData = user as Record<string, any>;
       setProfileData({
