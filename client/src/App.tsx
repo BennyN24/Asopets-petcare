@@ -113,7 +113,7 @@ function Router() {
 
 function App() {
   // Ensure React is available to child components
-  React.useEffect(() => {
+  useEffect(() => {
     if (!(window as any).React) {
       (window as any).React = React;
     }
