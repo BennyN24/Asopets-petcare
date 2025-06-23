@@ -27,6 +27,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - Email/Password authentication only
   await setupAuth(app);
   
+  // Force session middleware to be applied early
+  console.log('[AUTH-SETUP] Session middleware configured');
+  
   // Disable debug logging in production, keep minimal logging
   if (process.env.NODE_ENV === 'development') {
     app.use((req, res, next) => {
@@ -97,16 +100,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Please confirm your email before logging in" });
       }
 
+      // Set user ID in session and force save
       req.session.userId = user.id;
-
-      res.json({ 
-        message: "Login successful",
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
+      
+      req.session.save((err: any) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Login failed - session error" });
         }
+        
+        console.log(`[AUTH] Login successful for ${user.email} - Session: ${req.sessionID}`);
+        
+        res.json({ 
+          message: "Login successful",
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          }
+        });
       });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
