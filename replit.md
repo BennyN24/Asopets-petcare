@@ -352,6 +352,10 @@ Changelog:
   * Added pet owner information display in both scanned pet cards and viewer
   * Implemented delete functionality for scanned pets with localStorage management
   * Made scanned pet cards fully clickable instead of requiring separate view button
+  * Added comprehensive pet deletion functionality with cascade delete for all associated records
+  * Implemented delete confirmation dialogs with detailed information about what will be removed
+  * Enhanced dashboard pet cards with delete buttons and proper click handling
+  * Added transaction-based deletion in storage layer to ensure data consistency
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting
