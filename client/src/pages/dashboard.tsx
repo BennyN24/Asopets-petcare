@@ -219,7 +219,14 @@ export default function Dashboard() {
                 </div>
                 <div className="grid grid-cols-1 gap-4">
                   {scannedPets.map((pet, index) => (
-                    <Card key={pet.petId || index} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <Card 
+                      key={pet.petId || index} 
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => {
+                        console.log("Opening scanned pet viewer for:", pet);
+                        setScannedPetData(pet);
+                      }}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start space-x-3">
                           <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
@@ -234,21 +241,9 @@ export default function Dashboard() {
                               </p>
                             )}
                             <p className="text-xs text-gray-400 mt-1">
-                              Scanned: {new Date(pet.scannedAt).toLocaleDateString()}
+                              Scanned: {pet.scannedAt ? new Date(pet.scannedAt).toLocaleDateString() : 'Unknown date'}
                             </p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log("Opening scanned pet viewer for:", pet);
-                              setScannedPetData(pet);
-                            }}
-                            className="text-primary hover:text-primary/80 text-[#333333]"
-                          >
-                            View
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -338,6 +333,18 @@ export default function Dashboard() {
         <ScannedPetViewer 
           data={scannedPetData}
           onClose={() => setScannedPetData(null)}
+          onDelete={(petData) => {
+            // Remove from localStorage
+            const savedPets = JSON.parse(localStorage.getItem('asopets_scanned_pets') || '[]');
+            const updatedPets = savedPets.filter((p: any) => 
+              !(p.petId === petData.petId && p.scannedAt === petData.scannedAt)
+            );
+            localStorage.setItem('asopets_scanned_pets', JSON.stringify(updatedPets));
+            
+            // Update state
+            setScannedPets(updatedPets);
+            setScannedPetData(null);
+          }}
         />
       )}
 
