@@ -10,7 +10,7 @@ interface PetCardProps {
   onDelete?: (pet: Pet) => void;
 }
 
-export default React.memo(function PetCard({ pet, reminders, onDelete }: PetCardProps) {
+export default memo(function PetCard({ pet, reminders, onDelete }: PetCardProps) {
   const [, setLocation] = useLocation();
   
   const handleCardClick = () => {

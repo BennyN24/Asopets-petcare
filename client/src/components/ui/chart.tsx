@@ -11,7 +11,7 @@ const THEMES = { light: "", dark: ".dark" } as const
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode
-    icon?: React.ComponentType
+    icon?: ComponentType
   } & (
     | { color?: string; theme?: never }
     | { color?: never; theme: Record<keyof typeof THEMES, string> }
@@ -34,11 +34,11 @@ function useChart() {
   return context
 }
 
-const ChartContainer = React.forwardRef<
+const ChartContainer = forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & {
+  ComponentProps<"div"> & {
     config: ChartConfig
-    children: React.ComponentProps<
+    children: ComponentProps<
       typeof RechartsPrimitive.ResponsiveContainer
     >["children"]
   }
@@ -102,10 +102,10 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
-const ChartTooltipContent = React.forwardRef<
+const ChartTooltipContent = forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<"div"> & {
+  ComponentProps<typeof RechartsPrimitive.Tooltip> &
+    ComponentProps<"div"> & {
       hideLabel?: boolean
       hideIndicator?: boolean
       indicator?: "line" | "dot" | "dashed"
@@ -258,9 +258,9 @@ ChartTooltipContent.displayName = "ChartTooltip"
 
 const ChartLegend = RechartsPrimitive.Legend
 
-const ChartLegendContent = React.forwardRef<
+const ChartLegendContent = forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> &
+  ComponentProps<"div"> &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string

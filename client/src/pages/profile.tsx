@@ -53,7 +53,14 @@ import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
 
@@ -495,7 +502,6 @@ export default function Profile() {
               <CardTitle>Edit Profile Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName">First Name</Label>
@@ -647,8 +653,8 @@ export default function Profile() {
             {!showContactForm ? (
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-4">
-                  Need help? Have questions about your pet care management? 
-                  Our support team is here to assist you.
+                  Need help? Have questions about your pet care management? Our
+                  support team is here to assist you.
                 </p>
                 <Button
                   onClick={() => setShowContactForm(true)}
@@ -659,14 +665,18 @@ export default function Profile() {
                 </Button>
               </div>
             ) : (
-              <ContactSupportForm 
+              <ContactSupportForm
                 userEmail={profileData.email || (user as any)?.email || ""}
-                userName={`${profileData.firstName || ""} ${profileData.lastName || ""}`.trim() || "Pet Owner"}
+                userName={
+                  `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim() ||
+                  "Pet Owner"
+                }
                 onSuccess={() => {
                   setShowContactForm(false);
                   toast({
                     title: "Message sent",
-                    description: "Your support request has been sent successfully. We'll get back to you soon!",
+                    description:
+                      "Your support request has been sent successfully. We'll get back to you soon!",
                   });
                 }}
                 onCancel={() => setShowContactForm(false)}
@@ -705,7 +715,7 @@ export default function Profile() {
             <Button
               variant="outline"
               className="w-full justify-start"
-              onClick={() => window.open("/faq", "_blank")}
+              onClick={() => setLocation("/faq")}
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               FAQ & Help
@@ -737,7 +747,12 @@ interface ContactSupportFormProps {
   onCancel: () => void;
 }
 
-function ContactSupportForm({ userEmail, userName, onSuccess, onCancel }: ContactSupportFormProps) {
+function ContactSupportForm({
+  userEmail,
+  userName,
+  onSuccess,
+  onCancel,
+}: ContactSupportFormProps) {
   const { toast } = useToast();
   const form = useForm<ContactSupportData>({
     resolver: zodResolver(contactSupportSchema),

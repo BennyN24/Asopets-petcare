@@ -1,42 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
 
 export function useAuth() {
-  const [authState, setAuthState] = React.useState<{
-    isAuthenticated: boolean;
-    user: any;
-    isLoading: boolean;
-  }>({
-    isAuthenticated: false,
+  const [localAuth, setLocalAuth] = useState<{ user: any; isAuthenticated: boolean }>({
     user: null,
-    isLoading: true,
+    isAuthenticated: false,
   });
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
   });
 
-  React.useEffect(() => {
-    const isAuthenticated = !!user && !error;
-    setAuthState({
-      isAuthenticated,
-      user,
-      isLoading,
-    });
-    
-    // Debug authentication state
-    console.log('useAuth update:', { 
-      user: !!user, 
-      isLoading, 
-      error: error?.message, 
-      isAuthenticated,
-      errorDetails: error 
-    });
-  }, [user, isLoading, error]);
+  useEffect(() => {
+    if (user && !error) {
+      setLocalAuth({ user, isAuthenticated: true });
+    } else if (error || user === null) {
+      setLocalAuth({ user: null, isAuthenticated: false });
+    }
+  }, [user, error]);
 
-  return authState;
+  return {
+    user: localAuth.user,
+    isLoading,
+    isAuthenticated: localAuth.isAuthenticated,
+  };
 }
