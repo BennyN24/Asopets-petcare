@@ -1,12 +1,11 @@
-import React, { forwardRef }
-import type { ComponentPropsWithoutRef, ElementRef } from "react"
+import React, { forwardRef } from "react"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 
 import { cn } from "@/lib/utils"
 
 const ScrollArea = forwardRef<
-  ElementRef<typeof ScrollAreaPrimitive.Root>,
-  ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
+  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
 >(({ className, children, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
@@ -23,8 +22,8 @@ const ScrollArea = forwardRef<
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
 const ScrollBar = forwardRef<
-  ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
-  ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
+  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
 >(({ className, orientation = "vertical", ...props }, ref) => (
   <ScrollAreaPrimitive.ScrollAreaScrollbar
     ref={ref}

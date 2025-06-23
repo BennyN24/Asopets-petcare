@@ -1,5 +1,4 @@
-import React, { forwardRef }
-import type { ComponentPropsWithoutRef, ElementRef } from "react"
+import React, { forwardRef } from "react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,

@@ -1,13 +1,12 @@
-import React, { forwardRef }
-import type { ComponentPropsWithoutRef, ElementRef } from "react"
+import React, { forwardRef } from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import { Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 const RadioGroup = forwardRef<
-  ElementRef<typeof RadioGroupPrimitive.Root>,
-  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
+  React.ElementRef<typeof RadioGroupPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Root
@@ -20,8 +19,8 @@ const RadioGroup = forwardRef<
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
 const RadioGroupItem = forwardRef<
-  ElementRef<typeof RadioGroupPrimitive.Item>,
-  ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Item

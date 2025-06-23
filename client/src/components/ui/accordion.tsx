@@ -1,5 +1,4 @@
-import React, { forwardRef }
-import type { ComponentPropsWithoutRef, ElementRef } from "react"
+import React, { forwardRef } from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
 
@@ -8,8 +7,8 @@ import { cn } from "@/lib/utils"
 const Accordion = AccordionPrimitive.Root
 
 const AccordionItem = forwardRef<
-  ElementRef<typeof AccordionPrimitive.Item>,
-  ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+  React.ElementRef<typeof AccordionPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Item
     ref={ref}
@@ -20,8 +19,8 @@ const AccordionItem = forwardRef<
 AccordionItem.displayName = "AccordionItem"
 
 const AccordionTrigger = forwardRef<
-  ElementRef<typeof AccordionPrimitive.Trigger>,
-  ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
+  React.ElementRef<typeof AccordionPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
@@ -40,8 +39,8 @@ const AccordionTrigger = forwardRef<
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
 
 const AccordionContent = forwardRef<
-  ElementRef<typeof AccordionPrimitive.Content>,
-  ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
+  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}

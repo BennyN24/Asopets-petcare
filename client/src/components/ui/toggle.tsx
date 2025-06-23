@@ -1,5 +1,4 @@
-import React, { forwardRef }
-import type { ComponentPropsWithoutRef, ElementRef } from "react"
+import React, { forwardRef } from "react"
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { cva, type VariantProps } from "class-variance-authority"
 
@@ -28,8 +27,8 @@ const toggleVariants = cva(
 )
 
 const Toggle = forwardRef<
-  ElementRef<typeof TogglePrimitive.Root>,
-  ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &
+  React.ElementRef<typeof TogglePrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root> &
     VariantProps<typeof toggleVariants>
 >(({ className, variant, size, ...props }, ref) => (
   <TogglePrimitive.Root

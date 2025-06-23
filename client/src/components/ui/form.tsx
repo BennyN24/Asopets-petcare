@@ -87,8 +87,8 @@ const FormItem = forwardRef<
 FormItem.displayName = "FormItem"
 
 const FormLabel = forwardRef<
-  ElementRef<typeof LabelPrimitive.Root>,
-  ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
@@ -104,8 +104,8 @@ const FormLabel = forwardRef<
 FormLabel.displayName = "FormLabel"
 
 const FormControl = forwardRef<
-  ElementRef<typeof Slot>,
-  ComponentPropsWithoutRef<typeof Slot>
+  React.ElementRef<typeof Slot>,
+  React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
