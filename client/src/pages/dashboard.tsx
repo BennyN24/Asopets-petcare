@@ -399,37 +399,37 @@ export default function Dashboard() {
       />
 
       {/* Delete Pet Confirmation Dialog */}
-      <AlertDialog open={!!petToDelete} onOpenChange={() => setPetToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Pet Profile</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete {petToDelete?.name}'s profile? This will permanently remove:
-              <ul className="mt-2 list-disc list-inside space-y-1">
-                <li>Pet profile and information</li>
-                <li>All medical records</li>
-                <li>All reminders and notifications</li>
-                <li>All photos and attachments</li>
-              </ul>
-              <p className="mt-2 font-medium text-red-600">This action cannot be undone.</p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (petToDelete) {
+      {petToDelete && (
+        <AlertDialog open={true} onOpenChange={() => setPetToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Pet Profile</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete {petToDelete.name}'s profile? This will permanently remove:
+                <ul className="mt-2 list-disc list-inside space-y-1">
+                  <li>Pet profile and information</li>
+                  <li>All medical records</li>
+                  <li>All reminders and notifications</li>
+                  <li>All photos and attachments</li>
+                </ul>
+                <p className="mt-2 font-medium text-red-600">This action cannot be undone.</p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setPetToDelete(null)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
                   deletePetMutation.mutate(petToDelete.id);
-                }
-              }}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={deletePetMutation.isPending}
-            >
-              {deletePetMutation.isPending ? 'Deleting...' : 'Delete Pet'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+                }}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={deletePetMutation.isPending}
+              >
+                {deletePetMutation.isPending ? 'Deleting...' : 'Delete Pet'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
 
       <BottomNavigation activeTab="home" />
     </div>
