@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,16 +36,16 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = React.useState("overview");
-  const [showVetClinics, setShowVetClinics] = React.useState(false);
-  const [showQRScanner, setShowQRScanner] = React.useState(false);
-  const [showNotifications, setShowNotifications] = React.useState(false);
-  const [scannedPetData, setScannedPetData] = React.useState<any>(null);
-  const [scannedPets, setScannedPets] = React.useState<any[]>([]);
-  const [petToDelete, setPetToDelete] = React.useState<Pet | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showVetClinics, setShowVetClinics] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [scannedPetData, setScannedPetData] = useState<any>(null);
+  const [scannedPets, setScannedPets] = useState<any[]>([]);
+  const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
 
   // Load scanned pets from localStorage on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const savedScannedPets = localStorage.getItem('asopets-scanned-pets');
     if (savedScannedPets) {
       try {
@@ -57,12 +57,12 @@ export default function Dashboard() {
   }, []);
 
   // Save scanned pets to localStorage whenever it changes
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem('asopets-scanned-pets', JSON.stringify(scannedPets));
   }, [scannedPets]);
 
   // Redirect to login if not authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",

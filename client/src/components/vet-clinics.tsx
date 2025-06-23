@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,21 +114,21 @@ function ClinicReviews({ clinicId }: ClinicReviewsProps) {
 }
 
 export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinicsProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
-  const [showRatingForm, setShowRatingForm] = React.useState(false);
-  const [showReviews, setShowReviews] = React.useState<{ [key: number]: boolean }>({});
-  const [showMap, setShowMap] = React.useState(false);
-  const [useGoogleMaps, setUseGoogleMaps] = React.useState(true);
-  const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
-  const [googleMapsLoaded, setGoogleMapsLoaded] = React.useState(false);
-  const [showDebugPanel, setShowDebugPanel] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
+  const [showRatingForm, setShowRatingForm] = useState(false);
+  const [showReviews, setShowReviews] = useState<{ [key: number]: boolean }>({});
+  const [showMap, setShowMap] = useState(false);
+  const [useGoogleMaps, setUseGoogleMaps] = useState(true);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Get user location with high accuracy
-  const getCurrentLocation = React.useCallback(() => {
+  const getCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       console.log("Getting current location...");
       navigator.geolocation.getCurrentPosition(
@@ -158,7 +158,7 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getCurrentLocation();
   }, [getCurrentLocation]);
 

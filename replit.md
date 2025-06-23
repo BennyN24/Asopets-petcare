@@ -359,6 +359,8 @@ Changelog:
   * Enhanced pet profile photo functionality with upload capabilities in both add and edit forms
   * Integrated compact photo upload mode for editing existing pets
   * Updated pet cards to properly display profile photos when available
+  * Fixed React hooks import errors throughout the application
+  * Removed currency symbols from financial displays for cleaner formatting
 - June 18, 2025. Enhanced schedule management and comprehensive bug fixes:
   * Added advanced sorting and filtering to schedule page with type, pet, and date options
   * Fixed completed reminders to display completion dates with proper formatting

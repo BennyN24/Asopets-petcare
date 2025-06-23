@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -30,15 +30,15 @@ export default function VetClinicsPage() {
   const queryClient = useQueryClient();
   
   // State management
-  const [userLocation, setUserLocation] = React.useState<{ lat: number; lng: number } | null>(null);
-  const [showMap, setShowMap] = React.useState(false);
-  const [useGoogleMaps, setUseGoogleMaps] = React.useState(true);
-  const [googleMapsLoaded, setGoogleMapsLoaded] = React.useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showMap, setShowMap] = useState(false);
+  const [useGoogleMaps, setUseGoogleMaps] = useState(true);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
 
-  const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
-  const [showRatingForm, setShowRatingForm] = React.useState(false);
-  const [showReviews, setShowReviews] = React.useState<Record<number, boolean>>({});
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
+  const [showRatingForm, setShowRatingForm] = useState(false);
+  const [showReviews, setShowReviews] = useState<Record<number, boolean>>({});
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch vet clinics
   const { data: clinics = [], isLoading, refetch } = useQuery<VetClinic[]>({
@@ -78,7 +78,7 @@ export default function VetClinicsPage() {
   });
 
   // Get user location on mount
-  React.useEffect(() => {
+  useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {

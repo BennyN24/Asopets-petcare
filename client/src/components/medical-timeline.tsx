@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,16 +37,16 @@ interface MedicalTimelineProps {
 export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimelineProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedRecord, setSelectedRecord] = React.useState<MedicalRecord | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [showAttachments, setShowAttachments] = React.useState(false);
-  const [attachmentIndex, setAttachmentIndex] = React.useState(0);
+  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [attachmentIndex, setAttachmentIndex] = useState(0);
   
   // Filter and sort states
-  const [filterType, setFilterType] = React.useState<MedicalRecordType | 'all'>('all');
-  const [sortBy, setSortBy] = React.useState<'date' | 'type' | 'cost'>('date');
-  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
-  const [showFilters, setShowFilters] = React.useState(false);
+  const [filterType, setFilterType] = useState<MedicalRecordType | 'all'>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'type' | 'cost'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showFilters, setShowFilters] = useState(false);
 
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
@@ -115,7 +115,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
   };
 
   // Filter and sort records
-  const filteredAndSortedRecords = React.useMemo(() => {
+  const filteredAndSortedRecords = useMemo(() => {
     let filtered = medicalRecords;
     
     // Apply type filter
@@ -148,7 +148,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
   }, [medicalRecords, filterType, sortBy, sortOrder]);
 
   // Get unique record types for filter options
-  const availableTypes = React.useMemo(() => {
+  const availableTypes = useMemo(() => {
     const types = new Set(medicalRecords.map(record => record.type));
     return Array.from(types).sort();
   }, [medicalRecords]);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import QRScanner from "@/components/qr-scanner";
 
 export default function QRScannerPage() {
   const [, setLocation] = useLocation();
-  const [showScanner, setShowScanner] = React.useState(true);
+  const [showScanner, setShowScanner] = useState(true);
 
   const handleScanSuccess = (qrData: any) => {
     console.log("QR scan successful:", qrData);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +17,10 @@ export default function MapDebugPanel({
   googleMapsLoaded,
   onLocationRefresh
 }: MapDebugPanelProps) {
-  const [apiKeyStatus, setApiKeyStatus] = React.useState<'loading' | 'valid' | 'invalid'>('loading');
-  const [networkStatus, setNetworkStatus] = React.useState(navigator.onLine);
+  const [apiKeyStatus, setApiKeyStatus] = useState<'loading' | 'valid' | 'invalid'>('loading');
+  const [networkStatus, setNetworkStatus] = useState(navigator.onLine);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkApiKey = async () => {
       try {
         const response = await fetch('/api/google-maps-config');

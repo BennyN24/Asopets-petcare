@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function EmailConfirmed() {
   const [, setLocation] = useLocation();
-  const [status, setStatus] = React.useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = React.useState('');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [message, setMessage] = useState('');
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const confirmEmail = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');

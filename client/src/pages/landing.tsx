@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Shield, Calendar, Bell, Smartphone, Lock } from "lucide-react";
 import SMSOTPLogin from "@/components/sms-otp-login";
 
 export default function Landing() {
-  const [showSMSLogin, setShowSMSLogin] = React.useState(false);
+  const [showSMSLogin, setShowSMSLogin] = useState(false);
 
   const handleLogin = () => {
     window.location.href = "/api/login";

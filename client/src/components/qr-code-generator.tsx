@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +13,8 @@ interface QRCodeGeneratorProps {
 }
 
 export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGeneratorProps) {
-  const [qrCodeUrl, setQrCodeUrl] = React.useState<string>("");
-  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
   const generateQRData = () => {
@@ -131,7 +131,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     generateQRCode();
   }, [pet, medicalRecords]);
 

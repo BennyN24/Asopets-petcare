@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,14 +24,14 @@ interface GoogleMapProps {
 }
 
 export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNearbyPlacesFound, onMapLoaded, className }: GoogleMapProps) {
-  const mapRef = React.useRef<HTMLDivElement>(null);
-  const [map, setMap] = React.useState<any>(null);
-  const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
-  const [isLoaded, setIsLoaded] = React.useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<any>(null);
+  const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { toast } = useToast();
 
   // Load Google Maps API
-  React.useEffect(() => {
+  useEffect(() => {
     if (window.google) {
       console.log("Google Maps already loaded");
       setIsLoaded(true);
@@ -128,7 +128,7 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
   }, [toast]);
 
   // Initialize map
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoaded || !mapRef.current || !userLocation) {
       console.log("Map initialization skipped:", { isLoaded, hasMapRef: !!mapRef.current, userLocation });
       return;
@@ -196,7 +196,7 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
   }, [isLoaded, userLocation, onNearbyPlacesFound, toast]);
 
   // Add clinic markers
-  React.useEffect(() => {
+  useEffect(() => {
     if (!map || !clinics.length) {
       console.log("Clinic markers skipped:", { hasMap: !!map, clinicsCount: clinics.length });
       return;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,11 +14,11 @@ interface VetClinicMapProps {
 }
 
 export default function VetClinicMap({ clinics, userLocation, onClose }: VetClinicMapProps) {
-  const [selectedClinic, setSelectedClinic] = React.useState<VetClinic | null>(null);
-  const [nearestClinic, setNearestClinic] = React.useState<VetClinic | null>(null);
+  const [selectedClinic, setSelectedClinic] = useState<VetClinic | null>(null);
+  const [nearestClinic, setNearestClinic] = useState<VetClinic | null>(null);
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (userLocation && clinics.length > 0) {
       // Find the nearest clinic
       let closest = clinics[0];

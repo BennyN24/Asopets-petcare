@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,7 @@ export default function SimpleMap({ clinics, userLocation, onClinicSelect, class
   };
 
   // Sort clinics by distance if user location is available
-  const sortedClinics = React.useMemo(() => {
+  const sortedClinics = useMemo(() => {
     if (!userLocation) return clinics;
     
     return [...clinics].sort((a, b) => {

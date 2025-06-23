@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,12 +7,12 @@ import { useToast } from "@/hooks/use-toast";
 import { OfflineStorage } from "@/lib/offline-storage";
 
 export default function OfflineSyncIndicator() {
-  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
-  const [offlineData, setOfflineData] = React.useState({ hasOfflineData: false, count: 0 });
-  const [isSyncing, setIsSyncing] = React.useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [offlineData, setOfflineData] = useState({ hasOfflineData: false, count: 0 });
+  const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -65,7 +65,7 @@ export default function OfflineSyncIndicator() {
   };
 
   // Auto-sync when coming back online
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOnline && offlineData.hasOfflineData && !isSyncing) {
       setTimeout(() => {
         handleSync();

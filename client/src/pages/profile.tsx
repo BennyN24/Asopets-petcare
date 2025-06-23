@@ -90,9 +90,9 @@ export default function Profile() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isEditingProfile, setIsEditingProfile] = React.useState(false);
-  const [showContactForm, setShowContactForm] = React.useState(false);
-  const [profileData, setProfileData] = React.useState<UserProfile>({
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [profileData, setProfileData] = useState<UserProfile>({
     id: "",
     firstName: "",
     lastName: "",
@@ -314,10 +314,10 @@ export default function Profile() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-PH", {
+    return amount.toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount);
+    });
   };
 
   const handleSaveProfile = async () => {

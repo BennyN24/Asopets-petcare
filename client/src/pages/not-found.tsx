@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ export default function NotFound() {
   const [, setLocation] = useLocation();
   
   // Debug why 404 is showing
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('NotFound component rendered for path:', window.location.pathname);
     console.log('Document cookies:', document.cookie);
     console.log('Current timestamp:', new Date().toISOString());

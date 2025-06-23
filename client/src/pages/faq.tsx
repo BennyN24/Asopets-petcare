@@ -149,7 +149,7 @@ const categories = [...new Set(faqData.map(item => item.category))];
 
 export default function FAQ() {
   const [, setLocation] = useLocation();
-  const [openItems, setOpenItems] = React.useState<string[]>([]);
+  const [openItems, setOpenItems] = useState<string[]>([]);
 
   const toggleItem = (question: string) => {
     setOpenItems(prev => 

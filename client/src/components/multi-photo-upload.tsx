@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, Upload, X, Image as ImageIcon, ZoomIn } from "lucide-react";
@@ -18,10 +18,10 @@ export default function MultiPhotoUpload({
   maxPhotos = 3,
   className = "" 
 }: MultiPhotoUploadProps) {
-  const [photos, setPhotos] = React.useState<string[]>(currentPhotos);
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [selectedPhoto, setSelectedPhoto] = React.useState<string | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [photos, setPhotos] = useState<string[]>(currentPhotos);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const compressImage = (file: File): Promise<string> => {
