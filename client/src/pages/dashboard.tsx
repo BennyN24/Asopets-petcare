@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";

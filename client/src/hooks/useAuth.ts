@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import * as React from "react";
+import React from "react";
 
 export function useAuth() {
   const [authState, setAuthState] = React.useState<{
