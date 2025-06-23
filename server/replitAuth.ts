@@ -152,8 +152,19 @@ export async function setupAuth(app: Express) {
     }
     
     console.log(`[AUTH] Login attempt for hostname: ${req.hostname}`);
-    passport.authenticate(`replitauth:${req.hostname}`, {
-      prompt: "login consent",
+    
+    // Check if strategy exists for this hostname
+    const strategyName = `replitauth:${req.hostname}`;
+    if (!passport._strategy(strategyName)) {
+      console.log(`[AUTH] No strategy found for ${req.hostname}, using first available strategy`);
+      const firstDomain = domains[0];
+      return passport.authenticate(`replitauth:${firstDomain}`, {
+        scope: ["openid", "email", "profile", "offline_access"],
+        failureRedirect: "/login?error=auth_failed",
+      })(req, res, next);
+    }
+    
+    passport.authenticate(strategyName, {
       scope: ["openid", "email", "profile", "offline_access"],
       failureRedirect: "/login?error=auth_failed",
     })(req, res, next);
