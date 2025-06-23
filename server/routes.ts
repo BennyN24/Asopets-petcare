@@ -27,13 +27,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - Email/Password authentication only
   await setupAuth(app);
   
-  // Add comprehensive error logging for authentication routes
-  app.use((req, res, next) => {
-    if (req.path.includes('/api/auth') || req.path.includes('/api/login') || req.path.includes('/api/replit')) {
-      console.log(`[AUTH-DEBUG] ${req.method} ${req.path} - Session ID: ${req.sessionID} - User ID: ${req.session?.userId || 'none'}`);
-    }
-    next();
-  });
+  // Disable debug logging in production, keep minimal logging
+  if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+      if (req.path.includes('/api/auth')) {
+        console.log(`[AUTH] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - User: ${req.session?.userId ? 'authenticated' : 'none'}`);
+      }
+      next();
+    });
+  }
 
   // Email/Password Authentication Routes
   console.log('[AUTH-SETUP] Setting up email/password authentication routes');
@@ -357,9 +359,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get current user
+  // Get current user - with enhanced caching
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
+      // Set cache headers for better client-side caching
+      res.set({
+        'Cache-Control': 'private, max-age=300', // 5 minutes
+        'ETag': `"user-${req.user.id}-${req.user.updatedAt || Date.now()}"`,
+      });
+      
       res.json(req.user);
     } catch (error) {
       console.error("Error fetching user:", error);

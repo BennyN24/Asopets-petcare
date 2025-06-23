@@ -7,7 +7,7 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days for better persistence
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
@@ -20,35 +20,32 @@ export function getSession() {
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    name: 'asopets.session',
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: sessionTtl,
+      sameSite: 'lax',
     },
   });
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  console.log(`[AUTH-DEBUG] Checking authentication for ${req.method} ${req.path} - Session ID: ${req.sessionID}`);
-  
   if (!req.session || !req.session.userId) {
-    console.log(`[AUTH-DEBUG] No session or user ID found - Session exists: ${!!req.session}, User ID: ${req.session?.userId || 'none'}`);
     return res.status(401).json({ message: "Unauthorized" });
   }
   
   try {
     const user = await storage.getUser(req.session.userId);
     if (!user) {
-      console.log(`[AUTH-DEBUG] User not found in database for ID: ${req.session.userId}`);
       req.session.destroy(() => {});
       return res.status(401).json({ message: "Unauthorized" });
     }
     
     req.user = user;
-    console.log(`[AUTH-DEBUG] Authentication successful for user: ${user.id} (${user.email})`);
     next();
   } catch (error) {
-    console.error("[AUTH-DEBUG] Authentication error:", error);
+    console.error("Authentication error:", error);
     req.session.destroy(() => {});
     return res.status(401).json({ message: "Unauthorized" });
   }

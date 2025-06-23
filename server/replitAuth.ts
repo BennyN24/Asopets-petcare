@@ -144,31 +144,8 @@ export async function setupAuth(app: Express) {
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
-  // Replit Auth login endpoint - only enabled if OIDC is configured
-  app.get("/api/replit-login", (req, res, next) => {
-    if (!config) {
-      console.log('[AUTH] OIDC not configured, redirecting to login page');
-      return res.redirect("/login?error=replit_auth_not_configured");
-    }
-    
-    console.log(`[AUTH] Replit login attempt for hostname: ${req.hostname}`);
-    
-    // Check if strategy exists for this hostname
-    const strategyName = `replitauth:${req.hostname}`;
-    if (!passport._strategy(strategyName)) {
-      console.log(`[AUTH] No strategy found for ${req.hostname}, using first available strategy`);
-      const firstDomain = domains[0];
-      return passport.authenticate(`replitauth:${firstDomain}`, {
-        scope: ["openid", "email", "profile", "offline_access"],
-        failureRedirect: "/login?error=auth_failed",
-      })(req, res, next);
-    }
-    
-    passport.authenticate(strategyName, {
-      scope: ["openid", "email", "profile", "offline_access"],
-      failureRedirect: "/login?error=auth_failed",
-    })(req, res, next);
-  });
+  // DISABLED: GET /api/login endpoint to prevent 404 errors and logout cycling
+  // Only email/password authentication via POST /api/auth/login is supported
 
   app.get("/api/callback", (req, res, next) => {
     if (!config) {
