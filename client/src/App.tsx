@@ -20,6 +20,7 @@ import ForgotPassword from "@/pages/forgot-password";
 import EmailConfirmed from "@/pages/email-confirmed";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
+import FAQ from "@/pages/faq";
 
 // Import authenticated pages directly to avoid lazy loading issues
 import Schedule from "@/pages/schedule";
@@ -43,7 +44,7 @@ function Router() {
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user });
   console.log('Current location:', window.location.pathname);
-  
+
   // Add route debugging
   React.useEffect(() => {
     console.log('Route changed to:', window.location.pathname, { 
@@ -84,13 +85,14 @@ function Router() {
           <Route path="/qr-scanner" component={QRScannerPage} />
         </>
       )}
-      
+
       {/* Public routes - always available */}
       <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/terms" component={TermsOfService} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
-      
+      <Route path="/faq" component={FAQ} />
+
       {/* Unauthenticated routes */}
       {!isAuthenticated && (
         <>
@@ -102,7 +104,7 @@ function Router() {
           <Route path="/landing" component={Landing} />
         </>
       )}
-      
+
       {/* Catch-all route for 404 */}
       <Route component={NotFound} />
     </Switch>

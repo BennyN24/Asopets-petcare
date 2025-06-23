@@ -702,6 +702,15 @@ export default function Profile() {
               Import Data
             </Button>
 
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => window.open("/faq", "_blank")}
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              FAQ & Help
+            </Button>
+
             <Separator />
 
             <Button
