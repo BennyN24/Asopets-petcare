@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { WifiOff, Wifi } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 

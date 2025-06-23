@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
