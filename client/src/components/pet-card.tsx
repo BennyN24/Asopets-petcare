@@ -53,17 +53,21 @@ export default React.memo(function PetCard({ pet, reminders, onDelete }: PetCard
 
       {/* Pet Image or Icon */}
       <div onClick={handleCardClick} className="cursor-pointer">
-        {pet.imageUrl ? (
+        {pet.imageUrl && pet.imageUrl.trim() !== '' ? (
           <img 
             src={pet.imageUrl} 
             alt={pet.name}
-            className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
+            className="w-16 h-16 rounded-full mx-auto mb-3 object-cover border-2 border-white shadow-sm"
+            onError={(e) => {
+              console.log('Image failed to load for pet:', pet.name);
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
           />
-        ) : (
-          <div className="w-16 h-16 rounded-full mx-auto mb-3 bg-gray-100 flex items-center justify-center">
-            {getCategoryIcon(pet.category)}
-          </div>
-        )}
+        ) : null}
+        <div className={`w-16 h-16 rounded-full mx-auto mb-3 bg-gray-100 flex items-center justify-center ${pet.imageUrl && pet.imageUrl.trim() !== '' ? 'hidden' : ''}`}>
+          {getCategoryIcon(pet.category)}
+        </div>
 
         {/* Pet Info */}
         <div className="text-center">
