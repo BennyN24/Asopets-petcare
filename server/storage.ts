@@ -220,7 +220,7 @@ export class DatabaseStorage implements IStorage {
         
         // Finally delete the pet
         const results = await tx.delete(pets).where(eq(pets.id, id));
-        if (results.length === 0) {
+        if (results.rowCount === 0) {
           throw new Error('Pet not found');
         }
       });

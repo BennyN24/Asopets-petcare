@@ -78,7 +78,9 @@ if (process.env.SENDGRID_API_KEY) {
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const baseUrl = process.env.BASE_URL || "https://asopets.com";
+  const baseUrl = process.env.NODE_ENV === 'development' 
+    ? `http://localhost:5000`
+    : "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
   // Always log the confirmation link for testing
@@ -129,22 +131,14 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         </html>
       `;
 
-      const msg: any = {
+      await sendEmail({
         to: email,
-        from: "support@asopets.com",
+        from: "noreply@asopets.com",
         subject: "Confirm Your ASOPets Account",
         html: emailHtml,
         text: `Welcome to ASOPets! Please confirm your email address by visiting: ${confirmationLink}`,
-        trackingSettings: {
-          clickTracking: {
-            enable: false,
-          },
-        },
-      };
-
-      const result = await sgMail.send(msg);
+      });
       console.log(`Confirmation email sent to ${email}`);
-      console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
       // Development mode - log the link
       console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
@@ -243,7 +237,6 @@ export const sendPasswordResetEmail = async (
 
       const result = await sgMail.send(msg);
       console.log(`Password reset email sent to ${email}`);
-      console.log("SendGrid response:", result[0].statusCode, result[0].body);
     } else {
       console.log(`Password reset link for ${email}: ${resetLink}`);
       console.log(
