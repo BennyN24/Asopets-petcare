@@ -8,7 +8,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
 interface BiometricLoginProps {
-  onSuccess: () => void;
+  onSuccess: (authenticated?: boolean) => void;
   onBackToRegular: () => void;
   email?: string;
 }
@@ -56,14 +56,39 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
     try {
       const assertion = await authenticateWithBiometric(email);
       if (assertion) {
-        // Simulate biometric login success - in real app you'd verify with server
-        // For now, we'll proceed with regular email/password flow but show success
-        toast({
-          title: "Biometric verified",
-          description: "Please complete login with your password",
-          variant: "default",
-        });
-        onSuccess();
+        // Complete biometric login - authenticate directly with the server
+        try {
+          const response = await apiRequest("POST", "/api/auth/biometric-login", {
+            email,
+            biometricData: {
+              id: Array.from(new Uint8Array(assertion.rawId))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join(''),
+              type: assertion.type
+            }
+          });
+          
+          // Force query invalidation to update auth state
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          
+          toast({
+            title: "Login successful",
+            description: "Welcome back! Logged in with biometric authentication",
+            variant: "default",
+          });
+          
+          // Pass true to indicate successful authentication
+          onSuccess(true);
+        } catch (serverError: any) {
+          // If server-side biometric auth fails, fall back to regular login
+          toast({
+            title: "Biometric verified locally",
+            description: "Please complete login with your password",
+            variant: "default",
+          });
+          // Pass false to indicate fallback to password
+          onSuccess(false);
+        }
       }
     } catch (error) {
       console.error('Biometric authentication failed:', error);

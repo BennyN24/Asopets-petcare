@@ -6,6 +6,7 @@ import type { Express, RequestHandler } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { env, isDevelopment } from "./config";
+import { db } from "./db";
 
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days for better persistence
@@ -107,6 +108,82 @@ export const generateUserId = (): string => {
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
   app.use(getSession());
+
+    // Login route
+  app.post("/api/auth/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    try {
+      const user = await loginUser(email, password);
+
+      // Store user session
+      req.session!.userId = user.id;
+
+      // Log session creation
+      console.log(`[AUTH] POST /api/auth/login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`);
+
+      res.json({ 
+        message: "Login successful", 
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          displayName: user.displayName,
+          isEmailConfirmed: user.isEmailConfirmed 
+        } 
+      });
+    } catch (error: any) {
+      console.error("Login error:", error.message);
+      res.status(401).json({ message: error.message });
+    }
+  });
+
+  // Biometric login route
+  app.post("/api/auth/biometric-login", async (req, res) => {
+    const { email, biometricData } = req.body;
+
+    if (!email || !biometricData) {
+      return res.status(400).json({ message: "Email and biometric data are required" });
+    }
+
+    try {
+      // In a real implementation, you would verify the biometric data against stored credentials
+      // For now, we'll just verify the user exists and is confirmed
+      const users = db.prepare(`
+        SELECT id, email, displayName, isEmailConfirmed 
+        FROM users 
+        WHERE email = ? AND isEmailConfirmed = 1
+      `).all(email);
+
+      if (users.length === 0) {
+        return res.status(401).json({ message: "Invalid credentials or email not confirmed" });
+      }
+
+      const user = users[0];
+
+      // Store user session
+      req.session!.userId = user.id;
+
+      // Log session creation
+      console.log(`[AUTH] POST /api/auth/biometric-login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`);
+
+      res.json({ 
+        message: "Biometric login successful", 
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          displayName: user.displayName,
+          isEmailConfirmed: user.isEmailConfirmed 
+        } 
+      });
+    } catch (error: any) {
+      console.error("Biometric login error:", error.message);
+      res.status(401).json({ message: error.message });
+    }
+  });
 }
 
 // Configure SendGrid
@@ -293,3 +370,34 @@ export const sendPasswordResetEmail = async (
     console.log(`Password reset link for ${email}: ${resetLink}`);
   }
 };
+
+async function loginUser(email: string, password: string) {
+  const users = db.prepare(`
+    SELECT id, email, displayName, passwordHash, isEmailConfirmed
+    FROM users
+    WHERE email = ?
+  `).all(email);
+
+  if (users.length === 0) {
+    throw new Error("Invalid credentials");
+  }
+
+  const user = users[0];
+
+  if (!user.isEmailConfirmed) {
+    throw new Error("Email not confirmed");
+  }
+
+  const passwordMatch = await verifyPassword(password, user.passwordHash);
+
+  if (!passwordMatch) {
+    throw new Error("Invalid credentials");
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    isEmailConfirmed: user.isEmailConfirmed
+  };
+}

@@ -135,14 +135,23 @@ export default function Login() {
     setShowBiometricLogin(true);
   };
 
-  const handleBiometricSuccess = () => {
+  const handleBiometricSuccess = (authenticated?: boolean) => {
     setShowBiometricLogin(false);
-    // Continue with regular login flow
-    toast({
-      title: "Biometric verified",
-      description: "Please complete your login",
-      variant: "default",
-    });
+    
+    if (authenticated) {
+      // Biometric login was successful, redirect to dashboard
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setTimeout(() => {
+        setLocation("/");
+      }, 1000);
+    } else {
+      // Biometric verified but need password, stay on login form
+      toast({
+        title: "Biometric verified",
+        description: "Please complete your login with password",
+        variant: "default",
+      });
+    }
   };
 
   const handleBiometricBack = () => {
