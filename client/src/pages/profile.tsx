@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,12 +37,26 @@ import {
   LogOut,
   Trash2,
   Fingerprint,
+  Download,
+  Upload,
+  MessageSquare,
+  Send,
+  Heart,
+  Settings,
+  Edit,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import PhotoUpload from "@/components/photo-upload";
 import AdBanner from "@/components/ad-banner";
+import BottomNavigation from "@/components/bottom-navigation";
 import { useBiometric } from "@/hooks/useBiometric";
-import type { User as UserType } from "@shared/schema";
+import { useAdMob } from "@/hooks/useAdMob";
+import { ADMOB_CONFIG } from "@/lib/admob-config";
+import { adUtils } from "@/utils/ad-utils";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import type { User as UserType, Pet, Reminder, MedicalRecord } from "@shared/schema";
 
 interface UserProfile {
   id: string;
