@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -39,16 +39,21 @@ import VetClinicsPage from "@/pages/vet-clinics";
 import QRScannerPage from "@/pages/qr-scanner";
 
 function Router() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user, error } = useAuth();
   const [, setLocation] = useLocation();
 
   // Debug authentication state
-  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user });
+  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error });
 
   // Show loading while authentication is being determined
   if (isLoading) {
     console.log('Showing loader - authentication in progress');
     return <PageLoader />;
+  }
+
+  // Handle authentication errors
+  if (error && !isAuthenticated) {
+    console.log('Authentication error, showing login:', error);
   }
 
   // Handle authentication-based redirects
@@ -72,10 +77,18 @@ function Router() {
 
   return (
     <Switch>
-      {/* Always render authenticated routes if user is authenticated */}
-      {isAuthenticated && (
+      {/* Public routes - always available */}
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-service" component={TermsOfService} />
+      <Route path="/faq" component={FAQ} />
+
+      {/* Authenticated routes */}
+      {isAuthenticated ? (
         <>
           <Route path="/" component={Dashboard} />
+          <Route path="/dashboard" component={Dashboard} />
           <Route path="/welcome" component={Welcome} />
           <Route path="/schedule" component={Schedule} />
           <Route path="/expenses" component={Expenses} />
@@ -91,30 +104,22 @@ function Router() {
           <Route path="/pet/:id/grooming" component={GroomingForm} />
           <Route path="/vet-clinics" component={VetClinicsPage} />
           <Route path="/qr-scanner" component={QRScannerPage} />
+          {/* Catch-all route for 404 when authenticated */}
+          <Route component={NotFound} />
         </>
-      )}
-
-      {/* Public routes - always available */}
-      <Route path="/privacy" component={PrivacyPolicy} />
-      <Route path="/terms" component={TermsOfService} />
-      <Route path="/privacy-policy" component={PrivacyPolicy} />
-      <Route path="/terms-of-service" component={TermsOfService} />
-      <Route path="/faq" component={FAQ} />
-
-      {/* Unauthenticated routes */}
-      {!isAuthenticated && (
+      ) : (
         <>
+          {/* Unauthenticated routes */}
           <Route path="/" component={Login} />
           <Route path="/signup" component={Signup} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
           <Route path="/email-confirmed" component={EmailConfirmed} />
           <Route path="/landing" component={Landing} />
+          {/* Catch-all route for 404 when unauthenticated */}
+          <Route component={NotFound} />
         </>
       )}
-
-      {/* Catch-all route for 404 */}
-      <Route component={NotFound} />
     </Switch>
   );
 }

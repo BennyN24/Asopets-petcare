@@ -44,14 +44,42 @@ export const getQueryFn: <T>(options: {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,
+      queryFn: async ({ queryKey, signal }) => {
+        const [url, ...params] = queryKey as [string, ...unknown[]];
+
+        try {
+          const response = await fetch(url, {
+            credentials: "include",
+            signal,
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              // Clear any existing auth data on 401
+              queryClient.setQueryData(["/api/auth/user"], null);
+            }
+            const errorText = await response.text();
+            console.error(`API Error ${response.status}:`, errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error(`Query failed for ${url}:`, error);
+          throw error;
+        }
+      },
+      retry: (failureCount, error: any) => {
+        // Don't retry on 401 Unauthorized
+        if (error?.message?.includes('401')) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+      staleTime: 1000 * 60 * 5, // 5 minutes
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
-    },
-    mutations: {
-      retry: false,
+      refetchOnMount: true,
     },
   },
 });
