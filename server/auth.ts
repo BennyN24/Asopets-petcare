@@ -16,57 +16,63 @@ export function getSession() {
     ttl: sessionTtl / 1000,
     tableName: "sessions",
   });
-  
+
   return session({
     secret: env.SESSION_SECRET,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
-    name: 'connect.sid',
+    name: "connect.sid",
     rolling: true,
     cookie: {
       httpOnly: true,
       secure: !isDevelopment,
       maxAge: sessionTtl,
-      sameSite: 'lax',
-      path: '/',
+      sameSite: "lax",
+      path: "/",
     },
     // Add session store error handling
-    unset: 'destroy', // Ensures session is completely removed on logout
+    unset: "destroy", // Ensures session is completely removed on logout
   });
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  if (isDevelopment && req.path.includes('/api/')) {
-    console.log(`[AUTH-CHECK] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - Has session: ${!!req.session} - User ID: ${req.session?.userId || 'none'}`);
+  if (isDevelopment && req.path.includes("/api/")) {
+    console.log(
+      `[AUTH-CHECK] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - Has session: ${!!req.session} - User ID: ${req.session?.userId || "none"}`,
+    );
   }
-  
+
   // Set no-cache headers for authenticated endpoints
   res.set({
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0'
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    Pragma: "no-cache",
+    Expires: "0",
   });
-  
+
   if (!req.session || !req.session.userId) {
     if (isDevelopment) {
       console.log(`[AUTH-CHECK] No valid session found for ${req.path}`);
     }
     return res.status(401).json({ message: "Unauthorized" });
   }
-  
+
   try {
     const user = await storage.getUser(req.session.userId);
     if (!user) {
-      console.log(`[AUTH-CHECK] User not found in database: ${req.session.userId}`);
+      console.log(
+        `[AUTH-CHECK] User not found in database: ${req.session.userId}`,
+      );
       req.session.destroy(() => {});
       return res.status(401).json({ message: "Unauthorized" });
     }
-    
+
     if (isDevelopment) {
-      console.log(`[AUTH-CHECK] User authenticated: ${user.email} (${user.id})`);
+      console.log(
+        `[AUTH-CHECK] User authenticated: ${user.email} (${user.id})`,
+      );
     }
-    
+
     req.user = user;
     next();
   } catch (error) {
@@ -106,9 +112,9 @@ if (env.SENDGRID_API_KEY) {
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const baseUrl = isDevelopment 
+  const baseUrl = isDevelopment
     ? `http://localhost:5000`
-    : (env.BASE_URL || "https://asopets.replit.app");
+    : env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
   // Always log the confirmation link for testing
@@ -194,9 +200,9 @@ export const sendPasswordResetEmail = async (
   email: string,
   resetToken: string,
 ) => {
-  const baseUrl = isDevelopment 
-    ? 'http://localhost:5000' 
-    : (env.BASE_URL || "https://asopets.replit.app");
+  const baseUrl = isDevelopment
+    ? "http://localhost:5000"
+    : env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
   // Always log the password reset link for testing
@@ -251,7 +257,7 @@ export const sendPasswordResetEmail = async (
 
       const msg: any = {
         to: email,
-        from: "support@asopets.com",
+        from: "noreply@asopets.com",
         subject: "Reset Your ASOPets Password",
         html: emailHtml,
         text: `Reset your ASOPets password by visiting: ${resetLink} (This link expires in 1 hour)`,
