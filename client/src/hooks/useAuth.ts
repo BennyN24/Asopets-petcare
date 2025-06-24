@@ -28,7 +28,7 @@ export function useAuth() {
     
     try {
       // Call logout endpoint
-      await fetch("/api/logout", {
+      const response = await fetch("/api/logout", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -36,6 +36,10 @@ export function useAuth() {
           'Pragma': 'no-cache'
         }
       });
+      
+      if (!response.ok) {
+        console.error("Logout failed:", response.status);
+      }
     } catch (error) {
       console.error("Logout API error:", error);
     }
@@ -46,11 +50,18 @@ export function useAuth() {
     // Clear React Query cache
     queryClient.clear();
     
-    // Clear localStorage
+    // Clear localStorage and sessionStorage
     localStorage.clear();
+    sessionStorage.clear();
     
-    // Force immediate redirect to login
-    window.location.replace("/");
+    // Invalidate auth query to force re-authentication
+    queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    
+    // Small delay to ensure state is cleared, then redirect
+    setTimeout(() => {
+      console.log('[CLIENT-LOGOUT] Redirecting to login page...');
+      window.location.replace("/");
+    }, 100);
   };
 
   return {

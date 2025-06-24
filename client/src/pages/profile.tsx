@@ -96,7 +96,7 @@ type ContactSupportData = z.infer<typeof contactSupportSchema>;
 
 export default function Profile() {
   const [, setLocation] = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -248,14 +248,20 @@ export default function Profile() {
 
   const accountAge = calculateAccountAge();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     toast({
       title: "Logging out",
       description: "Redirecting to login page...",
     });
-    setTimeout(() => {
-      window.location.href = "/api/logout";
-    }, 1000);
+    
+    // Use the auth hook's logout function
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Fallback redirect if logout fails
+      window.location.replace("/");
+    }
   };
 
   const handleExportData = () => {
