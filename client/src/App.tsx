@@ -45,19 +45,10 @@ function Router() {
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error });
 
-  // Show loading while authentication is being determined
-  if (isLoading) {
-    console.log('Showing loader - authentication in progress');
-    return <PageLoader />;
-  }
-
-  // Handle authentication errors
-  if (error && !isAuthenticated) {
-    console.log('Authentication error, showing login:', error);
-  }
-
-  // Handle authentication-based redirects
+  // Handle authentication-based redirects - always call useEffect
   useEffect(() => {
+    if (isLoading) return; // Don't redirect while loading
+    
     const currentPath = window.location.pathname;
     
     if (!isAuthenticated && !["/", "/signup", "/forgot-password", "/reset-password", "/email-confirmed", "/landing"].includes(currentPath)) {
@@ -72,6 +63,17 @@ function Router() {
       return;
     }
   }, [isAuthenticated, isLoading, setLocation]);
+
+  // Show loading while authentication is being determined
+  if (isLoading) {
+    console.log('Showing loader - authentication in progress');
+    return <PageLoader />;
+  }
+
+  // Handle authentication errors
+  if (error && !isAuthenticated) {
+    console.log('Authentication error, showing login:', error);
+  }
 
   console.log('Rendering routes with auth state:', { isAuthenticated, isLoading });
 
