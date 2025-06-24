@@ -1,4 +1,3 @@
-
 # AdMob Integration Setup Guide
 
 ## Overview
@@ -24,9 +23,9 @@ After setting up your app in AdMob, you'll receive:
 2. Replace the placeholder values with your actual AdMob IDs:
 
 ```env
-REACT_APP_ADMOB_APP_ID=ca-app-pub-YOUR_PUBLISHER_ID~YOUR_APP_ID
-REACT_APP_ADMOB_CLIENT_ID=ca-pub-YOUR_PUBLISHER_ID
-REACT_APP_ADMOB_BANNER_HOME=ca-app-pub-YOUR_PUBLISHER_ID/YOUR_BANNER_AD_UNIT_ID
+VITE_ADMOB_APP_ID=ca-app-pub-YOUR_PUBLISHER_ID~YOUR_APP_ID
+VITE_ADMOB_CLIENT_ID=ca-pub-YOUR_PUBLISHER_ID
+VITE_ADMOB_BANNER_HOME=ca-app-pub-YOUR_PUBLISHER_ID/YOUR_BANNER_AD_UNIT_ID
 # ... etc
 ```
 
