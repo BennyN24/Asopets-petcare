@@ -64,6 +64,10 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
+import AdBanner from "@/components/ad-banner";
+import { useAdMob } from "@/hooks/useAdMob";
+import { ADMOB_CONFIG } from "@/lib/admob-config";
+import { adUtils } from "@/utils/ad-utils";
 
 interface UserProfile {
   id: string;
@@ -99,6 +103,7 @@ export default function Profile() {
   const { user, isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { adsLoaded } = useAdMob(ADMOB_CONFIG);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [profileData, setProfileData] = useState<UserProfile>({
@@ -619,6 +624,16 @@ export default function Profile() {
             )}
           </CardContent>
         </Card>
+
+        {/* AdMob Banner Ad */}
+        {ADMOB_CONFIG.SETTINGS.SHOW_BANNERS && adsLoaded && (
+          <AdBanner
+            adSlot={adUtils.getAdUnit('BANNER_PROFILE')}
+            adFormat="auto"
+            className="my-4"
+            style={{ minHeight: '100px', textAlign: 'center' }}
+          />
+        )}
 
         {/* Financial Summary */}
         <Card>
