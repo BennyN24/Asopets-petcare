@@ -37,23 +37,32 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment", // Use back camera on mobile
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 },
-          frameRate: { ideal: 30, min: 10 }
+          width: { ideal: 1920, min: 640 },
+          height: { ideal: 1080, min: 480 },
+          frameRate: { ideal: 30, min: 15 }
         }
       });
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.play();
+        
+        // Wait for video to be ready before starting detection
+        videoRef.current.onloadedmetadata = () => {
+          console.log("📹 Video metadata loaded, starting QR detection");
+          videoRef.current?.play().then(() => {
+            console.log("▶️ Video playing, dimensions:", videoRef.current?.videoWidth, "x", videoRef.current?.videoHeight);
+            // Start scanning after video is playing
+            setTimeout(() => {
+              startQRDetection();
+            }, 500);
+          });
+        };
       }
 
       setStream(mediaStream);
-      
-      // Start scanning for QR codes
-      startQRDetection();
 
     } catch (err) {
+      console.error("📷 Camera error:", err);
       setError("Camera access denied or not available");
       setIsScanning(false);
     }
@@ -66,10 +75,17 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
 
     if (!canvas || !video || !context) return;
 
+    let scanningActive = true;
+
     const scanFrame = () => {
-      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      if (!scanningActive || !isScanning) return;
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0 && video.videoHeight > 0) {
+        // Set canvas dimensions to match video
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+        
+        // Draw the current frame
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         try {
@@ -79,25 +95,26 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           });
 
           if (code && code.data) {
-            console.log("QR Code detected! Raw data length:", code.data.length);
-            console.log("Raw QR code data:", code.data);
+            console.log("🔍 QR Code detected! Raw data length:", code.data.length);
+            console.log("📄 Raw QR code data:", code.data);
             
             try {
               const qrData = JSON.parse(code.data);
-              console.log("Successfully parsed QR data:", qrData);
-              console.log("QR Data validation check:", {
+              console.log("✅ Successfully parsed QR data:", qrData);
+              console.log("🔍 QR Data validation check:", {
                 hasType: !!qrData.type,
                 type: qrData.type,
-                hasPetId: !!qrData.petId,
-                petId: qrData.petId,
-                hasOwnerId: !!qrData.ownerId,
-                ownerId: qrData.ownerId,
+                hasPetId: !!(qrData.petId || qrData.id),
+                petId: qrData.petId || qrData.id,
+                hasOwnerId: !!(qrData.ownerId || qrData.userId),
+                ownerId: qrData.ownerId || qrData.userId,
                 name: qrData.name || qrData.petName
               });
               
               // Check for pet_profile type with required fields
               if (qrData.type === 'pet_profile' && (qrData.petId || qrData.id)) {
-                console.log("✅ Valid pet QR code detected successfully!");
+                console.log("🎉 Valid pet QR code detected successfully!");
+                scanningActive = false; // Stop scanning
                 
                 // Normalize the data structure
                 const normalizedData = {
@@ -117,7 +134,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   owner: qrData.owner
                 };
                 
-                console.log("Normalized QR data:", normalizedData);
+                console.log("📋 Normalized QR data:", normalizedData);
                 
                 toast({
                   title: "Pet QR Code Found!",
@@ -138,21 +155,30 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
               }
             } catch (parseError) {
               console.error("❌ QR JSON parsing failed:", parseError);
-              console.log("Raw data that failed to parse:", code.data);
-              console.log("First 100 chars:", code.data.substring(0, 100));
+              console.log("📄 Raw data that failed to parse:", code.data);
+              console.log("📝 First 100 chars:", code.data.substring(0, 100));
             }
           }
         } catch (err) {
-          console.error("QR detection error:", err);
+          console.error("🚨 QR detection error:", err);
         }
       }
 
-      if (isScanning) {
-        requestAnimationFrame(scanFrame);
+      // Continue scanning with proper timing
+      if (scanningActive && isScanning) {
+        setTimeout(() => {
+          requestAnimationFrame(scanFrame);
+        }, 100); // Scan every 100ms for better performance
       }
     };
 
+    // Start the scanning loop
     scanFrame();
+
+    // Cleanup function
+    return () => {
+      scanningActive = false;
+    };
   };
 
   const stopCamera = () => {
