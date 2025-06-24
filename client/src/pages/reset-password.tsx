@@ -51,7 +51,7 @@ export default function ResetPassword() {
     const tokenParam = urlParams.get("token");
     console.log("Reset password page - URL search params:", window.location.search);
     console.log("Reset password page - Token param:", tokenParam);
-    
+
     if (tokenParam) {
       setToken(tokenParam);
       console.log("Token set successfully:", tokenParam);
@@ -84,14 +84,18 @@ export default function ResetPassword() {
         password: data.password,
       });
       console.log("Password reset response:", response);
-      
+
       setIsSuccess(true);
       toast({
         title: "Password reset successful",
         description:
           "Your password has been updated. You can now log in with your new password.",
       });
-      setTimeout(() => setLocation("/login"), 3000);
+
+      // Auto-redirect to login after 3 seconds
+      setTimeout(() => {
+        setLocation("/");
+      }, 3000);
     } catch (error: any) {
       console.error("Password reset error:", error);
       toast({

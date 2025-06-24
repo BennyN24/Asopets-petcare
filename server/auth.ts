@@ -31,8 +31,11 @@ export function getSession() {
       sameSite: "lax",
       path: "/",
     },
-    // Add session store error handling
     unset: "destroy", // Ensures session is completely removed on logout
+    proxy: true, // Trust first proxy for proper session handling
+    genid: () => {
+      return require('crypto').randomBytes(32).toString('hex');
+    }
   });
 }
 

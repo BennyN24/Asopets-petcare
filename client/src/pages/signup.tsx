@@ -60,7 +60,7 @@ export default function Signup() {
         email: data.email,
         password: data.password,
       });
-      
+
       setEmailSent(true);
       toast({
         title: "Account created successfully",
@@ -92,11 +92,9 @@ export default function Signup() {
               </p>
               <Button 
                 onClick={() => setLocation("/")} 
-                variant="outline" 
                 className="w-full"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Login
+                Continue to Login
               </Button>
             </CardContent>
           </Card>

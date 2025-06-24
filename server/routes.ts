@@ -101,10 +101,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Please confirm your email before logging in" });
       }
 
-      // Set user ID in session and force save
+      // Set user ID in session
       req.session.userId = user.id;
-      console.log(`[LOGIN] Setting session for user: ${user.email} (${user.id}) - Session: ${req.sessionID?.substring(0, 8)}...`);
+      console.log(`[LOGIN] Setting session for user: ${user.email} (${user.id})`);
       
+      // Force session save and send response
       req.session.save((err: any) => {
         if (err) {
           console.error("[LOGIN] Session save error:", err);
@@ -112,6 +113,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         console.log(`[LOGIN] Session saved successfully for user: ${user.email}`);
+        
+        // Set cache headers for auth endpoint
+        res.set({
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        });
+        
         res.json({ 
           message: "Login successful",
           user: {
@@ -201,48 +210,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Logout handler function
   const logoutHandler = (req: any, res: any) => {
     console.log(`[LOGOUT] Processing logout request for session: ${req.sessionID?.substring(0, 8)}...`);
-    console.log(`[LOGOUT] User ID in session: ${req.session?.userId || 'none'}`);
     
-    // Clear cache headers to prevent 304 responses
+    // Set no-cache headers
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0'
     });
     
+    // Clear cookie first
+    res.clearCookie('connect.sid', {
+      path: '/',
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: 'lax'
+    });
+    
     if (!req.session) {
-      console.log('[LOGOUT] No session found, clearing cookie anyway');
-      res.clearCookie('connect.sid', {
-        path: '/',
-        httpOnly: true,
-        secure: !isDevelopment,
-        sameSite: 'lax'
-      });
-      return res.json({ message: "Logout successful - no session" });
+      console.log('[LOGOUT] No session found');
+      return res.json({ message: "Logout successful" });
     }
     
     req.session.destroy((err: any) => {
       if (err) {
         console.error("[LOGOUT] Session destroy error:", err);
-        // Still try to clear the cookie even if session destroy fails
-        res.clearCookie('connect.sid', {
-          path: '/',
-          httpOnly: true,
-          secure: !isDevelopment,
-          sameSite: 'lax'
-        });
-        return res.status(500).json({ message: "Failed to logout completely" });
       }
-      
-      console.log('[LOGOUT] Session destroyed successfully');
-      res.clearCookie('connect.sid', {
-        path: '/',
-        httpOnly: true,
-        secure: !isDevelopment,
-        sameSite: 'lax'
-      });
-      
-      console.log('[LOGOUT] Cookie cleared, logout complete');
+      console.log('[LOGOUT] Logout complete');
       res.json({ message: "Logout successful" });
     });
   };

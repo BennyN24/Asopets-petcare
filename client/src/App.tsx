@@ -40,25 +40,33 @@ import QRScannerPage from "@/pages/qr-scanner";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user });
-  console.log('Current location:', window.location.pathname);
-
-  // Add route debugging
-  useEffect(() => {
-    console.log('Route changed to:', window.location.pathname, { 
-      isAuthenticated, 
-      isLoading, 
-      hasUser: !!user 
-    });
-  }, [window.location.pathname, isAuthenticated, isLoading, user]);
 
   // Show loading while authentication is being determined
   if (isLoading) {
     console.log('Showing loader - authentication in progress');
     return <PageLoader />;
   }
+
+  // Handle authentication-based redirects
+  useEffect(() => {
+    const currentPath = window.location.pathname;
+    
+    if (!isAuthenticated && !["/", "/signup", "/forgot-password", "/reset-password", "/email-confirmed", "/landing"].includes(currentPath)) {
+      console.log('Unauthenticated user accessing protected route, redirecting to login');
+      setLocation("/");
+      return;
+    }
+    
+    if (isAuthenticated && ["/", "/signup", "/forgot-password", "/reset-password", "/landing"].includes(currentPath)) {
+      console.log('Authenticated user accessing auth routes, redirecting to dashboard');
+      setLocation("/dashboard");
+      return;
+    }
+  }, [isAuthenticated, isLoading, setLocation]);
 
   console.log('Rendering routes with auth state:', { isAuthenticated, isLoading });
 

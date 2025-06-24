@@ -102,7 +102,7 @@ export default function EmailConfirmed() {
           {status === 'success' && (
             <div className="space-y-3">
               <Button 
-                onClick={() => setLocation("/login")} 
+                onClick={() => setLocation("/")} 
                 className="w-full"
               >
                 Continue to Login

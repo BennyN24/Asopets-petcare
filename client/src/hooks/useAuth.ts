@@ -24,44 +24,33 @@ export function useAuth() {
   const isAuthenticated = !!user && !error;
 
   const logout = async () => {
+    console.log('[CLIENT-LOGOUT] Starting logout process...');
+    
     try {
-      console.log('[CLIENT-LOGOUT] Starting logout process...');
-
-      const response = await fetch("/api/logout", {
+      // Call logout endpoint
+      await fetch("/api/logout", {
         method: "GET",
         credentials: "include",
-        cache: "no-cache",
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
         }
       });
-
-      console.log('[CLIENT-LOGOUT] Logout response status:', response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('[CLIENT-LOGOUT] Logout response:', data);
-      } else {
-        console.error("Logout failed:", response.status, await response.text());
-      }
-
     } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      // Always clear client state and redirect, regardless of server response
-      console.log('[CLIENT-LOGOUT] Clearing client state...');
-      
-      // Clear React Query cache
-      queryClient.clear();
-      
-      // Clear any cached data in localStorage
-      localStorage.removeItem('auth-user');
-      
-      // Force page reload to ensure clean state and proper redirect
-      console.log('[CLIENT-LOGOUT] Redirecting to login...');
-      window.location.href = "/";
+      console.error("Logout API error:", error);
     }
+    
+    // Always clear client state and redirect
+    console.log('[CLIENT-LOGOUT] Clearing client state and redirecting...');
+    
+    // Clear React Query cache
+    queryClient.clear();
+    
+    // Clear localStorage
+    localStorage.clear();
+    
+    // Force immediate redirect to login
+    window.location.replace("/");
   };
 
   return {
