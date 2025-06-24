@@ -240,9 +240,59 @@ export const insertClinicRatingSchema = createInsertSchema(clinicRatings).omit({
   updatedAt: true,
 });
 
+// Subscription plans
+export const subscriptionPlans = pgTable("subscription_plans", {
+  id: serial("id").primaryKey(),
+  name: varchar("name").notNull(), // "Basic", "Premium 3GB", "Premium Unlimited"
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  storageLimit: integer("storage_limit"), // in MB, null for unlimited
+  features: jsonb("features").default({}),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User subscriptions
+export const userSubscriptions = pgTable("user_subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  planId: integer("plan_id").notNull().references(() => subscriptionPlans.id),
+  status: varchar("status").notNull().default("active"), // active, cancelled, expired
+  startDate: timestamp("start_date").defaultNow(),
+  endDate: timestamp("end_date"),
+  paymentMethod: varchar("payment_method"), // stripe, gcash, etc
+  paymentId: varchar("payment_id"), // external payment reference
+  storageUsed: integer("storage_used").default(0), // in MB
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Relations for subscriptions
+export const subscriptionPlansRelations = relations(subscriptionPlans, ({ many }) => ({
+  subscriptions: many(userSubscriptions),
+}));
+
+export const userSubscriptionsRelations = relations(userSubscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [userSubscriptions.userId],
+    references: [users.id],
+  }),
+  plan: one(subscriptionPlans, {
+    fields: [userSubscriptions.planId],
+    references: [subscriptionPlans.id],
+  }),
+}));
+
+// Update users relations
+export const usersRelations = relations(users, ({ many }) => ({
+  pets: many(pets),
+  subscriptions: many(userSubscriptions),
+}));
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type UserSubscription = typeof userSubscriptions.$inferSelect;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type Pet = typeof pets.$inferSelect;
 export type InsertPet = z.infer<typeof insertPetSchema>;

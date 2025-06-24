@@ -5,27 +5,28 @@ import { storage } from "./storage";
 import type { Express, RequestHandler } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
+import { env, isDevelopment } from "./config";
 
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days for better persistence
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
+    conString: env.DATABASE_URL,
     createTableIfMissing: false,
-    ttl: sessionTtl,
+    ttl: sessionTtl / 1000,
     tableName: "sessions",
   });
   
   return session({
-    secret: process.env.SESSION_SECRET || "dev-secret-key-asopets-2025",
+    secret: env.SESSION_SECRET,
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
-    name: 'connect.sid', // Use default session name
+    name: 'connect.sid',
     rolling: true,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: !isDevelopment,
       maxAge: sessionTtl,
       sameSite: 'lax',
       path: '/',
@@ -84,14 +85,14 @@ export async function setupAuth(app: Express) {
 }
 
 // Configure SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+if (env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(env.SENDGRID_API_KEY);
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const baseUrl = process.env.NODE_ENV === 'development' 
+  const baseUrl = isDevelopment 
     ? `http://localhost:5000`
-    : "https://asopets.com";
+    : (env.BASE_URL || "https://asopets.replit.app");
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
   // Always log the confirmation link for testing
@@ -142,7 +143,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         </html>
       `;
 
-      await sendEmail({
+      await sgMail.send({
         to: email,
         from: "noreply@asopets.com",
         subject: "Confirm Your ASOPets Account",
@@ -177,10 +178,9 @@ export const sendPasswordResetEmail = async (
   email: string,
   resetToken: string,
 ) => {
-  // Use current domain for reset links in development
-  const baseUrl = process.env.NODE_ENV === 'development' 
+  const baseUrl = isDevelopment 
     ? 'http://localhost:5000' 
-    : (process.env.BASE_URL || "https://asopets.com");
+    : (env.BASE_URL || "https://asopets.replit.app");
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
   // Always log the password reset link for testing
@@ -246,7 +246,7 @@ export const sendPasswordResetEmail = async (
         },
       };
 
-      const result = await sgMail.send(msg);
+      await sgMail.send(msg);
       console.log(`Password reset email sent to ${email}`);
     } else {
       console.log(`Password reset link for ${email}: ${resetLink}`);

@@ -31,21 +31,21 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, user: UpdateUser): Promise<User>;
   confirmUserEmail(token: string): Promise<User | null>;
-  
+
   // Pet operations
   getPetsByUserId(userId: string, options?: { page?: number; limit?: number; includePhotos?: boolean }): Promise<Pet[]>;
   getPetById(id: number): Promise<Pet | undefined>;
   createPet(pet: InsertPet): Promise<Pet>;
   updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet>;
   deletePet(id: number): Promise<void>;
-  
+
   // Medical record operations
   getMedicalRecordsByPetId(petId: number): Promise<MedicalRecord[]>;
   getMedicalRecordById(id: number): Promise<MedicalRecord | undefined>;
   createMedicalRecord(record: InsertMedicalRecord): Promise<MedicalRecord>;
   updateMedicalRecord(id: number, record: Partial<InsertMedicalRecord>): Promise<MedicalRecord>;
   deleteMedicalRecord(id: number): Promise<void>;
-  
+
   // Reminder operations
   getRemindersByUserId(userId: string): Promise<Reminder[]>;
   getActiveRemindersByUserId(userId: string): Promise<Reminder[]>;
@@ -55,13 +55,13 @@ export interface IStorage {
   updateReminder(id: number, reminder: Partial<InsertReminder>): Promise<Reminder>;
   deleteReminder(id: number): Promise<void>;
   markReminderCompleted(id: number): Promise<void>;
-  
+
   // Vet clinic operations
   getVetClinicsByLocation(latitude: number, longitude: number, radiusKm?: number): Promise<VetClinic[]>;
   getVetClinicById(id: number): Promise<VetClinic | undefined>;
   createVetClinic(clinic: InsertVetClinic): Promise<VetClinic>;
   updateVetClinic(id: number, clinic: Partial<InsertVetClinic>): Promise<VetClinic>;
-  
+
   // Clinic rating operations
   getClinicRatingsByClinicId(clinicId: number): Promise<ClinicRating[]>;
   getClinicRatingsByUserId(userId: string): Promise<ClinicRating[]>;
@@ -156,9 +156,9 @@ export class DatabaseStorage implements IStorage {
   async getPetsByUserId(userId: string, options: { page?: number; limit?: number; includePhotos?: boolean } = {}): Promise<Pet[]> {
     const { page = 1, limit = 20, includePhotos = true } = options;
     const offset = (page - 1) * limit;
-    
+
     let query;
-    
+
     // Exclude image URLs if not requested to reduce response size
     if (!includePhotos) {
       query = db.select({
@@ -178,14 +178,14 @@ export class DatabaseStorage implements IStorage {
     } else {
       query = db.select();
     }
-    
+
     const result = await query
       .from(pets)
       .where(eq(pets.userId, userId))
       .orderBy(desc(pets.createdAt))
       .limit(limit)
       .offset(offset);
-    
+
     return result as Pet[];
   }
 
@@ -214,10 +214,10 @@ export class DatabaseStorage implements IStorage {
       await db.transaction(async (tx) => {
         // Delete all reminders for this pet
         await tx.delete(reminders).where(eq(reminders.petId, id));
-        
+
         // Delete all medical records for this pet  
         await tx.delete(medicalRecords).where(eq(medicalRecords.petId, id));
-        
+
         // Finally delete the pet
         const results = await tx.delete(pets).where(eq(pets.id, id));
         if (results.rowCount === 0) {
@@ -286,7 +286,7 @@ export class DatabaseStorage implements IStorage {
         // Create 1-day reminder
         const oneDayBefore = new Date(record.nextDueDate);
         oneDayBefore.setDate(oneDayBefore.getDate() - 1);
-        
+
         await this.createReminder({
           petId: updatedRecord.petId,
           medicalRecordId: updatedRecord.id,
@@ -302,7 +302,7 @@ export class DatabaseStorage implements IStorage {
         if (updatedRecord.reminderSms) {
           const oneHourBefore = new Date(record.nextDueDate);
           oneHourBefore.setHours(oneHourBefore.getHours() - 1);
-          
+
           await this.createReminder({
             petId: updatedRecord.petId,
             medicalRecordId: updatedRecord.id,
@@ -459,10 +459,10 @@ export class DatabaseStorage implements IStorage {
 
   async createClinicRating(rating: InsertClinicRating): Promise<ClinicRating> {
     const [newRating] = await db.insert(clinicRatings).values(rating).returning();
-    
+
     // Update clinic average rating
     await this.updateClinicAverageRating(rating.clinicId);
-    
+
     return newRating;
   }
 
@@ -472,12 +472,12 @@ export class DatabaseStorage implements IStorage {
       .set(rating)
       .where(eq(clinicRatings.id, id))
       .returning();
-    
+
     // Update clinic average rating if rating changed
     if (rating.rating !== undefined) {
       await this.updateClinicAverageRating(updatedRating.clinicId);
     }
-    
+
     return updatedRating;
   }
 
@@ -486,7 +486,7 @@ export class DatabaseStorage implements IStorage {
       .delete(clinicRatings)
       .where(eq(clinicRatings.id, id))
       .returning();
-    
+
     // Update clinic average rating
     if (deletedRating) {
       await this.updateClinicAverageRating(deletedRating.clinicId);
@@ -515,7 +515,7 @@ export class DatabaseStorage implements IStorage {
     const averageRating = totalRatings > 0 
       ? ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings 
       : 0;
-    
+
     await db
       .update(vetClinics)
       .set({ 
@@ -525,5 +525,8 @@ export class DatabaseStorage implements IStorage {
       .where(eq(vetClinics.id, clinicId));
   }
 }
+
+// Import subscription methods
+export * from "./subscription-storage";
 
 export const storage = new DatabaseStorage();

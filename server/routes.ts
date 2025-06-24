@@ -10,6 +10,7 @@ import {
   insertReminderSchema,
   updateUserSchema,
 } from "@shared/schema";
+import { env, isDevelopment } from "./config";
 
 const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -31,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('[AUTH-SETUP] Session middleware configured');
   
   // Disable debug logging in production, keep minimal logging
-  if (process.env.NODE_ENV === 'development') {
+  if (isDevelopment) {
     app.use((req, res, next) => {
       if (req.path.includes('/api/auth')) {
         console.log(`[AUTH] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - User: ${req.session?.userId ? 'authenticated' : 'none'}`);
@@ -310,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[SMS] Generated OTP for ${phoneNumber}: ${otp}`);
       
       // Production-ready SMS implementation
-      if (process.env.NODE_ENV === 'development') {
+      if (isDevelopment) {
         // Development mode: show OTP in response
         res.json({ 
           message: "OTP sent successfully (development mode)", 
@@ -917,6 +918,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user ratings:", error);
       res.status(500).json({ message: "Failed to fetch user ratings" });
+    }
+  });
+
+  // Subscription routes
+  app.get("/api/subscription-plans", async (req, res) => {
+    try {
+      const plans = await storage.getSubscriptionPlans();
+      res.json(plans);
+    } catch (error) {
+      console.error("Error fetching subscription plans:", error);
+      res.status(500).json({ message: "Failed to fetch subscription plans" });
+    }
+  });
+
+  app.get("/api/my-subscription", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId || req.user.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const subscription = await storage.getUserSubscription(userId);
+      res.json(subscription);
+    } catch (error) {
+      console.error("Error fetching user subscription:", error);
+      res.status(500).json({ message: "Failed to fetch subscription" });
+    }
+  });
+
+  app.post("/api/subscribe", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId || req.user.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { planId, paymentMethod, paymentId } = req.body;
+      
+      if (!planId) {
+        return res.status(400).json({ message: "Plan ID is required" });
+      }
+      
+      // Create subscription
+      const subscription = await storage.createUserSubscription({
+        userId,
+        planId: parseInt(planId),
+        paymentMethod: paymentMethod || "manual",
+        paymentId: paymentId || null,
+      });
+      
+      res.status(201).json(subscription);
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      res.status(500).json({ message: "Failed to create subscription" });
+    }
+  });
+
+  app.get("/api/storage-usage", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId || req.user.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const usage = await storage.getStorageUsage(userId);
+      res.json(usage);
+    } catch (error) {
+      console.error("Error fetching storage usage:", error);
+      res.status(500).json({ message: "Failed to fetch storage usage" });
     }
   });
 
