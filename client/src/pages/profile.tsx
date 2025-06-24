@@ -254,7 +254,7 @@ export default function Profile() {
       description: "Redirecting to login page...",
     });
     setTimeout(() => {
-      window.location.href = "/";
+      window.location.href = "/api/logout";
     }, 1000);
   };
 
@@ -717,7 +717,7 @@ export default function Profile() {
             <Button
               variant="outline"
               className="w-full justify-start"
-              onClick={() => window.location.href = "/faq"}
+              onClick={() => (window.location.href = "/faq")}
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               FAQ & Help
