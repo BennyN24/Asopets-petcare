@@ -254,7 +254,7 @@ export default function Profile() {
       description: "Redirecting to login page...",
     });
     setTimeout(() => {
-      window.location.href = "/api/logout";
+      window.location.href = "/";
     }, 1000);
   };
 

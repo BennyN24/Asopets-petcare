@@ -65,7 +65,7 @@ export default function Login() {
       localStorage.removeItem('auth-user');
       
       // Redirect to dashboard after successful login
-      setLocation("/dashboard");
+      setLocation("/");
     } catch (error: any) {
       if (error.message?.includes("confirm your email")) {
         setShowResendConfirmation(true);

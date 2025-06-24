@@ -62,7 +62,7 @@ export default function ResetPassword() {
         description: "This password reset link is invalid or has expired.",
         variant: "destructive",
       });
-      setTimeout(() => setLocation("/login"), 2000);
+      setTimeout(() => setLocation("/"), 2000);
     }
   }, [toast, setLocation]);
 

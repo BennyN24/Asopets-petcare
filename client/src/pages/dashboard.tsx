@@ -190,6 +190,37 @@ export default function Dashboard() {
             <TabsTrigger value="pets">My Pets</TabsTrigger>
             <TabsTrigger value="insights">Health Insights</TabsTrigger>
           </TabsList>
+          {/* Overdue Reminders Alert */}
+          {overdueReminders.length > 0 && (
+            <Card className="border-destructive bg-red-50">
+              <CardContent className="p-4">
+                <div className="flex items-center mb-3">
+                  <Bell className="text-destructive mr-2 w-5 h-5" />
+                  <h3 className="font-semibold text-gray-900">
+                    Overdue Reminders
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  {overdueReminders.slice(0, 3).map((reminder) => (
+                    <div
+                      key={reminder.id}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-sm text-gray-700">
+                        {reminder.title}
+                      </span>
+                      <span className="status-badge overdue">Overdue</span>
+                    </div>
+                  ))}
+                  {overdueReminders.length > 3 && (
+                    <p className="text-xs text-gray-500">
+                      +{overdueReminders.length - 3} more overdue items
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <TabsContent value="pets" className="space-y-6 mt-6">
             <div className="flex items-center">
@@ -222,38 +253,6 @@ export default function Dashboard() {
                 <p className="text-blue-500 text-sm font-medium">Scan Pet QR</p>
               </div>
             </div>
-
-            {/* Overdue Reminders Alert */}
-            {overdueReminders.length > 0 && (
-              <Card className="border-destructive bg-red-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center mb-3">
-                    <Bell className="text-destructive mr-2 w-5 h-5" />
-                    <h3 className="font-semibold text-gray-900">
-                      Overdue Reminders
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {overdueReminders.slice(0, 3).map((reminder) => (
-                      <div
-                        key={reminder.id}
-                        className="flex justify-between items-center"
-                      >
-                        <span className="text-sm text-gray-700">
-                          {reminder.title}
-                        </span>
-                        <span className="status-badge overdue">Overdue</span>
-                      </div>
-                    ))}
-                    {overdueReminders.length > 3 && (
-                      <p className="text-xs text-gray-500">
-                        +{overdueReminders.length - 3} more overdue items
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Other Pets Section - Scanned QR Codes */}
             {scannedPets.length > 0 && (
