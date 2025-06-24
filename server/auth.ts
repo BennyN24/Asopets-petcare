@@ -31,19 +31,40 @@ export function getSession() {
       sameSite: 'lax',
       path: '/',
     },
+    // Add session store error handling
+    unset: 'destroy', // Ensures session is completely removed on logout
   });
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
+  if (isDevelopment && req.path.includes('/api/')) {
+    console.log(`[AUTH-CHECK] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - Has session: ${!!req.session} - User ID: ${req.session?.userId || 'none'}`);
+  }
+  
+  // Set no-cache headers for authenticated endpoints
+  res.set({
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
+  
   if (!req.session || !req.session.userId) {
+    if (isDevelopment) {
+      console.log(`[AUTH-CHECK] No valid session found for ${req.path}`);
+    }
     return res.status(401).json({ message: "Unauthorized" });
   }
   
   try {
     const user = await storage.getUser(req.session.userId);
     if (!user) {
+      console.log(`[AUTH-CHECK] User not found in database: ${req.session.userId}`);
       req.session.destroy(() => {});
       return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (isDevelopment) {
+      console.log(`[AUTH-CHECK] User authenticated: ${user.email} (${user.id})`);
     }
     
     req.user = user;

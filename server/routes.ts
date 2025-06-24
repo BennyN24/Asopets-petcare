@@ -103,13 +103,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Set user ID in session and force save
       req.session.userId = user.id;
+      console.log(`[LOGIN] Setting session for user: ${user.email} (${user.id}) - Session: ${req.sessionID?.substring(0, 8)}...`);
       
       req.session.save((err: any) => {
         if (err) {
-          console.error("Session save error:", err);
+          console.error("[LOGIN] Session save error:", err);
           return res.status(500).json({ message: "Login failed - session error" });
         }
         
+        console.log(`[LOGIN] Session saved successfully for user: ${user.email}`);
         res.json({ 
           message: "Login successful",
           user: {
@@ -198,12 +200,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Logout handler function
   const logoutHandler = (req: any, res: any) => {
+    console.log(`[LOGOUT] Processing logout request for session: ${req.sessionID?.substring(0, 8)}...`);
+    console.log(`[LOGOUT] User ID in session: ${req.session?.userId || 'none'}`);
+    
+    // Clear cache headers to prevent 304 responses
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
+    if (!req.session) {
+      console.log('[LOGOUT] No session found, clearing cookie anyway');
+      res.clearCookie('connect.sid', {
+        path: '/',
+        httpOnly: true,
+        secure: !isDevelopment,
+        sameSite: 'lax'
+      });
+      return res.json({ message: "Logout successful - no session" });
+    }
+    
     req.session.destroy((err: any) => {
       if (err) {
-        console.error("Logout error:", err);
-        return res.status(500).json({ message: "Failed to logout" });
+        console.error("[LOGOUT] Session destroy error:", err);
+        // Still try to clear the cookie even if session destroy fails
+        res.clearCookie('connect.sid', {
+          path: '/',
+          httpOnly: true,
+          secure: !isDevelopment,
+          sameSite: 'lax'
+        });
+        return res.status(500).json({ message: "Failed to logout completely" });
       }
-      res.clearCookie('connect.sid');
+      
+      console.log('[LOGOUT] Session destroyed successfully');
+      res.clearCookie('connect.sid', {
+        path: '/',
+        httpOnly: true,
+        secure: !isDevelopment,
+        sameSite: 'lax'
+      });
+      
+      console.log('[LOGOUT] Cookie cleared, logout complete');
       res.json({ message: "Logout successful" });
     });
   };
@@ -377,13 +416,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Session debug endpoint (development only)
+  if (isDevelopment) {
+    app.get('/api/debug/session', (req: any, res) => {
+      res.json({
+        sessionID: req.sessionID,
+        hasSession: !!req.session,
+        userId: req.session?.userId || null,
+        sessionData: req.session || null,
+        cookies: req.headers.cookie || null,
+      });
+    });
+  }
+
   // Get current user - with enhanced caching
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      // Set cache headers for better client-side caching
+      // Remove caching for auth endpoints to prevent logout issues
       res.set({
-        'Cache-Control': 'private, max-age=300', // 5 minutes
-        'ETag': `"user-${req.user.id}-${req.user.updatedAt || Date.now()}"`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       });
       
       res.json(req.user);
