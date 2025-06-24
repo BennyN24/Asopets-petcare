@@ -717,7 +717,7 @@ export default function Profile() {
             <Button
               variant="outline"
               className="w-full justify-start"
-              onClick={() => setLocation("/faq")}
+              onClick={() => window.location.href = "/faq"}
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               FAQ & Help

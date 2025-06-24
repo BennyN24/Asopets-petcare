@@ -110,8 +110,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Login failed - session error" });
         }
         
-        console.log(`[AUTH] Login successful for ${user.email} - Session: ${req.sessionID}`);
-        
         res.json({ 
           message: "Login successful",
           user: {

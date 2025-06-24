@@ -35,26 +35,21 @@ export function getSession() {
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  console.log(`[AUTH-CHECK] Session exists: ${!!req.session}, User ID: ${req.session?.userId || 'none'}, Session ID: ${req.sessionID?.substring(0, 8)}...`);
-  
   if (!req.session || !req.session.userId) {
-    console.log(`[AUTH-CHECK] No valid session found`);
     return res.status(401).json({ message: "Unauthorized" });
   }
   
   try {
     const user = await storage.getUser(req.session.userId);
     if (!user) {
-      console.log(`[AUTH-CHECK] User not found for ID: ${req.session.userId}`);
       req.session.destroy(() => {});
       return res.status(401).json({ message: "Unauthorized" });
     }
     
     req.user = user;
-    console.log(`[AUTH-CHECK] Authentication successful for ${user.email}`);
     next();
   } catch (error) {
-    console.error("[AUTH-CHECK] Authentication error:", error);
+    console.error("Authentication error:", error);
     req.session.destroy(() => {});
     return res.status(401).json({ message: "Unauthorized" });
   }

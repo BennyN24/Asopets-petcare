@@ -148,10 +148,7 @@ export const clinicRatings = pgTable("clinic_ratings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Relations
-export const usersRelations = relations(users, ({ many }) => ({
-  pets: many(pets),
-}));
+// Relations - keeping only the first definition
 
 export const petsRelations = relations(pets, ({ one, many }) => ({
   user: one(users, {
@@ -282,7 +279,7 @@ export const userSubscriptionsRelations = relations(userSubscriptions, ({ one })
   }),
 }));
 
-// Update users relations
+// Updated users relations with subscriptions
 export const usersRelations = relations(users, ({ many }) => ({
   pets: many(pets),
   subscriptions: many(userSubscriptions),

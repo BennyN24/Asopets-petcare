@@ -324,6 +324,14 @@ Changelog:
   * Enhanced Google Maps loading with timeout handling and error recovery
   * Added fallback mechanisms and duplicate filtering for Google Places results
   * Integrated real-time network status monitoring and API key validation
+- June 25, 2025. Critical application errors resolved and authentication optimized:
+  * Fixed "setLocation is not defined" error in profile.tsx by replacing with window.location.href
+  * Resolved duplicate usersRelations exports in schema.ts causing compilation failures
+  * Optimized session persistence with forced session save and proper error handling
+  * Reduced debug logging noise while maintaining error tracking capabilities
+  * Enhanced session configuration with 30-day TTL and improved cookie settings
+  * Verified successful authentication flow with consistent session management
+  * Application now runs without errors and maintains stable user sessions
 - June 23, 2025. Authentication system debugging and complete resolution:
   * Systematically resolved /api/login endpoint conflicts between email/password and Replit OIDC authentication
   * Renamed conflicting GET /api/login to /api/replit-login to eliminate authentication route conflicts
