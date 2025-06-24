@@ -49,7 +49,9 @@ export default function GroomingForm() {
       defaultValues={defaultValues}
       extraFields={extraFields}
       onCancel={() => setLocation(`/pet/${petId}`)}
-      onSuccess={() => setLocation(`/pet/${petId}`)}
+      onSuccess={() => {
+        setLocation(`/pet/${petId}?refresh=true`);
+      }}
     />
   );
 }

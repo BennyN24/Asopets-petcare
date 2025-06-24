@@ -43,7 +43,7 @@ export default function DewormingForm() {
       defaultValues={defaultValues}
       onCancel={() => setLocation(`/pet/${petId}`)}
       onSuccess={() => {
-        setLocation(`/pet/${petId}`);
+        setLocation(`/pet/${petId}?refresh=true`);
       }}
     />
   );

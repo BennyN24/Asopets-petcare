@@ -66,7 +66,7 @@ export default function LabTestForm() {
       extraFields={extraFields}
       onCancel={() => setLocation(`/pet/${petId}`)}
       onSuccess={() => {
-        setLocation(`/pet/${petId}`);
+        setLocation(`/pet/${petId}?refresh=true`);
       }}
     />
   );

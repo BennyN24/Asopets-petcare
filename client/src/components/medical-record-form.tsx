@@ -80,6 +80,7 @@ export default function MedicalRecordForm({
           description: `${recordType.charAt(0).toUpperCase() + recordType.slice(1)} record saved offline. Will sync when online.`,
           variant: "default",
         });
+        onSuccess();
       } else {
         queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "medical-records"] });
         queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "reminders"] });
@@ -88,8 +89,12 @@ export default function MedicalRecordForm({
           title: "Success",
           description: `${recordType.charAt(0).toUpperCase() + recordType.slice(1)} record saved successfully!`,
         });
+        
+        // Add a small delay then refresh the page to ensure fresh data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
-      onSuccess();
     },
     onError: (error) => {
       toast({

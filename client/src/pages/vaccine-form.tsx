@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useLocation } from "wouter";
-import { insertMedicalRecordSchema } from "@shared/schema";
 import MedicalRecordForm from "@/components/medical-record-form";
 
 const vaccineTypes = [
-  "Rabies",
   "DHPP (Distemper, Hepatitis, Parvovirus, Parainfluenza)",
-  "Bordetella",
+  "Rabies",
+  "Bordetella (Kennel Cough)", 
   "Lyme Disease",
   "Canine Influenza",
-  "FVRCP (Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia)",
+  "Leptospirosis",
+  "FVRCP (Feline Distemper)",
   "FeLV (Feline Leukemia)",
   "Other"
 ];
@@ -41,19 +41,13 @@ export default function VaccineForm() {
       name: "batchNumber" as const,
       label: "Batch/Lot Number",
       type: "text" as const,
-      placeholder: "Enter batch number",
-    },
-    {
-      name: "weight" as const,
-      label: "Pet Weight (kg)",
-      type: "text" as const,
-      placeholder: "Enter weight in kg",
+      placeholder: "Enter vaccine batch number",
     }
   ];
 
   return (
     <MedicalRecordForm
-      title="Add Vaccination Record"
+      title="Add Vaccine Record"
       petId={petId}
       recordType="vaccine"
       typeOptions={vaccineTypes}
@@ -61,7 +55,7 @@ export default function VaccineForm() {
       extraFields={extraFields}
       onCancel={() => setLocation(`/pet/${petId}`)}
       onSuccess={() => {
-        setLocation(`/pet/${petId}`);
+        setLocation(`/pet/${petId}?refresh=true`);
       }}
     />
   );

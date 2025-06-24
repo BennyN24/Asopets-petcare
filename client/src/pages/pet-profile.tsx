@@ -22,13 +22,26 @@ export default function PetProfile() {
   // Get URL parameters to determine initial tab
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Handle URL parameters for tab switching
+  // Handle URL parameters for tab switching and refresh data when needed
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
+    const refreshParam = urlParams.get('refresh');
+    
     if (tabParam && ['overview', 'records', 'qr', 'info'].includes(tabParam)) {
       setActiveTab(tabParam);
-      // Clear the URL parameter after setting the tab
+    }
+    
+    // If refresh parameter is present, refresh the page to get fresh data
+    if (refreshParam === 'true') {
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+      return;
+    }
+    
+    // Clear URL parameters after processing
+    if (tabParam || refreshParam) {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);

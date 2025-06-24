@@ -53,7 +53,7 @@ export default function SurgeryForm() {
       extraFields={extraFields}
       onCancel={() => setLocation(`/pet/${petId}`)}
       onSuccess={() => {
-        setLocation(`/pet/${petId}`);
+        setLocation(`/pet/${petId}?refresh=true`);
       }}
     />
   );
