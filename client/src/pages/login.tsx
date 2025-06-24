@@ -23,10 +23,13 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
+  Fingerprint,
 } from "lucide-react";
 import asopetsLogo from "@/assets/asopets-logo.png";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import BiometricLogin from "@/components/biometric-login";
+import { useBiometric } from "@/hooks/useBiometric";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -43,6 +46,8 @@ export default function Login() {
   const [isResending, setIsResending] = useState(false);
   const [lastEmailAttempt, setLastEmailAttempt] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showBiometricLogin, setShowBiometricLogin] = useState(false);
+  const { isSupported: biometricSupported, checkBiometricSupport } = useBiometric();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -51,6 +56,10 @@ export default function Login() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    checkBiometricSupport();
+  }, [checkBiometricSupport]);
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
@@ -121,6 +130,36 @@ export default function Login() {
       setIsResending(false);
     }
   };
+
+  const handleBiometricLogin = () => {
+    setShowBiometricLogin(true);
+  };
+
+  const handleBiometricSuccess = () => {
+    setShowBiometricLogin(false);
+    // Continue with regular login flow
+    toast({
+      title: "Biometric verified",
+      description: "Please complete your login",
+      variant: "default",
+    });
+  };
+
+  const handleBiometricBack = () => {
+    setShowBiometricLogin(false);
+  };
+
+  if (showBiometricLogin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+        <BiometricLogin
+          onSuccess={handleBiometricSuccess}
+          onBackToRegular={handleBiometricBack}
+          email={form.getValues("email")}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
@@ -219,6 +258,31 @@ export default function Login() {
                     </>
                   )}
                 </Button>
+
+                {/* Biometric Login Option */}
+                {biometricSupported && (
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-gray-300" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-2 text-gray-500">or</span>
+                    </div>
+                  </div>
+                )}
+
+                {biometricSupported && (
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    className="w-full border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+                    onClick={handleBiometricLogin}
+                    disabled={isLoading}
+                  >
+                    <Fingerprint className="w-4 h-4 mr-2 text-primary" />
+                    Login with Biometric
+                  </Button>
+                )}
               </form>
             </Form>
 

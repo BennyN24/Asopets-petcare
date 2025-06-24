@@ -1,59 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import {
-  User,
-  Settings,
-  Bell,
-  Shield,
-  Heart,
-  Calendar,
-  Phone,
-  Mail,
-  MapPin,
-  Edit,
-  LogOut,
-  Trash2,
-  Download,
-  Upload,
-  Save,
-  X,
-  Globe,
-  UserCircle,
-  ContactRound,
-  MessageSquare,
-  Send,
-} from "lucide-react";
-import PhotoUpload from "@/components/photo-upload";
-import { format } from "date-fns";
-import BottomNavigation from "@/components/bottom-navigation";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -62,12 +15,33 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import type { Pet, MedicalRecord, Reminder } from "@shared/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  User,
+  Mail,
+  MapPin,
+  Phone,
+  Calendar,
+  Edit3,
+  Save,
+  X,
+  Camera,
+  Shield,
+  Key,
+  Bell,
+  Globe,
+  Smartphone,
+  LogOut,
+  Trash2,
+  Fingerprint,
+} from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import PhotoUpload from "@/components/photo-upload";
 import AdBanner from "@/components/ad-banner";
-import { useAdMob } from "@/hooks/useAdMob";
-import { ADMOB_CONFIG } from "@/lib/admob-config";
-import { adUtils } from "@/utils/ad-utils";
+import { useBiometric } from "@/hooks/useBiometric";
+import type { User as UserType } from "@shared/schema";
 
 interface UserProfile {
   id: string;
@@ -126,6 +100,14 @@ export default function Profile() {
       reminders: true,
     },
   });
+  const {
+    isSupported: biometricSupported,
+    isLoading: biometricLoading,
+    registerBiometric,
+    hasBiometricStored,
+    removeBiometric,
+    checkBiometricSupport,
+  } = useBiometric();
 
   // Initialize profile data when user loads
   useEffect(() => {
@@ -258,7 +240,7 @@ export default function Profile() {
       title: "Logging out",
       description: "Redirecting to login page...",
     });
-    
+
     // Use the auth hook's logout function
     try {
       await logout();
@@ -315,7 +297,11 @@ export default function Profile() {
 
           toast({
             title: "Import successful",
-            description: `Found ${data.pets.length} pets, ${data.medicalRecords?.length || 0} medical records, and ${data.reminders?.length || 0} reminders.`,
+            description: `Found ${data.pets.length} pets, ${
+              data.medicalRecords?.length || 0
+            } medical records, and ${
+              data.reminders?.length || 0
+            } reminders.`,
           });
 
           // Here you would typically upload this data to your server
@@ -381,6 +367,22 @@ export default function Profile() {
       },
     }));
   };
+
+  const handleSetupBiometric = async () => {
+    if (!profileData?.id || !profileData?.email) return;
+
+    await registerBiometric(profileData.id, profileData.email);
+  };
+
+  const handleRemoveBiometric = async () => {
+    if (!profileData?.id) return;
+
+    removeBiometric(profileData.id);
+  };
+
+  const hasBiometric = profileData?.id
+    ? hasBiometricStored(profileData.id)
+    : false;
 
   if (!isAuthenticated) {
     return (
@@ -628,10 +630,10 @@ export default function Profile() {
         {/* AdMob Banner Ad */}
         {ADMOB_CONFIG.SETTINGS.SHOW_BANNERS && adsLoaded && (
           <AdBanner
-            adSlot={adUtils.getAdUnit('BANNER_PROFILE')}
+            adSlot={adUtils.getAdUnit("BANNER_PROFILE")}
             adFormat="auto"
             className="my-4"
-            style={{ minHeight: '100px', textAlign: 'center' }}
+            style={{ minHeight: "100px", textAlign: "center" }}
           />
         )}
 
@@ -691,8 +693,9 @@ export default function Profile() {
               <ContactSupportForm
                 userEmail={profileData.email || (user as any)?.email || ""}
                 userName={
-                  `${profileData.firstName || ""} ${profileData.lastName || ""}`.trim() ||
-                  "Pet Owner"
+                  `${profileData.firstName || ""} ${
+                    profileData.lastName || ""
+                  }`.trim() || "Pet Owner"
                 }
                 onSuccess={() => {
                   setShowContactForm(false);
@@ -754,6 +757,114 @@ export default function Profile() {
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Security Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Security & Privacy
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Key className="w-4 h-4 text-gray-500" />
+                <div>
+                  <p className="font-medium">Password</p>
+                  <p className="text-sm text-gray-500">
+                    Last changed 30 days ago
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">
+                Change
+              </Button>
+            </div>
+
+            <Separator />
+
+            {/* Biometric Authentication */}
+            {biometricSupported && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Fingerprint className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="font-medium">Biometric Authentication</p>
+                      <p className="text-sm text-gray-500">
+                        {hasBiometric
+                          ? "Fingerprint/Face ID is enabled"
+                          : "Secure login with fingerprint or face"}
+                      </p>
+                    </div>
+                  </div>
+                  {hasBiometric ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveBiometric}
+                      disabled={biometricLoading}
+                    >
+                      {biometricLoading ? (
+                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        "Remove"
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSetupBiometric}
+                      disabled={biometricLoading}
+                    >
+                      {biometricLoading ? (
+                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        "Setup"
+                      )}
+                    </Button>
+                  )}
+                </div>
+
+                <Separator />
+              </>
+            )}
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Bell className="w-4 h-4 text-gray-500" />
+                <div>
+                  <p className="font-medium">Notifications</p>
+                  <p className="text-sm text-gray-500">
+                    Email and push notifications
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">
+                Manage
+              </Button>
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Globe className="w-4 h-4 text-gray-500" />
+                <div>
+                  <p className="font-medium">Privacy Settings</p>
+                  <p className="text-sm text-gray-500">
+                    Control your data sharing
+                  </p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">
+                Configure
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
