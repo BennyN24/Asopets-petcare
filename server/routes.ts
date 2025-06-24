@@ -603,6 +603,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public endpoint for fetching medical records (limited data for emergency situations)
+  app.get("/api/pets/public/:id/medical-records", async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      
+      // Verify pet exists
+      const pet = await storage.getPetById(petId);
+      if (!pet) {
+        return res.status(404).json({ message: "Pet not found" });
+      }
+      
+      // Get medical records
+      const records = await storage.getMedicalRecordsByPetId(petId);
+      
+      // Return limited public medical record data (for emergency situations)
+      const publicRecords = records.map(record => ({
+        id: record.id,
+        type: record.type,
+        title: record.title,
+        date: record.dateAdministered,
+        veterinarian: record.veterinarian,
+        clinic: record.clinic,
+        nextDueDate: record.nextDueDate,
+        notes: record.notes,
+      }));
+      
+      res.json(publicRecords);
+    } catch (error) {
+      console.error("Error fetching public medical records:", error);
+      res.status(500).json({ message: "Failed to fetch medical records" });
+    }
+  });
+
   app.delete("/api/pets/:id", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.id);

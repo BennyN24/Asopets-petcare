@@ -22,6 +22,17 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Auto-start camera when component mounts
+    startCamera();
+    
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -51,11 +62,20 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           console.log("📹 Video metadata loaded, starting QR detection");
           videoRef.current?.play().then(() => {
             console.log("▶️ Video playing, dimensions:", videoRef.current?.videoWidth, "x", videoRef.current?.videoHeight);
-            // Start scanning after video is playing
-            setTimeout(() => {
-              startQRDetection();
-            }, 500);
+            // Start scanning immediately when video starts playing
+            startQRDetection();
+          }).catch((playError) => {
+            console.error("❌ Video play error:", playError);
+            setError("Failed to start video playback");
+            setIsScanning(false);
           });
+        };
+        
+        // Handle video errors
+        videoRef.current.onerror = (err) => {
+          console.error("❌ Video error:", err);
+          setError("Video playback error");
+          setIsScanning(false);
         };
       }
 
@@ -76,9 +96,20 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     if (!canvas || !video || !context) return;
 
     let scanningActive = true;
+    let lastScanTime = 0;
 
     const scanFrame = () => {
       if (!scanningActive || !isScanning) return;
+
+      const currentTime = Date.now();
+      
+      // Throttle scanning to avoid excessive processing
+      if (currentTime - lastScanTime < 200) {
+        requestAnimationFrame(scanFrame);
+        return;
+      }
+      
+      lastScanTime = currentTime;
 
       if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0 && video.videoHeight > 0) {
         // Set canvas dimensions to match video
@@ -131,7 +162,8 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   birthmarks: qrData.birthmarks,
                   medicalRecordCount: qrData.medicalRecordCount || 0,
                   lastUpdated: qrData.lastUpdated || qrData.timestamp,
-                  owner: qrData.owner
+                  owner: qrData.owner,
+                  scannedAt: new Date().toISOString()
                 };
                 
                 console.log("📋 Normalized QR data:", normalizedData);
@@ -164,16 +196,14 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
         }
       }
 
-      // Continue scanning with proper timing
+      // Continue scanning
       if (scanningActive && isScanning) {
-        setTimeout(() => {
-          requestAnimationFrame(scanFrame);
-        }, 100); // Scan every 100ms for better performance
+        requestAnimationFrame(scanFrame);
       }
     };
 
     // Start the scanning loop
-    scanFrame();
+    requestAnimationFrame(scanFrame);
 
     // Cleanup function
     return () => {
@@ -298,9 +328,9 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
               </p>
               
               <div className="grid grid-cols-1 gap-3">
-                <Button onClick={startCamera} className="w-full">
+                <Button onClick={startCamera} disabled className="w-full">
                   <Camera className="w-4 h-4 mr-2" />
-                  Start Camera
+                  Starting Camera...
                 </Button>
                 
                 <Button onClick={handleUploadClick} variant="outline" className="w-full">

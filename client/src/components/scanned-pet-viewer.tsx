@@ -58,12 +58,35 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
     other: "bg-gray-100 text-gray-800"
   };
 
-  const petName = data.name || data.petName || 'Unknown Pet';
-  const petCategory = data.category || 'other';
+  // Use fetched profile data if available, otherwise fall back to scanned data
+  const currentData = petProfile || data;
+  const petName = currentData.petName || currentData.name || 'Unknown Pet';
+  const petCategory = currentData.category || 'other';
 
   // Fetch medical records for the scanned pet
   const { data: medicalRecords, isLoading: loadingRecords } = useQuery({
-    queryKey: ['/api/pets', data.petId, 'medical-records'],
+    queryKey: [`/api/pets/public/${data.petId}/medical-records`],
+    queryFn: async () => {
+      const response = await fetch(`/api/pets/public/${data.petId}/medical-records`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch medical records');
+      }
+      return response.json();
+    },
+    enabled: !!data.petId && data.type === 'pet_profile',
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Fetch complete pet profile with owner information
+  const { data: petProfile, isLoading: loadingProfile } = useQuery({
+    queryKey: [`/api/pets/public/${data.petId}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/pets/public/${data.petId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch pet profile');
+      }
+      return response.json();
+    },
     enabled: !!data.petId && data.type === 'pet_profile',
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -88,9 +111,9 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
                 <Heart className="w-5 h-5 mr-2 text-primary" />
                 Pet Profile
               </CardTitle>
-              {data.owner && (
+              {(currentData.owner || petProfile?.owner) && (
                 <p className="text-sm text-gray-600 mt-1">
-                  Owner: {data.owner.name}
+                  Owner: {currentData.owner?.name || petProfile?.owner?.name}
                 </p>
               )}
             </div>
@@ -113,9 +136,9 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center">
-            {data.imageUrl ? (
+            {(currentData.imageUrl || petProfile?.pet?.imageUrl) ? (
               <img
-                src={data.imageUrl}
+                src={currentData.imageUrl || petProfile?.pet?.imageUrl}
                 alt={petName}
                 className="w-20 h-20 rounded-full mx-auto object-cover"
               />
@@ -130,50 +153,48 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
             >
               {petCategory}
             </Badge>
-          </div>
+          </div></div>
 
           {/* Pet Details */}
           <div className="space-y-3">
             <div className="border-t pt-3">
               <h4 className="font-medium text-gray-900 mb-2">Pet Information</h4>
               <div className="space-y-2 text-sm">
-                {data.breed && (
+                {(currentData.breed || petProfile?.pet?.breed) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Breed:</span>
-                    <span className="font-medium">{data.breed}</span>
+                    <span className="font-medium">{currentData.breed || petProfile?.pet?.breed}</span>
                   </div>
                 )}
-                {data.age && (
+                {(currentData.age || petProfile?.pet?.age) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Age:</span>
-                    <span className="font-medium">{data.age} months</span>
+                    <span className="font-medium">{currentData.age || petProfile?.pet?.age} months</span>
                   </div>
                 )}
-                {data.dateOfBirth && (
+                {(currentData.dateOfBirth || petProfile?.pet?.dateOfBirth) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Born:</span>
                     <span className="font-medium">
-                      {format(new Date(data.dateOfBirth), 'MMM dd, yyyy')}
+                      {format(new Date(currentData.dateOfBirth || petProfile?.pet?.dateOfBirth), 'MMM dd, yyyy')}
                     </span>
                   </div>
                 )}
-                {data.microchipId && (
+                {(currentData.microchipId || petProfile?.pet?.microchipId) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Microchip:</span>
-                    <span className="font-medium font-mono text-xs">{data.microchipId}</span>
+                    <span className="font-medium font-mono text-xs">{currentData.microchipId || petProfile?.pet?.microchipId}</span>
                   </div>
                 )}
-                {data.medicalRecordCount !== undefined && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Medical Records:</span>
-                    <span className="font-medium">{data.medicalRecordCount}</span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Medical Records:</span>
+                  <span className="font-medium">{medicalRecords?.length || currentData.medicalRecordCount || 0}</span>
+                </div>
               </div>
             </div>
 
             {/* Owner Information */}
-            {data.owner && (
+            {(currentData.owner || petProfile?.owner) && (
               <div className="border-t pt-3">
                 <h4 className="font-medium text-gray-900 mb-2 flex items-center">
                   <User className="w-4 h-4 mr-1" />
@@ -182,23 +203,23 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Name:</span>
-                    <span className="font-medium">{data.owner.name}</span>
+                    <span className="font-medium">{currentData.owner?.name || petProfile?.owner?.name}</span>
                   </div>
-                  {data.owner.phone && (
+                  {(currentData.owner?.phone || petProfile?.owner?.phone) && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Phone:</span>
-                      <a href={`tel:${data.owner.phone}`} className="font-medium text-blue-600 hover:underline flex items-center">
+                      <a href={`tel:${currentData.owner?.phone || petProfile?.owner?.phone}`} className="font-medium text-blue-600 hover:underline flex items-center">
                         <Phone className="w-3 h-3 mr-1" />
-                        {data.owner.phone}
+                        {currentData.owner?.phone || petProfile?.owner?.phone}
                       </a>
                     </div>
                   )}
-                  {data.owner.email && (
+                  {(currentData.owner?.email || petProfile?.owner?.email) && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Email:</span>
-                      <a href={`mailto:${data.owner.email}`} className="font-medium text-blue-600 hover:underline flex items-center">
+                      <a href={`mailto:${currentData.owner?.email || petProfile?.owner?.email}`} className="font-medium text-blue-600 hover:underline flex items-center">
                         <Mail className="w-3 h-3 mr-1" />
-                        {data.owner.email}
+                        {currentData.owner?.email || petProfile?.owner?.email}
                       </a>
                     </div>
                   )}
@@ -207,25 +228,26 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
             )}
 
             {/* Emergency Contact */}
-            {data.owner && (data.owner.emergencyContact || data.owner.emergencyPhone) && (
+            {((currentData.owner?.emergencyContact || currentData.owner?.emergencyPhone) || 
+              (petProfile?.owner?.emergencyContact || petProfile?.owner?.emergencyPhone)) && (
               <div className="border-t pt-3">
                 <h4 className="font-medium text-gray-900 mb-2 flex items-center">
                   <AlertTriangle className="w-4 h-4 mr-1 text-red-500" />
                   Emergency Contact
                 </h4>
                 <div className="space-y-2 text-sm">
-                  {data.owner.emergencyContact && (
+                  {(currentData.owner?.emergencyContact || petProfile?.owner?.emergencyContact) && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Name:</span>
-                      <span className="font-medium">{data.owner.emergencyContact}</span>
+                      <span className="font-medium">{currentData.owner?.emergencyContact || petProfile?.owner?.emergencyContact}</span>
                     </div>
                   )}
-                  {data.owner.emergencyPhone && (
+                  {(currentData.owner?.emergencyPhone || petProfile?.owner?.emergencyPhone) && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Phone:</span>
-                      <a href={`tel:${data.owner.emergencyPhone}`} className="font-medium text-red-600 hover:underline flex items-center">
+                      <a href={`tel:${currentData.owner?.emergencyPhone || petProfile?.owner?.emergencyPhone}`} className="font-medium text-red-600 hover:underline flex items-center">
                         <Phone className="w-3 h-3 mr-1" />
-                        {data.owner.emergencyPhone}
+                        {currentData.owner?.emergencyPhone || petProfile?.owner?.emergencyPhone}
                       </a>
                     </div>
                   )}
@@ -234,12 +256,12 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
             )}
 
             {/* Additional Information */}
-            {data.birthmarks && (
+            {(currentData.birthmarks || petProfile?.pet?.birthmarks) && (
               <div className="border-t pt-3">
                 <h4 className="font-medium text-gray-900 mb-2">Additional Information</h4>
                 <div className="text-sm">
                   <span className="text-gray-600 block">Birthmarks/Notes:</span>
-                  <span className="font-medium">{data.birthmarks}</span>
+                  <span className="font-medium">{currentData.birthmarks || petProfile?.pet?.birthmarks}</span>
                 </div>
               </div>
             )}
@@ -251,7 +273,7 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
                   <FileText className="w-4 h-4 mr-1" />
                   Recent Medical Records
                 </h4>
-                {loadingRecords ? (
+                {(loadingRecords || loadingProfile) ? (
                   <div className="text-sm text-gray-500">Loading medical records...</div>
                 ) : medicalRecords && medicalRecords.length > 0 ? (
                   <div className="space-y-2 max-h-40 overflow-y-auto">
