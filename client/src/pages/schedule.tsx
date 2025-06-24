@@ -24,6 +24,7 @@ import { format, isToday, isTomorrow, isThisWeek, differenceInDays } from "date-
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/bottom-navigation";
+import NotificationDropdown from "@/components/notification-dropdown";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
 import { useMemo } from "react";
@@ -37,6 +38,7 @@ export default function Schedule() {
   const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedPet, setSelectedPet] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "type" | "pet">("date");
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],
@@ -51,6 +53,23 @@ export default function Schedule() {
       return response.json();
     },
     enabled: isAuthenticated,
+  });
+
+  // Query for reminders with pet data for notifications
+  const { data: remindersWithPets = [] } = useQuery({
+    queryKey: ["/api/reminders/with-pets"],
+    queryFn: async () => {
+      const response = await fetch("/api/reminders");
+      if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
+      const remindersData = await response.json();
+      
+      // Combine reminders with pet data
+      return remindersData.map((reminder: any) => ({
+        ...reminder,
+        pet: pets.find((pet: PetType) => pet.id === reminder.petId)
+      })).filter((reminder: any) => reminder.pet); // Only include reminders with valid pets
+    },
+    enabled: isAuthenticated && pets.length > 0,
   });
 
   const completeReminderMutation = useMutation({
@@ -228,6 +247,20 @@ export default function Schedule() {
     completeReminderMutation.mutate(reminderId);
   };
 
+  // Calculate notification counts
+  const activeNotifications = remindersWithPets.filter((r: any) => !r.isCompleted);
+  const overdueNotifications = activeNotifications.filter((r: any) => r.isOverdue);
+  const upcomingNotifications = activeNotifications.filter((r: any) => !r.isOverdue);
+  const totalNotificationCount = activeNotifications.length;
+
+  const handleNotificationClick = () => {
+    setShowNotificationDropdown(!showNotificationDropdown);
+  };
+
+  const handleCloseNotifications = () => {
+    setShowNotificationDropdown(false);
+  };
+
   if (remindersLoading) {
     return (
       <div className="mobile-container">
@@ -255,11 +288,12 @@ export default function Schedule() {
               variant="ghost"
               size="sm"
               className="text-white hover:bg-white/20 relative p-2"
+              onClick={handleNotificationClick}
             >
               <Bell className="w-5 h-5" />
-              {(filteredUpcomingReminders.length + filteredCompletedReminders.length) > 0 && (
-                <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                  {(filteredUpcomingReminders.length + filteredCompletedReminders.length) > 9 ? '9+' : (filteredUpcomingReminders.length + filteredCompletedReminders.length)}
+              {totalNotificationCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {totalNotificationCount > 9 ? '9+' : totalNotificationCount}
                 </div>
               )}
             </Button>
@@ -533,6 +567,13 @@ export default function Schedule() {
       </div>
 
       <BottomNavigation activeTab="schedule" />
+      
+      {/* Notification Dropdown */}
+      <NotificationDropdown
+        reminders={remindersWithPets}
+        isOpen={showNotificationDropdown}
+        onClose={handleCloseNotifications}
+      />
     </div>
   );
 }
