@@ -153,7 +153,7 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
             >
               {petCategory}
             </Badge>
-          </div></div>
+          </div>
 
           {/* Pet Details */}
           <div className="space-y-3">
