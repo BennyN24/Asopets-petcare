@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 
 export function useAuth() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -29,7 +30,7 @@ export function useAuth() {
       const response = await fetch("/api/logout", {
         method: "GET",
         credentials: "include",
-        cache: "no-cache", // Prevent cached responses
+        cache: "no-cache",
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -45,26 +46,20 @@ export function useAuth() {
         console.error("Logout failed:", response.status, await response.text());
       }
 
-      // Always clear client state regardless of server response
-      console.log('[CLIENT-LOGOUT] Clearing client state...');
-      queryClient.clear();
-      setUser(null);
-      setIsAuthenticated(false);
-
-      // Clear any cached data in localStorage
-      localStorage.removeItem('auth-user');
-
-      // Force page reload to ensure clean state
-      console.log('[CLIENT-LOGOUT] Redirecting to login...');
-      window.location.href = "/";
-
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if logout request fails, clear local state
+    } finally {
+      // Always clear client state and redirect, regardless of server response
+      console.log('[CLIENT-LOGOUT] Clearing client state...');
+      
+      // Clear React Query cache
       queryClient.clear();
-      setUser(null);
-      setIsAuthenticated(false);
+      
+      // Clear any cached data in localStorage
       localStorage.removeItem('auth-user');
+      
+      // Force page reload to ensure clean state and proper redirect
+      console.log('[CLIENT-LOGOUT] Redirecting to login...');
       window.location.href = "/";
     }
   };
