@@ -182,23 +182,7 @@ export async function setupAuth(app: Express) {
     })(req, res, next);
   });
 
-  app.get("/api/logout", (req, res) => {
-    if (!config) {
-      req.logout(() => {
-        res.redirect("/login");
-      });
-      return;
-    }
-    
-    req.logout(() => {
-      res.redirect(
-        client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
-          post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
-        }).href
-      );
-    });
-  });
+  // DISABLED: Replit logout endpoint to prevent conflicts with main logout handler
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {

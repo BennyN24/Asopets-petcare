@@ -196,15 +196,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/logout', (req: any, res) => {
+  // Logout handler function
+  const logoutHandler = (req: any, res: any) => {
     req.session.destroy((err: any) => {
       if (err) {
+        console.error("Logout error:", err);
         return res.status(500).json({ message: "Failed to logout" });
       }
       res.clearCookie('connect.sid');
       res.json({ message: "Logout successful" });
     });
-  });
+  };
+
+  // Support both GET and POST logout endpoints
+  app.post('/api/auth/logout', logoutHandler);
+  app.get('/api/logout', logoutHandler);
 
   app.post('/api/auth/forgot-password', async (req: any, res) => {
     try {
