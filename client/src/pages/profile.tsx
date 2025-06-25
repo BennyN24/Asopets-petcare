@@ -498,6 +498,40 @@ export default function Profile() {
     }
   };
 
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", "/api/auth/account");
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Account Deleted",
+        description: "Your account and all associated data have been permanently deleted.",
+      });
+      localStorage.clear();
+      window.location.href = "/login";
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Deletion Failed",
+        description: error.message || "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleDeleteAccount = () => {
+    if (deleteConfirmationText !== "DELETE MY ACCOUNT") {
+      toast({
+        title: "Confirmation Required",
+        description: "Please type 'DELETE MY ACCOUNT' exactly to confirm.",
+        variant: "destructive",
+      });
+      return;
+    }
+    deleteAccountMutation.mutate();
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="mobile-container">
@@ -1077,6 +1111,79 @@ export default function Profile() {
               <PrivacySettings
                 onClose={() => setShowPrivacySettings(false)}
               />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteConfirmation && (
+          <Card className="fixed inset-4 z-50 bg-white shadow-lg rounded-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between text-destructive">
+                <span>Delete Account</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowDeleteConfirmation(false);
+                    setDeleteConfirmationText("");
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h4 className="font-semibold text-red-800 mb-2">Warning: This action cannot be undone</h4>
+                <p className="text-red-700 text-sm">
+                  Deleting your account will permanently remove:
+                </p>
+                <ul className="text-red-700 text-sm mt-2 space-y-1">
+                  <li>• All pet profiles and medical records</li>
+                  <li>• All reminders and schedules</li>
+                  <li>• All uploaded photos and documents</li>
+                  <li>• Your account and personal information</li>
+                </ul>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Type "DELETE MY ACCOUNT" to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmationText}
+                  onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  placeholder="DELETE MY ACCOUNT"
+                />
+              </div>
+
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowDeleteConfirmation(false);
+                    setDeleteConfirmationText("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteAccountMutation.isPending || deleteConfirmationText !== "DELETE MY ACCOUNT"}
+                >
+                  {deleteAccountMutation.isPending ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    "Delete Account"
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
