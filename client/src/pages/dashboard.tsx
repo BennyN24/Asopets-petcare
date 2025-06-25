@@ -158,7 +158,7 @@ export default function Dashboard() {
       <div className="bg-primary text-white p-4 safe-area-top">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Welcome back!</h1>
+            <h1 className="text-xl font-bold pt-[0px] pb-[0px] mt-[10px] mb-[10px]">Welcome back!</h1>
             <p className="text-white/80 text-sm">
               Managing {pets.length} pet{pets.length !== 1 ? "s" : ""}
             </p>
@@ -317,7 +317,6 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
-
       {/* Find Vet Clinics Modal */}
       {showVetClinics && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-10">
@@ -337,7 +336,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
       {showQRScanner && (
         <QRScanner 
           onClose={() => setShowQRScanner(false)}
@@ -380,7 +378,6 @@ export default function Dashboard() {
           }}
         />
       )}
-
       {scannedPetData && (
         <ScannedPetViewer 
           data={scannedPetData}
@@ -399,12 +396,10 @@ export default function Dashboard() {
           }}
         />
       )}
-
       <MedicationReminderManager 
         showDropdown={showNotifications}
         onDropdownClose={() => setShowNotifications(false)}
       />
-
       {/* Delete Pet Confirmation Dialog */}
       {petToDelete && (
         <AlertDialog open={true} onOpenChange={() => setPetToDelete(null)}>
@@ -437,7 +432,6 @@ export default function Dashboard() {
           </AlertDialogContent>
         </AlertDialog>
       )}
-
       <BottomNavigation activeTab="home" />
     </div>
   );
