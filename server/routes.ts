@@ -461,6 +461,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password change route
+  app.post('/api/auth/change-password', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Current password and new password are required" });
+      }
+
+      // Get current user
+      const user = await storage.getUser(userId);
+      if (!user || !user.passwordHash) {
+        return res.status(400).json({ message: "User not found or invalid account" });
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await verifyPassword(currentPassword, user.passwordHash);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+
+      // Hash new password
+      const newPasswordHash = await hashPassword(newPassword);
+
+      // Update password
+      await storage.updateUser(userId, { passwordHash: newPasswordHash });
+
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
   // Pet routes with pagination and size limits
   app.get("/api/pets", isAuthenticated, async (req: any, res) => {
     try {

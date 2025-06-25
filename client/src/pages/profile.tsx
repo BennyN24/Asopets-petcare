@@ -85,7 +85,17 @@ const contactSupportSchema = z.object({
   message: z.string().min(20, "Message must be at least 20 characters"),
 });
 
+const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Please confirm your new password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type ContactSupportData = z.infer<typeof contactSupportSchema>;
+type PasswordChangeData = z.infer<typeof passwordChangeSchema>;
 
 export default function Profile() {
   const [, setLocation] = useLocation();
@@ -95,6 +105,9 @@ export default function Profile() {
   const { adsLoaded } = useAdMob(ADMOB_CONFIG);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showPrivacySettings, setShowPrivacySettings] = useState(false);
   const [profileData, setProfileData] = useState<UserProfile>({
     id: "",
     firstName: "",
@@ -204,6 +217,63 @@ export default function Profile() {
       toast({
         title: "Update failed",
         description: "Failed to update your profile. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Password change mutation
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: PasswordChangeData) => {
+      const response = await fetch("/api/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to change password");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setShowPasswordChange(false);
+      toast({
+        title: "Password changed",
+        description: "Your password has been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Password change failed",
+        description: error.message || "Failed to change password. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Notification preferences mutation
+  const updateNotificationsMutation = useMutation({
+    mutationFn: async (preferences: any) => {
+      const response = await fetch("/api/auth/user", {
+        method: "PUT",
+        body: JSON.stringify({ notificationPreferences: preferences }),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) throw new Error("Failed to update notifications");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Notifications updated",
+        description: "Your notification preferences have been saved.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Update failed",
+        description: "Failed to update notification preferences.",
         variant: "destructive",
       });
     },
@@ -381,6 +451,11 @@ export default function Profile() {
         [type]: value,
       },
     }));
+  };
+
+  const handleSaveNotifications = async () => {
+    await updateNotificationsMutation.mutateAsync(profileData.notificationPreferences);
+    setShowNotificationSettings(false);
   };
 
   const handleSetupBiometric = async () => {
@@ -790,11 +865,15 @@ export default function Profile() {
                 <div>
                   <p className="font-medium">Password</p>
                   <p className="text-sm text-gray-500">
-                    Last changed 30 days ago
+                    Keep your account secure with a strong password
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPasswordChange(true)}
+              >
                 Change
               </Button>
             </div>
@@ -855,11 +934,15 @@ export default function Profile() {
                 <div>
                   <p className="font-medium">Notifications</p>
                   <p className="text-sm text-gray-500">
-                    Email and push notifications
+                    Manage your notification preferences
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowNotificationSettings(true)}
+              >
                 Manage
               </Button>
             </div>
@@ -872,16 +955,96 @@ export default function Profile() {
                 <div>
                   <p className="font-medium">Privacy Settings</p>
                   <p className="text-sm text-gray-500">
-                    Control your data sharing
+                    Control your data sharing and QR code visibility
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPrivacySettings(true)}
+              >
                 Configure
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Password Change Modal */}
+        {showPasswordChange && (
+          <Card className="fixed inset-4 z-50 bg-white shadow-lg rounded-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Change Password</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPasswordChange(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PasswordChangeForm
+                onSuccess={() => setShowPasswordChange(false)}
+                onCancel={() => setShowPasswordChange(false)}
+                isLoading={changePasswordMutation.isPending}
+                onSubmit={(data) => changePasswordMutation.mutate(data)}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Notification Settings Modal */}
+        {showNotificationSettings && (
+          <Card className="fixed inset-4 z-50 bg-white shadow-lg rounded-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Notification Settings</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowNotificationSettings(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <NotificationSettings
+                preferences={profileData.notificationPreferences!}
+                onPreferenceChange={handleNotificationChange}
+                onSave={handleSaveNotifications}
+                onCancel={() => setShowNotificationSettings(false)}
+                isLoading={updateNotificationsMutation.isPending}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Privacy Settings Modal */}
+        {showPrivacySettings && (
+          <Card className="fixed inset-4 z-50 bg-white shadow-lg rounded-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Privacy Settings</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPrivacySettings(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PrivacySettings
+                onClose={() => setShowPrivacySettings(false)}
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <BottomNavigation activeTab="profile" />
@@ -1003,5 +1166,308 @@ function ContactSupportForm({
         </div>
       </form>
     </Form>
+  );
+}
+
+interface PasswordChangeFormProps {
+  onSuccess: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
+  onSubmit: (data: PasswordChangeData) => void;
+}
+
+function PasswordChangeForm({ onSuccess, onCancel, isLoading, onSubmit }: PasswordChangeFormProps) {
+  const form = useForm<PasswordChangeData>({
+    resolver: zodResolver(passwordChangeSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+
+  const handleSubmit = (data: PasswordChangeData) => {
+    onSubmit(data);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="currentPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Current Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Enter your current password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="newPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Enter your new password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm New Password</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="Confirm your new password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex space-x-2">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="flex-1"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Changing...
+              </>
+            ) : (
+              <>
+                <Key className="w-4 h-4 mr-2" />
+                Change Password
+              </>
+            )}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+interface NotificationSettingsProps {
+  preferences: {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+    reminders: boolean;
+  };
+  onPreferenceChange: (type: string, value: boolean) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
+function NotificationSettings({ 
+  preferences, 
+  onPreferenceChange, 
+  onSave, 
+  onCancel, 
+  isLoading 
+}: NotificationSettingsProps) {
+  return (
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Email Notifications</p>
+            <p className="text-sm text-gray-500">Receive updates via email</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={preferences.email}
+            onChange={(e) => onPreferenceChange('email', e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">SMS Notifications</p>
+            <p className="text-sm text-gray-500">Receive updates via SMS</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={preferences.sms}
+            onChange={(e) => onPreferenceChange('sms', e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Push Notifications</p>
+            <p className="text-sm text-gray-500">Receive app notifications</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={preferences.push}
+            onChange={(e) => onPreferenceChange('push', e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Reminder Notifications</p>
+            <p className="text-sm text-gray-500">Get reminded about pet care tasks</p>
+          </div>
+          <input
+            type="checkbox"
+            checked={preferences.reminders}
+            onChange={(e) => onPreferenceChange('reminders', e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+      </div>
+
+      <div className="flex space-x-2">
+        <Button
+          onClick={onSave}
+          disabled={isLoading}
+          className="flex-1"
+        >
+          {isLoading ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save Settings
+            </>
+          )}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onCancel}
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface PrivacySettingsProps {
+  onClose: () => void;
+}
+
+function PrivacySettings({ onClose }: PrivacySettingsProps) {
+  const [qrCodePrivacy, setQrCodePrivacy] = useState(true);
+  const [dataSharing, setDataSharing] = useState(false);
+  const [profileVisibility, setProfileVisibility] = useState(false);
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">QR Code Information</p>
+            <p className="text-sm text-gray-500">
+              Allow emergency contact info in QR codes
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            checked={qrCodePrivacy}
+            onChange={(e) => setQrCodePrivacy(e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Anonymous Data Sharing</p>
+            <p className="text-sm text-gray-500">
+              Help improve our services with anonymous usage data
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            checked={dataSharing}
+            onChange={(e) => setDataSharing(e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Public Profile</p>
+            <p className="text-sm text-gray-500">
+              Make your profile visible to other users
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            checked={profileVisibility}
+            onChange={(e) => setProfileVisibility(e.target.checked)}
+            className="w-4 h-4"
+          />
+        </div>
+      </div>
+
+      <div className="bg-blue-50 p-3 rounded-lg">
+        <div className="flex items-start space-x-2">
+          <Shield className="w-4 h-4 text-blue-600 mt-0.5" />
+          <div className="text-xs text-blue-800">
+            <p className="font-medium mb-1">Your Privacy Matters</p>
+            <p>
+              We never sell your personal data. View our{" "}
+              <a href="/privacy-policy" className="underline">
+                Privacy Policy
+              </a>{" "}
+              for more details.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex space-x-2">
+        <Button className="flex-1">
+          <Save className="w-4 h-4 mr-2" />
+          Save Privacy Settings
+        </Button>
+        <Button variant="outline" onClick={onClose}>
+          Close
+        </Button>
+      </div>
+    </div>
   );
 }
