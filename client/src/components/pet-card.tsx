@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import type { Pet, Reminder } from "@shared/schema";
 import { Dog, Cat, Bird, Rabbit, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface PetCardProps {
   pet: Pet;
