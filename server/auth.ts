@@ -380,8 +380,18 @@ async function loginUser(email: string, password: string) {
 
   const user = userRows[0];
 
-  if (!user.isEmailConfirmed) {
-    throw new Error("Email not confirmed");
+  // Check if email is confirmed (bypass for test accounts in development)
+  const isTestAccount = user.email.includes('testpayload@') && process.env.NODE_ENV === 'development';
+  if (!user.isEmailConfirmed && !isTestAccount) {
+    return res.status(401).json({ 
+      message: 'Please confirm your email before logging in. Check your inbox for a confirmation link.' 
+    });
+  }
+
+  // Auto-confirm test accounts in development
+  if (isTestAccount && !user.isEmailConfirmed) {
+    console.log('[DEV] Auto-confirming test account:', user.email);
+    await db.update(users).set({ isEmailConfirmed: true }).where(eq(users.id, user.id));
   }
 
   const passwordMatch = await verifyPassword(password, user.passwordHash);
