@@ -383,9 +383,7 @@ async function loginUser(email: string, password: string) {
   // Check if email is confirmed (bypass for test accounts in development)
   const isTestAccount = user.email.includes('testpayload@') && process.env.NODE_ENV === 'development';
   if (!user.isEmailConfirmed && !isTestAccount) {
-    return res.status(401).json({ 
-      message: 'Please confirm your email before logging in. Check your inbox for a confirmation link.' 
-    });
+    throw new Error("Invalid credentials or email not confirmed");
   }
 
   // Auto-confirm test accounts in development

@@ -27,10 +27,10 @@ const loginSchema = z.object({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - Email/Password authentication only
   await setupAuth(app);
-  
+
   // Force session middleware to be applied early
   console.log('[AUTH-SETUP] Session middleware configured');
-  
+
   // Disable debug logging in production, keep minimal logging
   if (isDevelopment) {
     app.use((req, res, next) => {
@@ -43,11 +43,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Email/Password Authentication Routes
   console.log('[AUTH-SETUP] Setting up email/password authentication routes');
-  
+
   app.post('/api/auth/signup', async (req: any, res) => {
     try {
       const userData = signupSchema.parse(req.body);
-      
+
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
         return res.status(400).json({ message: "Email already registered" });
@@ -86,7 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/login', async (req: any, res) => {
     try {
       const loginData = loginSchema.parse(req.body);
-      
+
       const user = await storage.getUserByEmail(loginData.email);
       if (!user || !user.passwordHash) {
         return res.status(401).json({ message: "Invalid email or password" });
@@ -104,23 +104,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set user ID in session
       req.session.userId = user.id;
       console.log(`[LOGIN] Setting session for user: ${user.email} (${user.id})`);
-      
+
       // Force session save and send response
       req.session.save((err: any) => {
         if (err) {
           console.error("[LOGIN] Session save error:", err);
           return res.status(500).json({ message: "Login failed - session error" });
         }
-        
+
         console.log(`[LOGIN] Session saved successfully for user: ${user.email}`);
-        
+
         // Set cache headers for auth endpoint
         res.set({
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
           'Expires': '0'
         });
-        
+
         res.json({ 
           message: "Login successful",
           user: {
@@ -158,9 +158,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (e) {
         // If decoding fails, use the original token
       }
-      
+
       console.log(`Attempting email confirmation with token: ${cleanToken.substring(0, 20)}...`);
-      
+
       const user = await storage.confirmUserEmail(cleanToken);
       if (!user) {
         return res.status(400).json({ message: "Invalid or expired confirmation token" });
@@ -173,7 +173,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/resend-confirmation', async (req: any, res) => {
+  // Test confirmation endpoint for automated testing
+  app.post("/api/auth/test-confirm", async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Only allow test confirmation in development for test accounts
+    if (process.env.NODE_ENV !== 'development' || !email.includes('testpayload@')) {
+      return res.status(403).json({ message: "Test confirmation not allowed" });
+    }
+
+    try {
+      const user = await storage.getUserByEmail(email);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Force confirm the test account
+      await storage.updateUser(user.id, { 
+        isEmailConfirmed: true,
+        emailConfirmationToken: null,
+        emailConfirmationExpires: null
+      });
+
+      console.log(`[TEST] Force confirmed email for test account: ${email}`);
+      res.json({ message: "Test account email confirmed successfully" });
+
+    } catch (error: any) {
+      console.error("Test confirmation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Resend confirmation email
+  app.post("/api/auth/resend-confirmation", async (req, res) => {
     try {
       const { email } = req.body;
       if (!email) {
@@ -210,14 +247,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Logout handler function
   const logoutHandler = (req: any, res: any) => {
     console.log(`[LOGOUT] Processing logout request for session: ${req.sessionID?.substring(0, 8)}...`);
-    
+
     // Set no-cache headers
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0'
     });
-    
+
     // Clear cookie first
     res.clearCookie('connect.sid', {
       path: '/',
@@ -225,12 +262,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       secure: !isDevelopment,
       sameSite: 'lax'
     });
-    
+
     if (!req.session) {
       console.log('[LOGOUT] No session found');
       return res.json({ message: "Logout successful" });
     }
-    
+
     req.session.destroy((err: any) => {
       if (err) {
         console.error("[LOGOUT] Session destroy error:", err);
@@ -279,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { token, password } = req.body;
       console.log("Password reset request - Token:", token, "Password length:", password?.length);
-      
+
       if (!token || !password) {
         console.log("Missing token or password");
         return res.status(400).json({ message: "Token and password are required" });
@@ -293,17 +330,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Find user by reset token
       const user = await storage.getUserByResetToken(token);
       console.log("User found by token:", user ? `${user.email} (${user.id})` : 'none');
-      
+
       if (!user) {
         console.log("No user found with reset token");
         return res.status(400).json({ message: "Invalid reset token" });
       }
-      
+
       if (!user.passwordResetExpires) {
         console.log("No expiration date set for reset token");
         return res.status(400).json({ message: "Invalid reset token" });
       }
-      
+
       if (user.passwordResetExpires < new Date()) {
         console.log("Reset token expired:", user.passwordResetExpires, "vs", new Date());
         return res.status(400).json({ message: "Reset token has expired" });
@@ -332,7 +369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/send-otp', async (req, res) => {
     try {
       const { phoneNumber } = req.body;
-      
+
       if (!phoneNumber) {
         return res.status(400).json({ message: "Phone number is required" });
       }
@@ -345,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       otpStore.set(phoneNumber, { otp, expires, verified: false });
 
       console.log(`[SMS] Generated OTP for ${phoneNumber}: ${otp}`);
-      
+
       // Production-ready SMS implementation
       if (isDevelopment) {
         // Development mode: show OTP in response
@@ -371,13 +408,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/verify-otp', async (req, res) => {
     try {
       const { phoneNumber, otp } = req.body;
-      
+
       if (!phoneNumber || !otp) {
         return res.status(400).json({ message: "Phone number and OTP are required" });
       }
 
       const storedOtp = otpStore.get(phoneNumber);
-      
+
       if (!storedOtp) {
         return res.status(400).json({ message: "OTP not found or expired" });
       }
@@ -393,7 +430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Mark as verified and create/update user
       storedOtp.verified = true;
-      
+
       // Create or get user by phone number
       const userId = `sms_${phoneNumber.replace(/\D/g, '')}`;
       const user = await storage.upsertUser({
@@ -431,7 +468,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Pragma': 'no-cache',
         'Expires': '0'
       });
-      
+
       res.json(req.user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -465,14 +502,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Add pagination parameters
       const page = parseInt(req.query.page as string) || 1;
       const limit = Math.min(parseInt(req.query.limit as string) || 20, 50); // Max 50 pets per request
       const includePhotos = req.query.includePhotos === 'true';
-      
+
       const pets = await storage.getPetsByUserId(userId, { page, limit, includePhotos });
-      
+
       // If response is still too large, exclude images entirely
       let responseData = pets;
       const responseSize = JSON.stringify(responseData).length;
@@ -482,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           imageUrl: pet.imageUrl ? '[image_excluded_due_to_size]' : null
         }));
       }
-      
+
       res.json(responseData);
     } catch (error) {
       console.error("Error fetching pets:", error);
@@ -494,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const petId = parseInt(req.params.id);
       const pet = await storage.getPetById(petId);
-      
+
       if (!pet) {
         return res.status(404).json({ message: "Pet not found" });
       }
@@ -537,7 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify ownership
       const existingPet = await storage.getPetById(petId);
       if (!existingPet || existingPet.userId !== userId) {
@@ -560,18 +597,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/public/:id", async (req, res) => {
     try {
       const petId = parseInt(req.params.id);
-      
+
       const pet = await storage.getPetById(petId);
       if (!pet) {
         return res.status(404).json({ message: "Pet not found" });
       }
-      
+
       // Get owner information (limited public data)
       const owner = await storage.getUser(pet.userId);
       if (!owner) {
         return res.status(404).json({ message: "Owner not found" });
       }
-      
+
       // Return limited public information suitable for emergency/contact purposes
       const publicPetData = {
         type: 'pet_profile',
@@ -595,7 +632,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         scannedAt: new Date().toISOString(),
       };
-      
+
       res.json(publicPetData);
     } catch (error) {
       console.error("Error fetching public pet data:", error);
@@ -607,16 +644,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/public/:id/medical-records", async (req, res) => {
     try {
       const petId = parseInt(req.params.id);
-      
+
       // Verify pet exists
       const pet = await storage.getPetById(petId);
       if (!pet) {
         return res.status(404).json({ message: "Pet not found" });
       }
-      
+
       // Get medical records
       const records = await storage.getMedicalRecordsByPetId(petId);
-      
+
       // Return limited public medical record data (for emergency situations)
       const publicRecords = records.map(record => ({
         id: record.id,
@@ -628,7 +665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         nextDueDate: record.nextDueDate,
         notes: record.notes,
       }));
-      
+
       res.json(publicRecords);
     } catch (error) {
       console.error("Error fetching public medical records:", error);
@@ -643,7 +680,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify ownership
       const existingPet = await storage.getPetById(petId);
       if (!existingPet || existingPet.userId !== userId) {
@@ -652,7 +689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Delete pet and all associated records (this will cascade delete)
       await storage.deletePet(petId);
-      
+
       res.json({ message: 'Pet and all associated records deleted successfully' });
     } catch (error) {
       console.error("Error deleting pet:", error);
@@ -668,7 +705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify pet ownership
       const pet = await storage.getPetById(petId);
       if (!pet || pet.userId !== userId) {
@@ -690,7 +727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify pet ownership
       const pet = await storage.getPetById(petId);
       if (!pet || pet.userId !== userId) {
@@ -705,7 +742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (cleanedData.dateAdministered === '') {
         return res.status(400).json({ message: "Date administered is required" });
       }
-      
+
       const recordData = insertMedicalRecordSchema.parse(cleanedData);
       const record = await storage.createMedicalRecord(recordData);
       res.status(201).json(record);
@@ -725,7 +762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify ownership through pet
       const existingRecord = await storage.getMedicalRecordById(recordId);
       if (!existingRecord) {
@@ -756,7 +793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify ownership through pet
       const existingRecord = await storage.getMedicalRecordById(recordId);
       if (!existingRecord) {
@@ -798,16 +835,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       const [reminders, pets] = await Promise.all([
+        ```text
         storage.getActiveRemindersByUserId(userId),
         storage.getPetsByUserId(userId)
       ]);
-      
+
       // Combine reminders with pet information
       const remindersWithPets = reminders.map(reminder => {
         const pet = pets.find(p => p.id === reminder.petId);
         return { ...reminder, pet };
       }).filter(r => r.pet); // Only include reminders with valid pets
-      
+
       res.json(remindersWithPets);
     } catch (error) {
       console.error("Error fetching reminders with pets:", error);
@@ -836,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify pet ownership
       const pet = await storage.getPetById(petId);
       if (!pet || pet.userId !== userId) {
@@ -858,7 +896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       // Verify ownership through pet (simplified check)
       await storage.markReminderCompleted(reminderId);
       res.json({ message: "Reminder marked as completed" });
@@ -882,7 +920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { lat, lng, radius } = req.query;
       let clinics = [];
-      
+
       if (lat && lng) {
         // Get clinics from database
         clinics = await storage.getVetClinicsByLocation(
@@ -890,7 +928,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           parseFloat(lng), 
           radius ? parseFloat(radius) : 25 // Default 25km radius
         );
-        
+
         // Enhance with Google Places data if API key is available and we have few results
         if (process.env.GOOGLE_MAPS_API_KEY && clinics.length < 5) {
           try {
@@ -901,7 +939,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               parseFloat(lng), 
               (radius ? parseFloat(radius) : 25) * 1000 // Convert km to meters
             );
-            
+
             // Filter out duplicates based on name similarity
             const uniqueGoogleClinics = googleClinics.filter(googleClinic => {
               return !clinics.some(dbClinic => 
@@ -909,11 +947,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 googleClinic.name.toLowerCase().includes(dbClinic.name.toLowerCase())
               );
             });
-            
+
             // Merge Google Places results with database results
             const allClinics = [...clinics, ...uniqueGoogleClinics];
             console.log(`Found ${clinics.length} database clinics and ${uniqueGoogleClinics.length} unique Google Places clinics`);
-            
+
             res.json(allClinics);
             return;
           } catch (error) {
@@ -925,7 +963,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Return all clinics if no location provided
         clinics = await storage.getVetClinicsByLocation(0, 0, 999999);
       }
-      
+
       res.json(clinics);
     } catch (error) {
       console.error("Error fetching vet clinics:", error);
@@ -937,11 +975,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const clinic = await storage.getVetClinicById(id);
-      
+
       if (!clinic) {
         return res.status(404).json({ message: "Vet clinic not found" });
       }
-      
+
       res.json(clinic);
     } catch (error) {
       console.error("Error fetching vet clinic:", error);
@@ -981,7 +1019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         userId: userId,
       };
-      
+
       const rating = await storage.createClinicRating(ratingData);
       res.status(201).json(rating);
     } catch (error) {
@@ -1021,7 +1059,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       const subscription = await storage.getUserSubscription(userId);
       res.json(subscription);
     } catch (error) {
@@ -1036,13 +1074,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       const { planId, paymentMethod, paymentId } = req.body;
-      
+
       if (!planId) {
         return res.status(400).json({ message: "Plan ID is required" });
       }
-      
+
       // Create subscription
       const subscription = await storage.createUserSubscription({
         userId,
@@ -1050,7 +1088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentMethod: paymentMethod || "manual",
         paymentId: paymentId || null,
       });
-      
+
       res.status(201).json(subscription);
     } catch (error) {
       console.error("Error creating subscription:", error);
@@ -1064,7 +1102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       const usage = await storage.getStorageUsage(userId);
       res.json(usage);
     } catch (error) {
@@ -1077,14 +1115,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/support/contact", isAuthenticated, async (req: any, res) => {
     try {
       const { subject, message, userEmail, userName } = req.body;
-      
+
       if (!subject || !message) {
         return res.status(400).json({ message: "Subject and message are required" });
       }
 
       // Import sendEmail function
       const { sendEmail } = await import("./emailService");
-      
+
       const emailSent = await sendEmail({
         to: "support@asopets.com",
         from: "support@asopets.com", // Verified sender
@@ -1107,19 +1145,19 @@ Reply directly to this email to respond to the user.
   <h2 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
     ASOPETS Support Request
   </h2>
-  
+
   <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
     <p><strong>From:</strong> ${userName}</p>
     <p><strong>Email:</strong> ${userEmail}</p>
     <p><strong>User ID:</strong> ${req.user.id || 'Unknown'}</p>
     <p><strong>Subject:</strong> ${subject}</p>
   </div>
-  
+
   <div style="margin: 20px 0;">
     <h3 style="color: #374151;">Message:</h3>
     <div style="background-color: #ffffff; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; white-space: pre-wrap;">${message}</div>
   </div>
-  
+
   <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
     <p>This message was sent via the ASOPETS app contact form.</p>
     <p>Reply directly to this email to respond to the user.</p>

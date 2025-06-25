@@ -174,11 +174,24 @@ class PayloadTester {
           
         } catch (confirmError) {
           console.log('⚠️  Could not confirm email automatically');
-          console.log('📝 Creating temporary session for testing...');
+          console.log('📝 Attempting direct database confirmation...');
           
-          // For payload testing, we'll proceed with a mock session
-          this.cookies = 'test-session=payload-test-session';
-          console.log('✅ Using test session for payload testing');
+          try {
+            // Try direct database confirmation approach
+            await this.makeRequest('POST', '/api/auth/test-confirm', {
+              email: TEST_CONFIG.testUser.email
+            });
+            console.log('✅ Direct database confirmation successful');
+            
+            // Now try to login again
+            await this.makeRequest('POST', '/api/auth/login', loginData);
+            console.log('✅ Successfully logged in after direct confirmation');
+            
+          } catch (dbConfirmError) {
+            console.log('⚠️  All confirmation methods failed');
+            console.log('❌ Cannot proceed with payload test - authentication required');
+            throw new Error('Authentication setup failed - cannot run payload test');
+          }
         }
       } else {
         throw error;
