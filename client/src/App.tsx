@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWelcome } from "@/hooks/useWelcome";
 import LoadingSpinner from "@/components/loading-spinner";
 import ProtectedRoute from "@/components/protected-route";
-import OfflineIndicator from "@/components/offline-indicator";
+import { OfflineIndicator } from "@/components/offline-indicator";
 import WelcomeOverlay from "@/components/welcome-overlay";
 import { ErrorBoundary } from "@/components/error-boundary";
 
