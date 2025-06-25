@@ -173,7 +173,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Biometric verification endpoint
+  app.post("/api/auth/biometric-verify", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
 
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.isEmailConfirmed) {
+        return res.status(400).json({ message: "Please confirm your email first" });
+      }
+
+      req.session.userId = user.id;
+      req.session.email = user.email;
+      
+      await new Promise((resolve, reject) => {
+        req.session.save((err: any) => {
+          if (err) reject(err);
+          else resolve(undefined);
+        });
+      });
+
+      console.log(`[BIOMETRIC-AUTH] User logged in: ${user.email} (${user.id})`);
+      
+      res.json({ 
+        success: true, 
+        message: "Biometric authentication successful",
+        user: { id: user.id, email: user.email, isEmailConfirmed: user.isEmailConfirmed }
+      });
+    } catch (error) {
+      console.error("Biometric verification error:", error);
+      res.status(500).json({ message: "Biometric verification failed" });
+    }
+  });
 
   // Resend confirmation email
   app.post("/api/auth/resend-confirmation", async (req, res) => {

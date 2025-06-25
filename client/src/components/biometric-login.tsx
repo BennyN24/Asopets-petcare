@@ -61,43 +61,39 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
     setErrorMessage('');
 
     try {
-      const assertion = await authenticateWithBiometric(email);
+      const assertion = await authenticate();
       if (assertion) {
-        // Complete biometric login - authenticate directly with the server
-        try {
-          const response = await apiRequest("POST", "/api/auth/biometric-login", {
-            email,
-            biometricData: {
-              id: Array.from(new Uint8Array(assertion.rawId))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join(''),
-              type: assertion.type,
-              response: {
-                authenticatorData: Array.from(new Uint8Array(assertion.response.authenticatorData)),
-                clientDataJSON: Array.from(new Uint8Array(assertion.response.clientDataJSON)),
-                signature: Array.from(new Uint8Array(assertion.response.signature))
-              }
+        // Get stored user ID for biometric verification
+        const storedUserId = Object.keys(localStorage)
+          .find(key => key.startsWith('biometric_'))
+          ?.replace('biometric_', '');
+          
+        if (storedUserId) {
+          try {
+            const response = await apiRequest("POST", "/api/auth/biometric-verify", {
+              userId: storedUserId
+            });
+
+            if (response.success) {
+              queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+              setStep('success');
+              toast({
+                title: "Login Successful",
+                description: "Welcome back! Logged in with biometric authentication.",
+              });
+              setTimeout(() => {
+                onSuccess(true);
+              }, 1000);
+              return;
             }
-          });
-
-          // Force query invalidation to update auth state
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-
-          setStep('success');
-
-          setTimeout(() => {
-            onSuccess(true);
-          }, 1500);
-
-        } catch (serverError: any) {
-          console.error('Server-side biometric auth failed:', serverError);
-          setStep('error');
-          setErrorMessage('Biometric authentication failed on server. Please try regular login.');
-
-          setTimeout(() => {
-            onSuccess(false);
-          }, 2000);
+          } catch (serverError: any) {
+            console.error('Server-side biometric auth failed:', serverError);
+          }
         }
+        
+        // Fallback if no stored credentials or verification failed
+        setStep('error');
+        setErrorMessage('No biometric credentials found. Please set up biometric authentication first.');
       } else {
         setStep('error');
         setErrorMessage('Biometric authentication was cancelled or failed.');
