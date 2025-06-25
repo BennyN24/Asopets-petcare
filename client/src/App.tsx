@@ -5,10 +5,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/protected-route";
-import ErrorBoundary from "@/components/error-boundary";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { OfflineIndicator } from "@/components/offline-indicator";
+import { PageLoader } from "@/components/loading-spinner";
 
 // Pages
 import Landing from "@/pages/landing";
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
 import Dashboard from "@/pages/dashboard";
 import AddPet from "@/pages/add-pet";
 import PetProfile from "@/pages/pet-profile";
