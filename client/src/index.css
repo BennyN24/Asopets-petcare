@@ -2,65 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.7 100% 97.3%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.75rem;
-  }
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(158, 64%, 52%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(217, 91%, 60%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(43, 96%, 56%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  --success: hsl(158, 64%, 52%);
+  --success-foreground: hsl(0, 0%, 100%);
+}
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142.1 70.6% 45.3%;
-    --success-foreground: 144.9 80.4% 10%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(158, 64%, 52%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(217, 91%, 60%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(43, 96%, 56%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  --success: hsl(158, 64%, 52%);
+  --success-foreground: hsl(0, 0%, 100%);
 }
 
 @layer base {
@@ -69,79 +58,179 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply font-sans antialiased bg-background text-foreground;
   }
 }
 
-@layer utilities {
-  .animate-slide-in {
-    animation: slideIn 0.3s ease-out;
-  }
+/* Custom mobile container */
+.mobile-container {
+  max-width: 28rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: white;
+  position: relative;
+}
 
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
+/* Pet category buttons */
+.pet-category-btn {
+  @apply flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors;
+}
 
-  .animate-bounce-in {
-    animation: bounceIn 0.6s ease-out;
+.pet-category-btn.selected {
+  @apply border-primary bg-green-50;
+}
+
+/* Photo upload buttons */
+.photo-upload-btn {
+  @apply flex-1 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors;
+}
+
+/* Notification badges */
+.notification-badge {
+  @apply absolute -top-2 -right-2 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-medium;
+}
+
+.notification-badge.danger {
+  @apply bg-destructive;
+}
+
+.notification-badge.warning {
+  @apply bg-accent;
+}
+
+/* Medical record activity icons */
+.activity-icon {
+  @apply w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0;
+}
+
+.activity-icon.vaccine {
+  @apply bg-green-100 text-primary;
+}
+
+.activity-icon.deworming {
+  @apply bg-blue-100 text-secondary;
+}
+
+.activity-icon.treatment {
+  @apply bg-amber-100 text-accent;
+}
+
+.activity-icon.surgery {
+  @apply bg-red-100 text-destructive;
+}
+
+.activity-icon.checkup {
+  @apply bg-purple-100 text-purple-600;
+}
+
+/* Status badges */
+.status-badge {
+  @apply text-xs px-2 py-1 rounded-full font-medium;
+}
+
+.status-badge.overdue {
+  @apply bg-destructive text-destructive-foreground;
+}
+
+.status-badge.due-soon {
+  @apply bg-accent text-accent-foreground;
+}
+
+.status-badge.completed {
+  @apply bg-success text-success-foreground;
+}
+
+/* Mobile-specific optimizations */
+.mobile-container {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Touch optimization */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Active states for mobile */
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+.active\:scale-98:active {
+  transform: scale(0.98);
+}
+
+/* Fix iOS zoom on input focus */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select,
+  button {
+    font-size: 16px;
+  }
+  
+  /* Prevent zoom on button tap */
+  button, .touch-manipulation {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Fix mobile scrolling issues */
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
   }
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+/* Fix viewport issues on mobile browsers */
+@supports (-webkit-touch-callout: none) {
+  .mobile-container {
+    min-height: -webkit-fill-available;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0.3);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Production optimizations */
-* {
-  box-sizing: border-box;
-}
-
+/* Mobile Safari viewport fix */
 html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  line-height: 1.6;
+  height: -webkit-fill-available;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-button {
-  cursor: pointer;
-}
-
-input, textarea, select {
-  font-family: inherit;
+/* Fix mobile browser address bar height issues */
+@media screen and (max-width: 768px) {
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  .mobile-container {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
 }
