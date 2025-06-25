@@ -358,6 +358,18 @@ Changelog:
   * Enhanced session configuration with 30-day TTL and improved cookie settings
   * Verified successful authentication flow with consistent session management
   * Application now runs without errors and maintains stable user sessions
+- June 25, 2025. Comprehensive feature enhancements and security improvements:
+  * Implemented real WebAuthn biometric authentication with platform authenticator support
+  * Added comprehensive account deletion functionality with typed confirmation requirement
+  * Enhanced welcome overlay to show only for newly registered users (within 7 days)
+  * Created ScannedPetTransfer component for immediate pet profile transfer from QR scans
+  * Added "Add to My Pets" button with transfer confirmation dialog after QR scanning
+  * Enhanced QR code generation to include basic owner contact information
+  * Fixed scanned pet display to show proper pet names, categories, and medical record counts
+  * Improved dashboard QR scanner workflow with immediate transfer options
+  * Added contact info copy functionality for scanned pet owner details
+  * Implemented secure account deletion with cascading data removal (pets, records, reminders)
+  * Enhanced biometric setup with proper WebAuthn credential creation and error handling
 - June 23, 2025. Authentication system debugging and complete resolution:
   * Systematically resolved /api/login endpoint conflicts between email/password and Replit OIDC authentication
   * Renamed conflicting GET /api/login to /api/replit-login to eliminate authentication route conflicts

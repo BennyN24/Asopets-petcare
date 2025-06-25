@@ -28,6 +28,7 @@ import QuickActions from "@/components/quick-actions";
 import VetClinics from "@/components/vet-clinics";
 import QRScanner from "@/components/qr-scanner";
 import ScannedPetViewer from "@/components/scanned-pet-viewer";
+import ScannedPetTransfer from "@/components/scanned-pet-transfer";
 import MedicationReminderManager from "@/components/medication-reminder-manager";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
@@ -41,6 +42,8 @@ export default function Dashboard() {
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [scannedPetData, setScannedPetData] = useState<any>(null);
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
+  const [transferPetData, setTransferPetData] = useState<any>(null);
   const [scannedPets, setScannedPets] = useState<any[]>([]);
   const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
 

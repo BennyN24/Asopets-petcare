@@ -107,6 +107,8 @@ export default function Profile() {
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showPrivacySettings, setShowPrivacySettings] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
 
   const [profileData, setProfileData] = useState<UserProfile>({
     id: "",

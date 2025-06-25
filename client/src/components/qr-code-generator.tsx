@@ -34,6 +34,11 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
       medicalRecordCount: medicalRecords.length,
       lastUpdated: new Date().toISOString(),
       timestamp: new Date().toISOString(),
+      owner: {
+        name: "Pet Owner", // Basic info for contact
+        phone: "Contact via QR scan",
+        email: "Available on scan"
+      }
     };
     console.log("Generated QR data for pet:", petData);
     return JSON.stringify(petData);
