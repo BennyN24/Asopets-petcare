@@ -1,0 +1,53 @@
+{
+  "summary": {
+    "petsCreated": 0,
+    "recordsCreated": 0,
+    "totalApiCalls": 2,
+    "errorCount": 2,
+    "testDate": "2025-06-25T02:13:25.712Z"
+  },
+  "timings": [
+    {
+      "endpoint": "/api/auth/signup",
+      "method": "POST",
+      "responseTime": 1561,
+      "status": 201,
+      "timestamp": "2025-06-25T02:13:25.589Z"
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "responseTime": 118,
+      "status": 401,
+      "timestamp": "2025-06-25T02:13:25.709Z"
+    }
+  ],
+  "errors": [
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "status": 401,
+      "error": "Email not confirmed",
+      "timestamp": "2025-06-25T02:13:25.709Z"
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "error": "HTTP 401: Email not confirmed",
+      "responseTime": 119,
+      "timestamp": "2025-06-25T02:13:25.709Z"
+    }
+  ],
+  "createdPets": [],
+  "config": {
+    "baseUrl": "http://localhost:5000",
+    "testUser": {
+      "firstName": "Test",
+      "lastName": "User",
+      "email": "testpayload@example.com",
+      "password": "TestPassword123!"
+    },
+    "petCount": 50,
+    "recordsPerPet": 10
+  }
+}
