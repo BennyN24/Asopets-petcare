@@ -1,4 +1,5 @@
 import * as React from "react"
+import { ComponentProps } from "react"
 "use client"
 
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group"

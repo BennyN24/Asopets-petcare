@@ -1,4 +1,4 @@
-import React, { forwardRef, ComponentPropsWithoutRef } from "react"
+import React, { forwardRef, ComponentPropsWithoutRef, ComponentProps } from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"
 

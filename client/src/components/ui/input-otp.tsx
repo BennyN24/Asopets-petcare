@@ -1,4 +1,5 @@
 import * as React from "react"
+import { ComponentProps } from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
 

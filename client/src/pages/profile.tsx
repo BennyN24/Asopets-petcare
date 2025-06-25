@@ -1000,8 +1000,7 @@ export default function Profile() {
                 isLoading={changePasswordMutation.isPending}
                 onSubmit={(data) => changePasswordMutation.mutate(data)}
               />
-            </CardContent>```text
-
+            </CardContent>
           </Card>
         )}
 

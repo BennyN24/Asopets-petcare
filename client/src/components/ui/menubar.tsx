@@ -1,4 +1,5 @@
 import * as React from "react"
+import { ComponentProps } from "react"
 "use client"
 
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
