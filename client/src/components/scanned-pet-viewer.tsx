@@ -200,6 +200,8 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
               <div>Pet ID: {data.petId}</div>
               <div>Has owner: {!!currentData.owner}</div>
               <div>Has breed: {!!currentData.breed}</div>
+              <div>Has onTransfer: {!!onTransfer}</div>
+              <div>Current name: {currentData.name}</div>
             </div>
           </div>
 
