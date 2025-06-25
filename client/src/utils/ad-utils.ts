@@ -1,4 +1,3 @@
-
 import { ADMOB_CONFIG, TEST_AD_UNITS } from '@/lib/admob-config';
 
 // Track user actions for interstitial ad frequency
@@ -70,3 +69,24 @@ export const adUtils = {
     }
   }
 };
+
+export function shouldShowInterstitial(): boolean {
+  if (!ADMOB_CONFIG.SETTINGS.SHOW_BANNERS) return false;
+
+  actionCount++;
+  const now = Date.now();
+  const timeSinceLastAd = now - lastInterstitialTime;
+  const cooldownExpired = timeSinceLastAd > (ADMOB_CONFIG.SETTINGS.INTERSTITIAL_COOLDOWN * 60 * 1000);
+
+  if (actionCount >= ADMOB_CONFIG.SETTINGS.INTERSTITIAL_FREQUENCY && cooldownExpired) {
+    actionCount = 0;
+    lastInterstitialTime = now;
+    return true;
+  }
+
+  return false;
+}
+
+export function resetActionCount(): void {
+  actionCount = 0;
+}
