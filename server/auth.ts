@@ -7,6 +7,8 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { env, isDevelopment } from "./config";
 import { db } from "./db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days for better persistence
@@ -152,17 +154,14 @@ export async function setupAuth(app: Express) {
     try {
       // In a real implementation, you would verify the biometric data against stored credentials
       // For now, we'll just verify the user exists and is confirmed
-      const users = db.prepare(`
-        SELECT id, email, displayName, isEmailConfirmed 
-        FROM users 
-        WHERE email = ? AND isEmailConfirmed = 1
-      `).all(email);
+      // Replacing SQLite db.prepare with Drizzle ORM query
+      const userRows = await db.select().from(users).where(eq(users.email, email)).execute();
 
-      if (users.length === 0) {
+      if (userRows.length === 0) {
         return res.status(401).json({ message: "Invalid credentials or email not confirmed" });
       }
 
-      const user = users[0];
+      const user = userRows[0];
 
       // Store user session
       req.session!.userId = user.id;
@@ -372,17 +371,14 @@ export const sendPasswordResetEmail = async (
 };
 
 async function loginUser(email: string, password: string) {
-  const users = db.prepare(`
-    SELECT id, email, displayName, passwordHash, isEmailConfirmed
-    FROM users
-    WHERE email = ?
-  `).all(email);
+  // Use Drizzle ORM to query the database
+  const userRows = await db.select().from(users).where(eq(users.email, email)).execute();
 
-  if (users.length === 0) {
+  if (userRows.length === 0) {
     throw new Error("Invalid credentials");
   }
 
-  const user = users[0];
+  const user = userRows[0];
 
   if (!user.isEmailConfirmed) {
     throw new Error("Email not confirmed");
