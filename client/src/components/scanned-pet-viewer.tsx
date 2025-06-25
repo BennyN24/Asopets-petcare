@@ -4,24 +4,27 @@ import { Badge } from "@/components/ui/badge";
 import { X, User, Phone, Mail, MapPin, Heart, Calendar, AlertTriangle, FileText, Activity, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { QrCode } from "lucide-react";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ScannedPetData {
   type: string;
-  petId: number | string;
+  petId: string;
   ownerId?: string;
   name?: string;
   petName?: string;
   category?: string;
   breed?: string;
-  age?: number;
   dateOfBirth?: string;
+  age?: number;
   imageUrl?: string;
   microchipId?: string;
   birthmarks?: string;
   medicalRecordCount?: number;
   lastUpdated?: string;
   owner?: {
-    name: string;
+    name?: string;
     phone?: string;
     email?: string;
     emergencyContact?: string;
@@ -58,6 +61,20 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
     other: "bg-gray-100 text-gray-800"
   };
 
+  // Fetch complete pet profile with owner information
+  const { data: petProfile, isLoading: loadingProfile } = useQuery({
+    queryKey: [`/api/pets/public/${data.petId}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/pets/public/${data.petId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch pet profile');
+      }
+      return response.json();
+    },
+    enabled: !!data.petId && data.type === 'pet_profile',
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   // Use fetched profile data if available, otherwise fall back to scanned data
   const currentData = petProfile || data;
   const petName = currentData.petName || currentData.name || 'Unknown Pet';
@@ -77,20 +94,6 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch complete pet profile with owner information
-  const { data: petProfile, isLoading: loadingProfile } = useQuery({
-    queryKey: [`/api/pets/public/${data.petId}`],
-    queryFn: async () => {
-      const response = await fetch(`/api/pets/public/${data.petId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch pet profile');
-      }
-      return response.json();
-    },
-    enabled: !!data.petId && data.type === 'pet_profile',
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
   const recordTypeColors = {
     vaccine: "bg-green-100 text-green-800",
     deworming: "bg-blue-100 text-blue-800",
@@ -100,6 +103,21 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
     "lab-test": "bg-yellow-100 text-yellow-800",
     grooming: "bg-pink-100 text-pink-800"
   };
+
+  if (loadingProfile) {
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Loading Pet Profile...</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-8">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-2 z-50 overflow-y-auto">
@@ -136,9 +154,9 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center">
-            {(currentData.imageUrl || petProfile?.pet?.imageUrl) ? (
+            {(currentData.imageUrl || petProfile?.imageUrl) ? (
               <img
-                src={currentData.imageUrl || petProfile?.pet?.imageUrl}
+                src={currentData.imageUrl || petProfile?.imageUrl}
                 alt={petName}
                 className="w-20 h-20 rounded-full mx-auto object-cover"
               />
@@ -160,30 +178,30 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
             <div className="border-t pt-3">
               <h4 className="font-medium text-gray-900 mb-2">Pet Information</h4>
               <div className="space-y-2 text-sm">
-                {(currentData.breed || petProfile?.pet?.breed) && (
+                {(currentData.breed || petProfile?.breed) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Breed:</span>
-                    <span className="font-medium">{currentData.breed || petProfile?.pet?.breed}</span>
+                    <span className="font-medium">{currentData.breed || petProfile?.breed}</span>
                   </div>
                 )}
-                {(currentData.age || petProfile?.pet?.age) && (
+                {(currentData.age || petProfile?.age) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Age:</span>
-                    <span className="font-medium">{currentData.age || petProfile?.pet?.age} months</span>
+                    <span className="font-medium">{currentData.age || petProfile?.age} months</span>
                   </div>
                 )}
-                {(currentData.dateOfBirth || petProfile?.pet?.dateOfBirth) && (
+                {(currentData.dateOfBirth || petProfile?.dateOfBirth) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Born:</span>
                     <span className="font-medium">
-                      {format(new Date(currentData.dateOfBirth || petProfile?.pet?.dateOfBirth), 'MMM dd, yyyy')}
+                      {format(new Date(currentData.dateOfBirth || petProfile?.dateOfBirth), 'MMM dd, yyyy')}
                     </span>
                   </div>
                 )}
-                {(currentData.microchipId || petProfile?.pet?.microchipId) && (
+                {(currentData.microchipId || petProfile?.microchipId) && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Microchip:</span>
-                    <span className="font-medium font-mono text-xs">{currentData.microchipId || petProfile?.pet?.microchipId}</span>
+                    <span className="font-medium font-mono text-xs">{currentData.microchipId || petProfile?.microchipId}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
@@ -256,12 +274,12 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
             )}
 
             {/* Additional Information */}
-            {(currentData.birthmarks || petProfile?.pet?.birthmarks) && (
+            {(currentData.birthmarks || petProfile?.birthmarks) && (
               <div className="border-t pt-3">
                 <h4 className="font-medium text-gray-900 mb-2">Additional Information</h4>
                 <div className="text-sm">
                   <span className="text-gray-600 block">Birthmarks/Notes:</span>
-                  <span className="font-medium">{currentData.birthmarks || petProfile?.pet?.birthmarks}</span>
+                  <span className="font-medium">{currentData.birthmarks || petProfile?.birthmarks}</span>
                 </div>
               </div>
             )}

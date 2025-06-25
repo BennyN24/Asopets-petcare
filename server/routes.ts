@@ -173,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  
+
 
   // Resend confirmation email
   app.post("/api/auth/resend-confirmation", async (req, res) => {
@@ -834,7 +834,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pets/:petId/reminders", isAuthenticated, async (req: any, res) => {
     try {
-      const petId = parseInt(req.params.petId);
+const petId = parseInt(req.params.petId);
       const userId = req.session.userId || (req.user.id);
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -1139,6 +1139,87 @@ Reply directly to this email to respond to the user.
     } catch (error) {
       console.error("Error sending support request:", error);
       res.status(500).json({ message: "Failed to send support request" });
+    }
+  });
+
+  // Public endpoint for pet profile (for QR code access)
+  app.get("/api/pets/public/:petId", async (req, res) => {
+    try {
+      const petId = parseInt(req.params.petId);
+
+      if (isNaN(petId)) {
+        return res.status(400).json({ message: "Invalid pet ID" });
+      }
+
+      const pet = await storage.getPetById(petId);
+      if (!pet) {
+        return res.status(404).json({ message: "Pet not found" });
+      }
+
+       // Get owner information (limited public data)
+       const owner = await storage.getUser(pet.userId);
+       if (!owner) {
+         return res.status(404).json({ message: "Owner not found" });
+       }
+ 
+       // Return limited public information suitable for emergency/contact purposes
+       const publicPetData = {
+         type: 'pet_profile',
+         pet: {
+           id: pet.id,
+           name: pet.name,
+           category: pet.category,
+           breed: pet.breed || 'Unknown',
+           age: pet.age,
+           dateOfBirth: pet.dateOfBirth,
+           imageUrl: pet.imageUrl,
+           microchipId: pet.microchipId || null,
+           birthmarks: pet.birthmarks || null,
+         },
+         owner: {
+           name: `${owner.firstName || ''} ${owner.lastName || ''}`.trim() || 'Pet Owner',
+           phone: owner.phone || null,
+           email: owner.email || null,
+           emergencyContact: owner.emergencyContact || null,
+           emergencyPhone: owner.emergencyPhone || null,
+         },
+         scannedAt: new Date().toISOString(),
+       };
+
+      res.json(publicPetData);
+    } catch (error) {
+      console.error("Error fetching public pet profile:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Public endpoint for pet medical records (for QR code access)
+  app.get("/api/pets/public/:petId/medical-records", async (req, res) => {
+    try {
+      const petId = parseInt(req.params.petId);
+
+      if (isNaN(petId)) {
+        return res.status(400).json({ message: "Invalid pet ID" });
+      }
+
+      const records = await storage.getMedicalRecordsByPetId(petId);
+
+      // Return limited public medical record data (for emergency situations)
+      const publicRecords = records.map(record => ({
+        id: record.id,
+        type: record.type,
+        title: record.title,
+        date: record.dateAdministered,
+        veterinarian: record.veterinarian,
+        clinic: record.clinic,
+        nextDueDate: record.nextDueDate,
+        notes: record.notes,
+      }));
+
+      res.json(publicRecords);
+    } catch (error) {
+      console.error("Error fetching public medical records:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
