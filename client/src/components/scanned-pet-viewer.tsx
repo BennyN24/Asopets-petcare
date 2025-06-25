@@ -77,9 +77,18 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
   });
 
   // Use fetched profile data if available, otherwise fall back to scanned data
-  const currentData = petProfile || data;
+  const currentData = petProfile?.pet || petProfile || data.pet || data;
   const petName = currentData.petName || currentData.name || 'Unknown Pet';
   const petCategory = currentData.category || 'other';
+  
+  console.log('=== ScannedPetViewer Debug ===');
+  console.log('Raw data:', data);
+  console.log('Pet profile from API:', petProfile);
+  console.log('Current data being used:', currentData);
+  console.log('Pet name:', petName);
+  console.log('Pet category:', petCategory);
+  console.log('Has onTransfer prop:', !!onTransfer);
+  console.log('==============================');
 
   // Fetch medical records for the scanned pet
   const { data: medicalRecords, isLoading: loadingRecords } = useQuery({
@@ -184,6 +193,14 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
             >
               {petCategory}
             </Badge>
+            
+            {/* Debug info */}
+            <div className="mt-2 text-xs text-gray-500 border p-2 rounded">
+              <div>Data type: {data.type}</div>
+              <div>Pet ID: {data.petId}</div>
+              <div>Has owner: {!!currentData.owner}</div>
+              <div>Has breed: {!!currentData.breed}</div>
+            </div>
           </div>
 
           {/* Pet Details */}
