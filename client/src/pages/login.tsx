@@ -46,6 +46,11 @@ export default function Login() {
   const [showBiometricLogin, setShowBiometricLogin] = useState(false);
   const { isSupported: biometricSupported, checkBiometricSupport } = useBiometric();
 
+  useEffect(() => {
+    // Initialize biometric support check
+    checkBiometricSupport();
+  }, [checkBiometricSupport]);
+
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
