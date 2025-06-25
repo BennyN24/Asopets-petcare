@@ -71,6 +71,30 @@
   position: relative;
 }
 
+.mobile-safe {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Consistent page padding */
+.page-content {
+  padding: 1rem;
+  padding-bottom: 6rem; /* Space for bottom navigation */
+}
+
+.page-content-with-header {
+  padding: 0 1rem 6rem 1rem;
+}
+
+/* Card spacing consistency */
+.card-section {
+  margin-bottom: 1.5rem;
+}
+
+.card-section:last-child {
+  margin-bottom: 6rem; /* Extra space for bottom navigation */
+}
+
 /* Pet category buttons */
 .pet-category-btn {
   @apply flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors;
@@ -195,14 +219,14 @@
   button {
     font-size: 16px;
   }
-  
+
   /* Prevent zoom on button tap */
   button, .touch-manipulation {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* Fix mobile scrolling issues */
   body {
     -webkit-overflow-scrolling: touch;
@@ -228,7 +252,7 @@ html {
     height: 100%;
     overflow-x: hidden;
   }
-  
+
   .mobile-container {
     min-height: 100vh;
     min-height: -webkit-fill-available;

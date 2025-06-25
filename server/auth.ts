@@ -142,18 +142,20 @@ export async function setupAuth(app: Express) {
     }
   });
 
-  // Biometric login route
-  app.post("/api/auth/biometric-login", async (req, res) => {
+  app.post("/api/auth/biometric-login", async (req: Request, res: Response) => {
     const { email, biometricData } = req.body;
 
     if (!email || !biometricData) {
-      return res.status(400).json({ message: "Email and biometric data are required" });
+      return res.status(400).json({ message: "Email and biometric data required" });
+    }
+
+    // Validate biometric data structure
+    if (!biometricData.id || !biometricData.type) {
+      return res.status(400).json({ message: "Invalid biometric data format" });
     }
 
     try {
-      // In a real implementation, you would verify the biometric data against stored credentials
-      // For now, we'll just verify the user exists and is confirmed
-      // Replacing SQLite db.prepare with Drizzle ORM query
+      // Verify the user exists and is confirmed
       const userRows = await db.select().from(users).where(eq(users.email, email)).execute();
 
       if (userRows.length === 0) {
@@ -161,6 +163,17 @@ export async function setupAuth(app: Express) {
       }
 
       const user = userRows[0];
+
+      // Check if user's email is confirmed
+      if (!user.isEmailConfirmed) {
+        return res.status(401).json({ message: "Email not confirmed. Please verify your email first." });
+      }
+
+      // In a real implementation, you would:
+      // 1. Verify the biometric assertion against stored public key
+      // 2. Validate the signature
+      // 3. Check the authenticator data
+      // For now, we'll verify basic biometric data presence and user existence
 
       // Store user session
       req.session!.userId = user.id;
@@ -174,12 +187,15 @@ export async function setupAuth(app: Express) {
           id: user.id, 
           email: user.email, 
           displayName: user.displayName,
-          isEmailConfirmed: user.isEmailConfirmed 
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isEmailConfirmed: user.isEmailConfirmed,
+          createdAt: user.createdAt
         } 
       });
     } catch (error: any) {
       console.error("Biometric login error:", error.message);
-      res.status(401).json({ message: error.message });
+      res.status(401).json({ message: "Biometric authentication failed" });
     }
   });
 }

@@ -74,7 +74,6 @@ interface UserProfile {
   profileImageUrl?: string;
   notificationPreferences?: {
     email: boolean;
-    sms: boolean;
     push: boolean;
     reminders: boolean;
   };
@@ -123,7 +122,6 @@ export default function Profile() {
     profileImageUrl: "",
     notificationPreferences: {
       email: true,
-      sms: false,
       push: true,
       reminders: true,
     },
@@ -157,7 +155,6 @@ export default function Profile() {
         profileImageUrl: userData?.profileImageUrl || "",
         notificationPreferences: userData?.notificationPreferences || {
           email: true,
-          sms: false,
           push: true,
           reminders: true,
         },
@@ -801,55 +798,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Account Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Settings className="w-5 h-5 mr-2 text-primary" />
-              Account Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleExportData}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export My Data
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={handleImportData}
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Import Data
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => (window.location.href = "/faq")}
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              FAQ & Help
-            </Button>
-
-            <Separator />
-
-            <Button
-              variant="destructive"
-              className="w-full justify-start"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Security Section */}
         <Card>
           <CardHeader>
@@ -967,8 +915,67 @@ export default function Profile() {
                 Configure
               </Button>
             </div>
+             <Separator />
           </CardContent>
         </Card>
+         {/* Account Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Settings className="w-5 h-5 mr-2 text-primary" />
+              Account Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={handleExportData}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export My Data
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={handleImportData}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Import Data
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => (window.location.href = "/faq")}
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              FAQ & Help
+            </Button>
+
+            <Separator />
+
+            <Button
+              variant="destructive"
+              className="w-full justify-start"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+             <Separator />
+             <Button
+              variant="destructive"
+              className="w-full justify-start"
+             
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Account
+            </Button>
+          </CardContent>
+        </Card>
+      
 
         {/* Password Change Modal */}
         {showPasswordChange && (
@@ -1282,7 +1289,6 @@ function PasswordChangeForm({ onSuccess, onCancel, isLoading, onSubmit }: Passwo
 interface NotificationSettingsProps {
   preferences: {
     email: boolean;
-    sms: boolean;
     push: boolean;
     reminders: boolean;
   };
@@ -1302,31 +1308,6 @@ function NotificationSettings({
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">Email Notifications</p>
-            <p className="text-sm text-gray-500">Receive updates via email</p>
-          </div>
-          <input
-            type="checkbox"
-            checked={preferences.email}
-            onChange={(e) => onPreferenceChange('email', e.target.checked)}
-            className="w-4 h-4"
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">SMS Notifications</p>
-            <p className="text-sm text-gray-500">Receive updates via SMS</p>
-          </div>
-          <input
-            type="checkbox"
-            checked={preferences.sms}
-            onChange={(e) => onPreferenceChange('sms', e.target.checked)}
-            className="w-4 h-4"
-          />
-        </div>
 
         <div className="flex items-center justify-between">
           <div>

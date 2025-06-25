@@ -4,10 +4,12 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/hooks/useAuth";
+import { useWelcome } from "@/hooks/useWelcome";
+import LoadingSpinner from "@/components/loading-spinner";
 import ProtectedRoute from "@/components/protected-route";
+import OfflineIndicator from "@/components/offline-indicator";
+import WelcomeOverlay from "@/components/welcome-overlay";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { OfflineIndicator } from "@/components/offline-indicator";
-import { PageLoader } from "@/components/loading-spinner";
 
 // Pages
 import Landing from "@/pages/landing";
@@ -133,6 +135,9 @@ function Router() {
 }
 
 function App() {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const { showWelcome, markWelcomeSeen } = useWelcome();
+
   // Ensure React is available to child components
   useEffect(() => {
     if (!(window as any).React) {
@@ -146,6 +151,14 @@ function App() {
         <OfflineIndicator />
         <Toaster />
         <Router />
+
+        {/* Welcome Overlay for New Users */}
+        {showWelcome && (
+          <WelcomeOverlay 
+            onClose={markWelcomeSeen}
+            userName={(user as any)?.firstName || (user as any)?.displayName}
+          />
+        )}
       </QueryClientProvider>
     </ErrorBoundary>
   );

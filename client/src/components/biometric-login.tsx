@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Fingerprint, Shield, ArrowLeft } from 'lucide-react';
+import { Fingerprint, Shield, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import { useBiometric } from '@/hooks/useBiometric';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +14,9 @@ interface BiometricLoginProps {
 }
 
 export default function BiometricLogin({ onSuccess, onBackToRegular, email }: BiometricLoginProps) {
-  const [step, setStep] = useState<'check' | 'authenticate' | 'setup'>('check');
+  const [step, setStep] = useState<'check' | 'authenticate' | 'setup' | 'success' | 'error'>('check');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { 
     isSupported, 
     isLoading, 
@@ -37,6 +39,9 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
         } else {
           setStep('setup');
         }
+      } else {
+        setStep('error');
+        setErrorMessage('Biometric authentication is not supported on this device or browser.');
       }
     };
     
@@ -53,6 +58,9 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
       return;
     }
 
+    setIsAuthenticating(true);
+    setErrorMessage('');
+
     try {
       const assertion = await authenticateWithBiometric(email);
       if (assertion) {
@@ -64,34 +72,52 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
               id: Array.from(new Uint8Array(assertion.rawId))
                 .map(b => b.toString(16).padStart(2, '0'))
                 .join(''),
-              type: assertion.type
+              type: assertion.type,
+              response: {
+                authenticatorData: Array.from(new Uint8Array(assertion.response.authenticatorData)),
+                clientDataJSON: Array.from(new Uint8Array(assertion.response.clientDataJSON)),
+                signature: Array.from(new Uint8Array(assertion.response.signature))
+              }
             }
           });
           
           // Force query invalidation to update auth state
           queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
           
-          toast({
-            title: "Login successful",
-            description: "Welcome back! Logged in with biometric authentication",
-            variant: "default",
-          });
+          setStep('success');
           
-          // Pass true to indicate successful authentication
-          onSuccess(true);
+          setTimeout(() => {
+            onSuccess(true);
+          }, 1500);
+          
         } catch (serverError: any) {
-          // If server-side biometric auth fails, fall back to regular login
-          toast({
-            title: "Biometric verified locally",
-            description: "Please complete login with your password",
-            variant: "default",
-          });
-          // Pass false to indicate fallback to password
-          onSuccess(false);
+          console.error('Server-side biometric auth failed:', serverError);
+          setStep('error');
+          setErrorMessage('Biometric authentication failed on server. Please try regular login.');
+          
+          setTimeout(() => {
+            onSuccess(false);
+          }, 2000);
         }
+      } else {
+        setStep('error');
+        setErrorMessage('Biometric authentication was cancelled or failed.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Biometric authentication failed:', error);
+      setStep('error');
+      
+      if (error.name === 'NotAllowedError') {
+        setErrorMessage('Biometric authentication was denied. Please allow biometric access.');
+      } else if (error.name === 'NotSupportedError') {
+        setErrorMessage('Biometric authentication is not supported on this device.');
+      } else if (error.name === 'SecurityError') {
+        setErrorMessage('Security error occurred. Please try again.');
+      } else {
+        setErrorMessage('Biometric authentication failed. Please try again or use regular login.');
+      }
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -106,19 +132,32 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
     }
 
     try {
+      setErrorMessage('');
       // Generate a temporary user ID for demo purposes
       const tempUserId = `temp_${Date.now()}`;
       const credential = await registerBiometric(tempUserId, email);
       
       if (credential) {
         setStep('authenticate');
+        toast({
+          title: "Biometric setup complete",
+          description: "You can now authenticate using biometrics",
+          variant: "default",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Biometric setup failed:', error);
+      setStep('error');
+      setErrorMessage('Failed to setup biometric authentication. Please try again.');
     }
   };
 
-  if (!isSupported) {
+  const handleRetry = () => {
+    setStep('authenticate');
+    setErrorMessage('');
+  };
+
+  if (!isSupported && step !== 'error') {
     return (
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
@@ -143,16 +182,33 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center space-y-4">
-        <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-          <Fingerprint className="w-8 h-8 text-primary" />
+        <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${
+          step === 'success' ? 'bg-green-100' : 
+          step === 'error' ? 'bg-red-100' : 
+          'bg-primary/10'
+        }`}>
+          {step === 'success' ? (
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          ) : step === 'error' ? (
+            <AlertCircle className="w-8 h-8 text-red-600" />
+          ) : (
+            <Fingerprint className="w-8 h-8 text-primary" />
+          )}
         </div>
         <div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            {step === 'setup' ? 'Setup Biometric Login' : 'Biometric Login'}
+            {step === 'setup' ? 'Setup Biometric Login' : 
+             step === 'success' ? 'Login Successful' :
+             step === 'error' ? 'Authentication Failed' :
+             'Biometric Login'}
           </CardTitle>
           <p className="text-gray-600 mt-2">
             {step === 'setup' 
               ? 'Secure your account with fingerprint or face recognition'
+              : step === 'success'
+              ? 'Welcome back! Redirecting you now...'
+              : step === 'error'
+              ? errorMessage
               : 'Use your fingerprint or face to login securely'
             }
           </p>
@@ -195,10 +251,10 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
               </p>
               <Button 
                 onClick={handleBiometricAuth}
-                disabled={isLoading}
+                disabled={isLoading || isAuthenticating}
                 className="w-full"
               >
-                {isLoading ? (
+                {isLoading || isAuthenticating ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                     Authenticating...
@@ -214,17 +270,44 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
           </>
         )}
 
-        <div className="space-y-2">
-          <Button 
-            onClick={onBackToRegular} 
-            variant="outline" 
-            className="w-full"
-            disabled={isLoading}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Email Login
-          </Button>
-        </div>
+        {step === 'error' && (
+          <>
+            <div className="text-center space-y-3">
+              <Button 
+                onClick={handleRetry}
+                className="w-full"
+              >
+                <Fingerprint className="w-4 h-4 mr-2" />
+                Try Again
+              </Button>
+            </div>
+          </>
+        )}
+
+        {step === 'success' && (
+          <>
+            <div className="text-center space-y-3">
+              <div className="w-full bg-green-100 text-green-800 p-3 rounded-lg">
+                <p className="text-sm font-medium">Authentication successful!</p>
+                <p className="text-xs">Taking you to your dashboard...</p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {step !== 'success' && (
+          <div className="space-y-2">
+            <Button 
+              onClick={onBackToRegular} 
+              variant="outline" 
+              className="w-full"
+              disabled={isLoading || isAuthenticating}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Email Login
+            </Button>
+          </div>
+        )}
 
         {/* Security Notice */}
         <div className="bg-blue-50 p-3 rounded-lg">
