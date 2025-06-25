@@ -1,4 +1,3 @@
-import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { useMemo } from "react"
@@ -35,7 +34,7 @@ function useChart() {
   return context
 }
 
-const ChartContainer = forwardRef<
+const ChartContainer = React.forwardRef<
   HTMLDivElement,
   ComponentProps<"div"> & {
     config: ChartConfig
@@ -103,7 +102,7 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
-const ChartTooltipContent = forwardRef<
+const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   ComponentProps<typeof RechartsPrimitive.Tooltip> &
     ComponentProps<"div"> & {
@@ -259,7 +258,7 @@ ChartTooltipContent.displayName = "ChartTooltip"
 
 const ChartLegend = RechartsPrimitive.Legend
 
-const ChartLegendContent = forwardRef<
+const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   ComponentProps<"div"> &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {

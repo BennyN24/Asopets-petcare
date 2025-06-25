@@ -1,15 +1,12 @@
-import React, { ComponentPropsWithoutRef }, { ComponentPropsWithoutRef } from "react"
 "use client"
 
-import React, { ComponentPropsWithoutRef }, { forwardRef } from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
 
-const Avatar = forwardRef<
+const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
@@ -22,10 +19,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
-const AvatarImage = forwardRef<
+const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
@@ -35,10 +31,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
-const AvatarFallback = forwardRef<
+const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}

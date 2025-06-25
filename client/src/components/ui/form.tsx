@@ -1,4 +1,3 @@
-import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import { useContext, createContext, forwardRef, useId } from "react"
@@ -73,7 +72,7 @@ const FormItemContext = createContext<FormItemContextValue>(
   {} as FormItemContextValue
 )
 
-const FormItem = forwardRef<
+const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
@@ -87,10 +86,9 @@ const FormItem = forwardRef<
 })
 FormItem.displayName = "FormItem"
 
-const FormLabel = forwardRef<
+const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
@@ -105,10 +103,9 @@ import { ComponentPropsWithoutRef } from "react"
 })
 FormLabel.displayName = "FormLabel"
 
-const FormControl = forwardRef<
+const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof Slot>
+  React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
@@ -128,7 +125,7 @@ import { ComponentPropsWithoutRef } from "react"
 })
 FormControl.displayName = "FormControl"
 
-const FormDescription = forwardRef<
+const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
@@ -145,7 +142,7 @@ const FormDescription = forwardRef<
 })
 FormDescription.displayName = "FormDescription"
 
-const FormMessage = forwardRef<
+const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {

@@ -1,5 +1,3 @@
-import React, { ComponentPropsWithoutRef } from "react"
-import React, { forwardRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
 

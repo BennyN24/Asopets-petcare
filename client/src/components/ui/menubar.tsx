@@ -1,7 +1,5 @@
-import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
-import React, { forwardRef } from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
@@ -37,10 +35,9 @@ function MenubarSub({
   return <MenubarPrimitive.Sub data-slot="menubar-sub" {...props} />
 }
 
-const Menubar = forwardRef<
+const Menubar = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Root>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.Root>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Root>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
@@ -53,10 +50,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 Menubar.displayName = MenubarPrimitive.Root.displayName
 
-const MenubarTrigger = forwardRef<
+const MenubarTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Trigger>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.Trigger>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Trigger>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Trigger
     ref={ref}
@@ -69,10 +65,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
 
-const MenubarSubTrigger = forwardRef<
+const MenubarSubTrigger = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubTrigger>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.SubTrigger> & {
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.SubTrigger> & {
     inset?: boolean
   }
 >(({ className, inset, children, ...props }, ref) => (
@@ -91,10 +86,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName
 
-const MenubarSubContent = forwardRef<
+const MenubarSubContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.SubContent>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.SubContent>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.SubContent>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubContent
     ref={ref}
@@ -107,10 +101,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName
 
-const MenubarContent = forwardRef<
+const MenubarContent = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Content>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.Content>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Content>
 >(
   (
     { className, align = "start", alignOffset = -4, sideOffset = 8, ...props },
@@ -133,10 +126,9 @@ import { ComponentPropsWithoutRef } from "react"
 )
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 
-const MenubarItem = forwardRef<
+const MenubarItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Item>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.Item> & {
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Item> & {
     inset?: boolean
   }
 >(({ className, inset, ...props }, ref) => (
@@ -152,10 +144,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarItem.displayName = MenubarPrimitive.Item.displayName
 
-const MenubarCheckboxItem = forwardRef<
+const MenubarCheckboxItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.CheckboxItem>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.CheckboxItem>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.CheckboxItem>
 >(({ className, children, checked, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
@@ -176,10 +167,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
 
-const MenubarRadioItem = forwardRef<
+const MenubarRadioItem = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.RadioItem>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.RadioItem>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.RadioItem>
 >(({ className, children, ...props }, ref) => (
   <MenubarPrimitive.RadioItem
     ref={ref}
@@ -199,10 +189,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
 
-const MenubarLabel = forwardRef<
+const MenubarLabel = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Label>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.Label> & {
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Label> & {
     inset?: boolean
   }
 >(({ className, inset, ...props }, ref) => (
@@ -218,10 +207,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName
 
-const MenubarSeparator = forwardRef<
+const MenubarSeparator = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Separator>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof MenubarPrimitive.Separator>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Separator>
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Separator
     ref={ref}

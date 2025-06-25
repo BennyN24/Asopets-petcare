@@ -1,9 +1,7 @@
-import React, { ComponentPropsWithoutRef } from "react"
-import React, { forwardRef } from "react"
 
 import { cn } from "@/lib/utils"
 
-const Card = forwardRef<
+const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -18,7 +16,7 @@ const Card = forwardRef<
 ))
 Card.displayName = "Card"
 
-const CardHeader = forwardRef<
+const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -30,7 +28,7 @@ const CardHeader = forwardRef<
 ))
 CardHeader.displayName = "CardHeader"
 
-const CardTitle = forwardRef<
+const CardTitle = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -45,7 +43,7 @@ const CardTitle = forwardRef<
 ))
 CardTitle.displayName = "CardTitle"
 
-const CardDescription = forwardRef<
+const CardDescription = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -57,7 +55,7 @@ const CardDescription = forwardRef<
 ))
 CardDescription.displayName = "CardDescription"
 
-const CardContent = forwardRef<
+const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -65,7 +63,7 @@ const CardContent = forwardRef<
 ))
 CardContent.displayName = "CardContent"
 
-const CardFooter = forwardRef<
+const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (

@@ -1,7 +1,5 @@
-import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
-import React, { forwardRef } from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
@@ -16,10 +14,9 @@ const SheetClose = SheetPrimitive.Close
 
 const SheetPortal = SheetPrimitive.Portal
 
-const SheetOverlay = forwardRef<
+const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
@@ -52,11 +49,10 @@ const sheetVariants = cva(
 )
 
 interface SheetContentProps
-import { ComponentPropsWithoutRef } from "react"
-  extends ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
 
-const SheetContent = forwardRef<
+const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
 >(({ side = "right", className, children, ...props }, ref) => (
@@ -105,10 +101,9 @@ const SheetFooter = ({
 )
 SheetFooter.displayName = "SheetFooter"
 
-const SheetTitle = forwardRef<
+const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
@@ -118,10 +113,9 @@ import { ComponentPropsWithoutRef } from "react"
 ))
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
-const SheetDescription = forwardRef<
+const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
