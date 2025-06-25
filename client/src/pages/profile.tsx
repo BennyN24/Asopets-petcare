@@ -455,14 +455,25 @@ export default function Profile() {
     setShowNotificationSettings(false);
   };
 
+  const { registerBiometric } = useBiometric();
+
   const handleSetupBiometric = async () => {
     if (!profileData?.id || !profileData?.email) return;
     setBiometricLoading(true);
     
     try {
+      const credential = await registerBiometric(profileData.id, profileData.email);
+      if (credential) {
+        toast({
+          title: "Biometric Setup Complete",
+          description: "You can now use biometric authentication to login.",
+        });
+      }
+    } catch (error: any) {
       toast({
-        title: "Biometric setup",
-        description: "Biometric authentication setup would be initiated here.",
+        title: "Setup Failed",
+        description: error.message || "Failed to setup biometric authentication.",
+        variant: "destructive",
       });
     } finally {
       setBiometricLoading(false);
@@ -474,8 +485,10 @@ export default function Profile() {
     setBiometricLoading(true);
     
     try {
+      // Remove biometric data from local storage or server
+      localStorage.removeItem(`biometric_${profileData.id}`);
       toast({
-        title: "Biometric removed",
+        title: "Biometric Removed",
         description: "Biometric authentication has been disabled for your account.",
       });
     } finally {
@@ -981,7 +994,7 @@ export default function Profile() {
              <Button
               variant="destructive"
               className="w-full justify-start"
-
+              onClick={() => setShowDeleteConfirmation(true)}
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Account

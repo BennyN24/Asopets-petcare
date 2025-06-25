@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-export interface BiometricSupport {
-  isAvailable: boolean;
-  supportedMethods: string[];
+export interface BiometricCredential {
+  id: string;
+  type: string;
+  publicKey: ArrayBuffer;
 }
 
 export function useBiometric() {
   const [isSupported, setIsSupported] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     checkBiometricSupport();
@@ -16,46 +18,130 @@ export function useBiometric() {
 
   const checkBiometricSupport = async () => {
     try {
-      // Check if WebAuthn is supported
-      if (typeof window !== 'undefined' && window.PublicKeyCredential) {
-        setIsSupported(true);
+      if (typeof window === 'undefined') return;
 
-        // Check if user has enrolled credentials
+      // Check if WebAuthn is supported
+      const webAuthnSupported = window.PublicKeyCredential && 
+        typeof window.PublicKeyCredential.create === 'function';
+
+      if (webAuthnSupported) {
+        setIsSupported(true);
+        
+        // Check if platform authenticator is available
         const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
         setIsEnrolled(available);
+      } else {
+        setIsSupported(false);
+        setError('WebAuthn not supported on this device');
       }
     } catch (err) {
-      console.error('Biometric check failed:', err);
-      setError('Biometric authentication not available');
+      console.error('Biometric support check failed:', err);
+      setError('Unable to check biometric support');
+      setIsSupported(false);
     }
   };
 
-  const authenticate = async (): Promise<boolean> => {
+  const registerBiometric = async (userId: string, email: string): Promise<BiometricCredential | null> => {
     if (!isSupported) {
       throw new Error('Biometric authentication not supported');
     }
 
-    try {
-      // For demo purposes, we'll simulate biometric auth
-      // In production, this would use WebAuthn APIs
+    setIsLoading(true);
+    setError(null);
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const success = Math.random() > 0.1; // 90% success rate for demo
-          resolve(success);
-        }, 2000);
-      });
-    } catch (err) {
-      console.error('Biometric authentication failed:', err);
+    try {
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge: new Uint8Array(32),
+          rp: {
+            name: "ASOPETS",
+            id: window.location.hostname,
+          },
+          user: {
+            id: new TextEncoder().encode(userId),
+            name: email,
+            displayName: email,
+          },
+          pubKeyCredParams: [
+            { alg: -7, type: "public-key" },
+            { alg: -257, type: "public-key" }
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            userVerification: "required",
+            requireResidentKey: false,
+          },
+          timeout: 60000,
+          attestation: "direct"
+        }
+      }) as PublicKeyCredential;
+
+      if (credential) {
+        setIsEnrolled(true);
+        return {
+          id: credential.id,
+          type: credential.type,
+          publicKey: (credential.response as AuthenticatorAttestationResponse).getPublicKey() || new ArrayBuffer(0)
+        };
+      }
+      return null;
+    } catch (err: any) {
+      console.error('Biometric registration failed:', err);
+      if (err.name === 'NotAllowedError') {
+        setError('Biometric registration was cancelled or not allowed');
+      } else if (err.name === 'NotSupportedError') {
+        setError('Biometric authentication not supported');
+      } else {
+        setError('Failed to register biometric authentication');
+      }
       throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const authenticate = async (credentialId?: string): Promise<boolean> => {
+    if (!isSupported) {
+      throw new Error('Biometric authentication not supported');
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const credential = await navigator.credentials.get({
+        publicKey: {
+          challenge: new Uint8Array(32),
+          allowCredentials: credentialId ? [{
+            id: new TextEncoder().encode(credentialId),
+            type: 'public-key'
+          }] : [],
+          userVerification: 'required',
+          timeout: 60000
+        }
+      });
+
+      return !!credential;
+    } catch (err: any) {
+      console.error('Biometric authentication failed:', err);
+      if (err.name === 'NotAllowedError') {
+        setError('Biometric authentication was cancelled');
+      } else {
+        setError('Biometric authentication failed');
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
     isSupported,
     isEnrolled,
+    isLoading,
     error,
     authenticate,
+    registerBiometric,
     checkBiometricSupport
   };
 }

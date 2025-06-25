@@ -8,10 +8,16 @@ export function useWelcome() {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Check if this is a new user (you can customize this logic)
-      const hasSeenWelcome = localStorage.getItem(`welcome_seen_${user.id}`);
+      // Check if this is a new user by checking account creation date
+      const accountCreatedAt = new Date(user.createdAt);
+      const now = new Date();
+      const daysSinceCreation = (now.getTime() - accountCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
       
-      if (!hasSeenWelcome) {
+      // Show welcome for users created within the last 7 days
+      const hasSeenWelcome = localStorage.getItem(`welcome_seen_${user.id}`);
+      const isNewUser = daysSinceCreation <= 7;
+      
+      if (isNewUser && !hasSeenWelcome) {
         setShowWelcome(true);
       }
     }
