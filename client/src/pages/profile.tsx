@@ -495,7 +495,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 safe-container">
-      <div className="max-w-md mx-auto bg-white min-h-screen relative mobile-safe-padding">
+      <div className="max-w-md mx-auto bg-white min-h-screen relative mobile-safe-padding pl-[0px] pr-[0px]">
         {/* Header */}
       <div className="bg-primary text-white p-4">
         <div className="flex items-center justify-between">
