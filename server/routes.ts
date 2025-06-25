@@ -31,11 +31,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Force session middleware to be applied early
   console.log('[AUTH-SETUP] Session middleware configured');
 
-  // Disable debug logging in production, keep minimal logging
+  // Minimal auth logging
   if (isDevelopment) {
     app.use((req, res, next) => {
-      if (req.path.includes('/api/auth')) {
-        console.log(`[AUTH] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - User: ${req.session?.userId ? 'authenticated' : 'none'}`);
+      if (req.path.includes('/api/auth') && req.method === 'POST') {
+        console.log(`[AUTH] ${req.method} ${req.path}`);
       }
       next();
     });
@@ -173,41 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test confirmation endpoint for automated testing
-  app.post("/api/auth/test-confirm", async (req, res) => {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    // Only allow test confirmation in development for test accounts
-    if (process.env.NODE_ENV !== 'development' || !email.includes('testpayload@')) {
-      return res.status(403).json({ message: "Test confirmation not allowed" });
-    }
-
-    try {
-      const user = await storage.getUserByEmail(email);
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Force confirm the test account
-      await storage.updateUser(user.id, { 
-        isEmailConfirmed: true,
-        emailConfirmationToken: null,
-        emailConfirmationExpires: null
-      });
-
-      console.log(`[TEST] Force confirmed email for test account: ${email}`);
-      res.json({ message: "Test account email confirmed successfully" });
-
-    } catch (error: any) {
-      console.error("Test confirmation error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
+  
 
   // Resend confirmation email
   app.post("/api/auth/resend-confirmation", async (req, res) => {

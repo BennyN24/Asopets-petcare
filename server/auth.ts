@@ -43,10 +43,9 @@ export function getSession() {
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  if (isDevelopment && req.path.includes("/api/")) {
-    console.log(
-      `[AUTH-CHECK] ${req.method} ${req.path} - Session: ${req.sessionID?.substring(0, 8)}... - Has session: ${!!req.session} - User ID: ${req.session?.userId || "none"}`,
-    );
+  // Minimal auth check logging
+  if (isDevelopment && !req.session?.userId) {
+    console.log(`[AUTH-CHECK] Unauthorized access to ${req.path}`);
   }
 
   // Set no-cache headers for authenticated endpoints
@@ -196,11 +195,10 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
     : env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
-  // Always log the confirmation link for testing
-  console.log(`\n=== EMAIL CONFIRMATION LINK ===`);
-  console.log(`Email: ${email}`);
-  console.log(`Link: ${confirmationLink}`);
-  console.log(`================================\n`);
+  // Log confirmation link in development only
+  if (isDevelopment) {
+    console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+  }
 
   try {
     // Check if SendGrid is configured
@@ -284,11 +282,10 @@ export const sendPasswordResetEmail = async (
     : env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
-  // Always log the password reset link for testing
-  console.log(`\n=== PASSWORD RESET LINK ===`);
-  console.log(`Email: ${email}`);
-  console.log(`Link: ${resetLink}`);
-  console.log(`===========================\n`);
+  // Log reset link in development only
+  if (isDevelopment) {
+    console.log(`Password reset link for ${email}: ${resetLink}`);
+  }
 
   try {
     if (process.env.SENDGRID_API_KEY) {
@@ -380,16 +377,8 @@ async function loginUser(email: string, password: string) {
 
   const user = userRows[0];
 
-  // Check if email is confirmed (bypass for test accounts in development)
-  const isTestAccount = user.email.includes('testpayload@') && process.env.NODE_ENV === 'development';
-  if (!user.isEmailConfirmed && !isTestAccount) {
+  if (!user.isEmailConfirmed) {
     throw new Error("Invalid credentials or email not confirmed");
-  }
-
-  // Auto-confirm test accounts in development
-  if (isTestAccount && !user.isEmailConfirmed) {
-    console.log('[DEV] Auto-confirming test account:', user.email);
-    await db.update(users).set({ isEmailConfirmed: true }).where(eq(users.id, user.id));
   }
 
   const passwordMatch = await verifyPassword(password, user.passwordHash);
