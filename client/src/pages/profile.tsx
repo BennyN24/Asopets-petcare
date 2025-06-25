@@ -1059,6 +1059,7 @@ export default function Profile() {
       <div className="h-20"></div>
 
       <BottomNavigation activeTab="profile" />
+      </div>
     </div>
   );
 }
