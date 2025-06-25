@@ -1,5 +1,5 @@
-import React, { ComponentPropsWithoutRef } from "react"
-import React, { forwardRef } from "react"
+import React, { ComponentPropsWithoutRef }, { ComponentPropsWithoutRef } from "react"
+import React, { ComponentPropsWithoutRef }, { forwardRef } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"

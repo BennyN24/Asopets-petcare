@@ -279,7 +279,7 @@ export const userSubscriptionsRelations = relations(userSubscriptions, ({ one })
   }),
 }));
 
-// Updated users relations with subscriptions
+// Users relations - consolidated with pets and subscriptions
 export const usersRelations = relations(users, ({ many }) => ({
   pets: many(pets),
   subscriptions: many(userSubscriptions),

@@ -1,5 +1,4 @@
-import React, { ComponentPropsWithoutRef } from "react"
-import React, { forwardRef } from "react"
+import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
@@ -11,10 +10,9 @@ const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 
 const AlertDialogPortal = AlertDialogPrimitive.Portal
 
-const AlertDialogOverlay = forwardRef<
+const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
-import { ComponentPropsWithoutRef } from "react"
-  ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
