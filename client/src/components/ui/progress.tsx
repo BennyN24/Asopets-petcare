@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { forwardRef } from "react"
@@ -7,6 +8,7 @@ import { cn } from "@/lib/utils"
 
 const Progress = forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
 >(({ className, value, ...props }, ref) => (
   <ProgressPrimitive.Root

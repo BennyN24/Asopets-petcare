@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 import React, { forwardRef } from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
@@ -8,6 +9,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 const Command = forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
@@ -35,6 +37,7 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
 
 const CommandInput = forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
@@ -54,6 +57,7 @@ CommandInput.displayName = CommandPrimitive.Input.displayName
 
 const CommandList = forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive.List>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
@@ -67,6 +71,7 @@ CommandList.displayName = CommandPrimitive.List.displayName
 
 const CommandEmpty = forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
 >((props, ref) => (
   <CommandPrimitive.Empty
@@ -80,6 +85,7 @@ CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
 const CommandGroup = forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
@@ -96,6 +102,7 @@ CommandGroup.displayName = CommandPrimitive.Group.displayName
 
 const CommandSeparator = forwardRef<
   React.ElementRef<typeof CommandPrimitive.Separator>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
@@ -108,6 +115,7 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
 const CommandItem = forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item

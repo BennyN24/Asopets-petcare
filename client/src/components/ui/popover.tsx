@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 import React, { forwardRef } from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
@@ -9,6 +10,7 @@ const PopoverTrigger = PopoverPrimitive.Trigger
 
 const PopoverContent = forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
 >(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
   <PopoverPrimitive.Portal>

@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { forwardRef } from "react"
@@ -11,6 +12,7 @@ const HoverCardTrigger = HoverCardPrimitive.Trigger
 
 const HoverCardContent = forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
 >(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
   <HoverCardPrimitive.Content

@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import { useContext, createContext, forwardRef, useId } from "react"
@@ -88,6 +89,7 @@ FormItem.displayName = "FormItem"
 
 const FormLabel = forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField()
@@ -105,6 +107,7 @@ FormLabel.displayName = "FormLabel"
 
 const FormControl = forwardRef<
   React.ElementRef<typeof Slot>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()

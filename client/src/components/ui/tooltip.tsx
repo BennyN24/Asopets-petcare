@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { forwardRef } from "react"
@@ -13,6 +14,7 @@ const TooltipTrigger = TooltipPrimitive.Trigger
 
 const TooltipContent = forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
 >(({ className, sideOffset = 4, ...props }, ref) => (
   <TooltipPrimitive.Content

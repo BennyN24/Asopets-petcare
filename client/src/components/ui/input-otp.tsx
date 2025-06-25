@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 import React, { forwardRef } from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 import { Dot } from "lucide-react"
@@ -6,6 +7,7 @@ import { cn } from "@/lib/utils"
 
 const InputOTP = forwardRef<
   React.ElementRef<typeof OTPInput>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof OTPInput>
 >(({ className, containerClassName, ...props }, ref) => (
   <OTPInput

@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { forwardRef } from "react"
@@ -17,6 +18,7 @@ const SheetPortal = SheetPrimitive.Portal
 
 const SheetOverlay = forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
@@ -50,6 +52,7 @@ const sheetVariants = cva(
 )
 
 interface SheetContentProps
+import { ComponentPropsWithoutRef } from "react"
   extends ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
 
@@ -104,6 +107,7 @@ SheetFooter.displayName = "SheetFooter"
 
 const SheetTitle = forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
@@ -116,6 +120,7 @@ SheetTitle.displayName = SheetPrimitive.Title.displayName
 
 const SheetDescription = forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description

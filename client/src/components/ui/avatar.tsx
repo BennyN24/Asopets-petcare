@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { forwardRef } from "react"
@@ -7,6 +8,7 @@ import { cn } from "@/lib/utils"
 
 const Avatar = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
@@ -22,6 +24,7 @@ Avatar.displayName = AvatarPrimitive.Root.displayName
 
 const AvatarImage = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
@@ -34,6 +37,7 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
 const AvatarFallback = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Fallback

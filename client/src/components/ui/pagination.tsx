@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 import React, { forwardRef } from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 

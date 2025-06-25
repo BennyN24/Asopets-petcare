@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 import React, { forwardRef } from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -9,6 +10,7 @@ const ToastProvider = ToastPrimitives.Provider
 
 const ToastViewport = forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Viewport
@@ -40,6 +42,7 @@ const toastVariants = cva(
 
 const Toast = forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
     VariantProps<typeof toastVariants>
 >(({ className, variant, ...props }, ref) => {
@@ -55,6 +58,7 @@ Toast.displayName = ToastPrimitives.Root.displayName
 
 const ToastAction = forwardRef<
   React.ElementRef<typeof ToastPrimitives.Action>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ToastPrimitives.Action>
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Action
@@ -70,6 +74,7 @@ ToastAction.displayName = ToastPrimitives.Action.displayName
 
 const ToastClose = forwardRef<
   React.ElementRef<typeof ToastPrimitives.Close>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Close
@@ -88,6 +93,7 @@ ToastClose.displayName = ToastPrimitives.Close.displayName
 
 const ToastTitle = forwardRef<
   React.ElementRef<typeof ToastPrimitives.Title>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ToastPrimitives.Title>
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
@@ -100,6 +106,7 @@ ToastTitle.displayName = ToastPrimitives.Title.displayName
 
 const ToastDescription = forwardRef<
   React.ElementRef<typeof ToastPrimitives.Description>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof ToastPrimitives.Description>
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
@@ -110,6 +117,7 @@ const ToastDescription = forwardRef<
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
+import { ComponentPropsWithoutRef } from "react"
 type ToastProps = ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>

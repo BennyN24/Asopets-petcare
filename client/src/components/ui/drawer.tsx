@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import React, { forwardRef } from "react"
@@ -24,6 +25,7 @@ const DrawerClose = DrawerPrimitive.Close
 
 const DrawerOverlay = forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Overlay
@@ -36,6 +38,7 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
 const DrawerContent = forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DrawerPortal>
@@ -79,6 +82,7 @@ DrawerFooter.displayName = "DrawerFooter"
 
 const DrawerTitle = forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Title>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Title
@@ -94,6 +98,7 @@ DrawerTitle.displayName = DrawerPrimitive.Title.displayName
 
 const DrawerDescription = forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Description>,
+import { ComponentPropsWithoutRef } from "react"
   ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Description

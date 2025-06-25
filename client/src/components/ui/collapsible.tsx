@@ -1,3 +1,4 @@
+import React, { ComponentPropsWithoutRef } from "react"
 "use client"
 
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
