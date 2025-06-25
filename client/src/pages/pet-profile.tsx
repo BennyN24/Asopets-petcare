@@ -18,20 +18,20 @@ export default function PetProfile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const petId = parseInt(id || "0");
-  
+
   // Get URL parameters to determine initial tab
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Handle URL parameters for tab switching and refresh data when needed
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     const refreshParam = urlParams.get('refresh');
-    
+
     if (tabParam && ['overview', 'records', 'qr', 'info'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
-    
+
     // If refresh parameter is present, refresh the page to get fresh data
     if (refreshParam === 'true') {
       setTimeout(() => {
@@ -39,13 +39,13 @@ export default function PetProfile() {
       }, 100);
       return;
     }
-    
+
     // Clear URL parameters after processing
     if (tabParam || refreshParam) {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
-  
+
   // Also check for URL changes (in case user navigates back/forward)
   useEffect(() => {
     const handlePopState = () => {
@@ -55,7 +55,7 @@ export default function PetProfile() {
         setActiveTab(tabParam);
       }
     };
-    
+
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
@@ -175,7 +175,7 @@ export default function PetProfile() {
             <TabsTrigger value="qr">QR Code</TabsTrigger>
             <TabsTrigger value="info">Pet Info</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="overview" className="space-y-6 mt-6">
             {/* Health Summary */}
             <HealthSummaryCard 
@@ -184,7 +184,7 @@ export default function PetProfile() {
               petId={petId}
               onRecordsClick={() => setActiveTab('records')}
             />
-            
+
             {/* Quick Actions Menu */}
             <Card>
               <CardContent className="p-4">
@@ -289,18 +289,18 @@ export default function PetProfile() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="records" className="mt-6">
             <MedicalTimeline petId={petId} medicalRecords={medicalRecords} />
           </TabsContent>
-          
+
           <TabsContent value="qr" className="mt-6 space-y-4">
             <QRCodeGenerator 
               pet={pet} 
               medicalRecords={medicalRecords} 
             />
           </TabsContent>
-          
+
           <TabsContent value="info" className="mt-6">
             <Card>
               <CardContent className="p-6">
@@ -311,7 +311,7 @@ export default function PetProfile() {
                   </div>
                   {pet && <PetEditForm pet={pet} />}
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -323,35 +323,35 @@ export default function PetProfile() {
                       <p className="text-gray-900 capitalize">{pet.category}</p>
                     </div>
                   </div>
-                  
+
                   {pet.breed && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Breed</label>
                       <p className="text-gray-900">{pet.breed}</p>
                     </div>
                   )}
-                  
+
                   {pet.dateOfBirth && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Date of Birth</label>
                       <p className="text-gray-900">{formatDate(pet.dateOfBirth)}</p>
                     </div>
                   )}
-                  
+
                   {pet.microchipId && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Microchip ID</label>
                       <p className="text-gray-900 font-mono text-sm">{pet.microchipId}</p>
                     </div>
                   )}
-                  
+
                   {pet.birthmarks && (
                     <div>
                       <label className="text-sm font-medium text-gray-500">Identifying Marks</label>
                       <p className="text-gray-900">{pet.birthmarks}</p>
                     </div>
                   )}
-                  
+
                   {pet.imageUrl && (
                     <div>
                       <label className="text-sm font-medium text-gray-500 mb-2 block">Photo</label>

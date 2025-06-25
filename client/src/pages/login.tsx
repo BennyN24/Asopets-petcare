@@ -1,9 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Fingerprint, Download } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import BiometricLogin from "@/components/biometric-login";
+import asopetsLogo from "@/assets/asopets-logo.png";
 import {
   Form,
   FormControl,
@@ -16,19 +22,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
-  Mail,
-  Lock,
   Heart,
   CheckCircle,
-  AlertCircle,
-  Eye,
-  EyeOff,
-  Fingerprint,
 } from "lucide-react";
-import asopetsLogo from "@/assets/asopets-logo.png";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import BiometricLogin from "@/components/biometric-login";
 import { useBiometric } from "@/hooks/useBiometric";
 
 const loginSchema = z.object({
@@ -66,13 +63,13 @@ export default function Login() {
     setShowResendConfirmation(false);
     try {
       const response = await apiRequest("POST", "/api/auth/login", data);
-      
+
       // Force query invalidation to update auth state
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      
+
       // Clear any cached data and redirect
       localStorage.removeItem('auth-user');
-      
+
       // Redirect to dashboard after successful login
       setLocation("/");
     } catch (error: any) {
@@ -99,7 +96,7 @@ export default function Login() {
 
   const handleResendConfirmation = async () => {
     if (!lastEmailAttempt) return;
-    
+
     setIsResending(true);
     try {
       await apiRequest("POST", "/api/auth/resend-confirmation", { 
@@ -137,7 +134,7 @@ export default function Login() {
 
   const handleBiometricSuccess = (authenticated?: boolean) => {
     setShowBiometricLogin(false);
-    
+
     if (authenticated) {
       // Biometric login was successful, redirect to dashboard
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });

@@ -75,7 +75,7 @@ function Router() {
   // Show loading while authentication is being determined
   if (isLoading) {
     console.log('Showing loader - authentication in progress');
-    return <PageLoader />;
+    return <LoadingSpinner />;
   }
 
   // Handle authentication errors

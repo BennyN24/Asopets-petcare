@@ -1,7 +1,21 @@
 import React, { memo } from "react";
 import { useLocation } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { 
+  Calendar, 
+  MapPin, 
+  Heart, 
+  MoreVertical,
+  PawPrint,
+  Cake,
+  Weight,
+  Palette,
+  User
+} from "lucide-react";
 import type { Pet, Reminder } from "@shared/schema";
-import { Dog, Cat, Bird, Rabbit, Heart, Trash2 } from "lucide-react";
+import { Dog, Cat, Bird, Rabbit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PetCardProps {
@@ -12,12 +26,12 @@ interface PetCardProps {
 
 export default memo(function PetCard({ pet, reminders, onDelete }: PetCardProps) {
   const [, setLocation] = useLocation();
-  
+
   const handleCardClick = () => {
     console.log('Navigating to pet profile:', `/pet/${pet.id}`);
     setLocation(`/pet/${pet.id}`);
   };
-  
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "dog": return <Dog className="w-8 h-8 text-gray-600" />;
@@ -73,7 +87,7 @@ export default memo(function PetCard({ pet, reminders, onDelete }: PetCardProps)
         <div className="text-center">
           <h3 className="font-semibold text-gray-900 text-sm mb-1">{pet.name}</h3>
           <p className="text-xs text-gray-600 mb-2">{pet.breed}</p>
-          
+
           {/* Notifications Badge */}
           {totalNotifications > 0 && (
             <div className="flex items-center justify-center space-x-1">

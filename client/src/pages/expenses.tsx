@@ -40,7 +40,7 @@ export default function Expenses() {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterPet, setFilterPet] = useState("all");
@@ -111,11 +111,11 @@ export default function Expenses() {
   // Calculate expenses
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
-  
+
   const yearlyExpenses = recordsWithCost
     .filter(record => isThisYear(new Date(record.dateAdministered)))
     .reduce((sum, record) => sum + parseAmount(record.cost), 0);
-  
+
   const monthlyExpenses = recordsWithCost
     .filter(record => isThisMonth(new Date(record.dateAdministered)))
     .reduce((sum, record) => sum + parseAmount(record.cost), 0);
@@ -148,7 +148,7 @@ export default function Expenses() {
         return recordDate.getFullYear() === currentYear && recordDate.getMonth() === i;
       })
       .reduce((sum, record) => sum + parseAmount(record.cost), 0);
-    
+
     return {
       month: format(month, 'MMM'),
       amount: monthExpenses,
@@ -163,18 +163,18 @@ export default function Expenses() {
   const filteredRecords = recordsWithCost.filter(record => {
     const pet = pets.find(p => p.id === record.petId);
     const petName = pet?.name || '';
-    
+
     const matchesSearch = record.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (record.veterinarian && record.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+
     const matchesType = filterType === "all" || record.type === filterType;
     const matchesPet = filterPet === "all" || record.petId.toString() === filterPet;
-    
+
     return matchesSearch && matchesType && matchesPet;
   }).sort((a, b) => {
     let comparison = 0;
-    
+
     switch (sortBy) {
       case 'date':
         comparison = new Date(a.dateAdministered).getTime() - new Date(b.dateAdministered).getTime();
@@ -193,7 +193,7 @@ export default function Expenses() {
       default:
         comparison = 0;
     }
-    
+
     return sortOrder === 'desc' ? -comparison : comparison;
   });
 
@@ -212,11 +212,11 @@ export default function Expenses() {
         parseAmount(record.cost).toFixed(2)
       ];
     });
-    
+
     const csvContent = [headers, ...csvData]
       .map(row => row.map(cell => `"${cell}"`).join(','))
       .join('\n');
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -224,7 +224,7 @@ export default function Expenses() {
     a.download = `pet-expenses-${format(new Date(), 'yyyy-MM-dd')}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-    
+
     toast({
       title: "Export Complete",
       description: "Expense data has been exported to CSV file.",
@@ -253,7 +253,7 @@ export default function Expenses() {
 
   const sortedTypeExpenses = Object.entries(expensesByType)
     .sort(([,a], [,b]) => b - a);
-  
+
   const sortedPetExpenses = Object.entries(expensesByPet)
     .sort(([,a], [,b]) => b - a);
 
@@ -401,7 +401,7 @@ export default function Expenses() {
                       Export CSV
                     </Button>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 gap-3">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -412,7 +412,7 @@ export default function Expenses() {
                         className="pl-10"
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-2">
                       <Select value={filterType} onValueChange={setFilterType}>
                         <SelectTrigger>
@@ -428,7 +428,7 @@ export default function Expenses() {
                           <SelectItem value="lab-test">Lab Test</SelectItem>
                         </SelectContent>
                       </Select>
-                      
+
                       <Select value={filterPet} onValueChange={setFilterPet}>
                         <SelectTrigger>
                           <SelectValue placeholder="All Pets" />
@@ -443,7 +443,7 @@ export default function Expenses() {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Select value={sortBy} onValueChange={setSortBy}>
                         <SelectTrigger className="flex-1">
@@ -456,7 +456,7 @@ export default function Expenses() {
                           <SelectItem value="type">Type</SelectItem>
                         </SelectContent>
                       </Select>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -672,7 +672,7 @@ export default function Expenses() {
                       <p className="text-lg font-bold text-primary">{formatCurrency(monthlyBudget)}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Spent This Month</span>
                     <span className="font-bold">{formatCurrency(monthlyExpenses)}</span>
@@ -683,7 +683,7 @@ export default function Expenses() {
                       {formatCurrency(monthlyBudget - monthlyExpenses)}
                     </span>
                   </div>
-                  
+
                   <div className="mt-4">
                     <div className="flex justify-between text-sm mb-1">
                       <span>Budget Usage</span>
@@ -723,7 +723,7 @@ export default function Expenses() {
                       .filter(record => record.petId === pet.id && isThisMonth(new Date(record.dateAdministered)))
                       .reduce((sum, record) => sum + parseAmount(record.cost), 0);
                     const petBudgetUsed = petExpenses > 0 ? (petExpenses / budgetGoal) * 100 : 0;
-                    
+
                     return (
                       <div key={pet.id} className="space-y-2">
                         <div className="flex justify-between items-center">
@@ -774,6 +774,8 @@ export default function Expenses() {
           </TabsContent>
         </Tabs>
       </div>
+      {/* Bottom spacing to prevent cutoff from bottom navigation */}
+      <div className="h-20"></div>
       <BottomNavigation activeTab="expenses" />
     </div>
   );

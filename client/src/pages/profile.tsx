@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -482,8 +482,9 @@ export default function Profile() {
   }
 
   return (
-    <div className="mobile-container mobile-safe pb-20">
-      {/* Header */}
+    <div className="min-h-screen bg-gray-50 safe-container">
+      <div className="max-w-md mx-auto bg-white min-h-screen relative mobile-safe-padding">
+        {/* Header */}
       <div className="bg-primary text-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -968,14 +969,14 @@ export default function Profile() {
              <Button
               variant="destructive"
               className="w-full justify-start"
-             
+
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Account
             </Button>
           </CardContent>
         </Card>
-      
+
 
         {/* Password Change Modal */}
         {showPasswordChange && (
@@ -999,7 +1000,8 @@ export default function Profile() {
                 isLoading={changePasswordMutation.isPending}
                 onSubmit={(data) => changePasswordMutation.mutate(data)}
               />
-            </CardContent>
+            </CardContent>```text
+
           </Card>
         )}
 
@@ -1053,6 +1055,9 @@ export default function Profile() {
           </Card>
         )}
       </div>
+
+      {/* Bottom spacing to prevent cutoff from bottom navigation */}
+      <div className="h-20"></div>
 
       <BottomNavigation activeTab="profile" />
     </div>

@@ -62,7 +62,7 @@ export default function Schedule() {
       const response = await fetch("/api/reminders");
       if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
       const remindersData = await response.json();
-      
+
       // Combine reminders with pet data
       return remindersData.map((reminder: any) => ({
         ...reminder,
@@ -322,7 +322,7 @@ export default function Schedule() {
                 </Button>
               )}
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {/* Type Filter */}
               <div>
@@ -567,7 +567,7 @@ export default function Schedule() {
       </div>
 
       <BottomNavigation activeTab="schedule" />
-      
+
       {/* Notification Dropdown */}
       <NotificationDropdown
         reminders={remindersWithPets}

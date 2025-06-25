@@ -127,7 +127,7 @@ export default function AddPet() {
       });
       return;
     }
-    
+
     createPetMutation.mutate({
       ...data,
       category: selectedCategory,
@@ -173,7 +173,7 @@ export default function AddPet() {
             {/* Pet Photo Upload */}
             <div>
               <Label className="block text-sm font-medium text-gray-700 mb-3">Pet Photo</Label>
-              
+
               {/* Hidden file inputs */}
               <input
                 ref={cameraInputRef}
@@ -234,7 +234,7 @@ export default function AddPet() {
                   </button>
                 </div>
               )}
-              
+
               {isUploading && (
                 <div className="mt-2 text-center">
                   <span className="text-sm text-gray-500">Processing image...</span>

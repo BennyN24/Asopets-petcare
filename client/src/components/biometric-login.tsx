@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,7 +32,7 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
         // Check if user has existing biometric setup
         const hasExistingBiometric = Object.keys(localStorage)
           .some(key => key.startsWith('biometric_'));
-        
+
         if (hasExistingBiometric) {
           setStep('authenticate');
         } else {
@@ -44,7 +43,7 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
         setErrorMessage('Biometric authentication is not supported on this device or browser.');
       }
     };
-    
+
     initBiometric();
   }, [checkBiometricSupport]);
 
@@ -80,21 +79,21 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
               }
             }
           });
-          
+
           // Force query invalidation to update auth state
           queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-          
+
           setStep('success');
-          
+
           setTimeout(() => {
             onSuccess(true);
           }, 1500);
-          
+
         } catch (serverError: any) {
           console.error('Server-side biometric auth failed:', serverError);
           setStep('error');
           setErrorMessage('Biometric authentication failed on server. Please try regular login.');
-          
+
           setTimeout(() => {
             onSuccess(false);
           }, 2000);
@@ -106,7 +105,7 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
     } catch (error: any) {
       console.error('Biometric authentication failed:', error);
       setStep('error');
-      
+
       if (error.name === 'NotAllowedError') {
         setErrorMessage('Biometric authentication was denied. Please allow biometric access.');
       } else if (error.name === 'NotSupportedError') {
@@ -136,7 +135,7 @@ export default function BiometricLogin({ onSuccess, onBackToRegular, email }: Bi
       // Generate a temporary user ID for demo purposes
       const tempUserId = `temp_${Date.now()}`;
       const credential = await registerBiometric(tempUserId, email);
-      
+
       if (credential) {
         setStep('authenticate');
         toast({
