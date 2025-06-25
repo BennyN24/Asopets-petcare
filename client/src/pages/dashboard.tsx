@@ -153,9 +153,9 @@ export default function Dashboard() {
   const totalNotifications = overdueReminders.length;
 
   return (
-    <div className="mobile-container mobile-safe">
+    <div className="mobile-container mobile-safe touch-manipulation">
       {/* Header */}
-      <div className="bg-primary text-white p-4">
+      <div className="bg-primary text-white p-4 safe-area-top">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">Welcome back!</h1>
@@ -168,7 +168,9 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => setShowNotifications(true)}
-              className="relative text-[#333333]"
+              onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+              onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              className="relative text-[#333333] touch-manipulation"
             >
               <Bell className="w-4 h-4" />
               {totalNotifications > 0 && (
@@ -238,16 +240,20 @@ export default function Dashboard() {
               ))}
               {/* Add Pet Card */}
               <div
-                className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+                className="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors touch-manipulation active:scale-95"
                 onClick={() => setLocation("/add-pet")}
+                onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
                 <Plus className="text-gray-400 text-2xl mb-2" />
                 <p className="text-gray-500 text-sm font-medium">Add Pet</p>
               </div>
               {/* QR Scanner Card */}
               <div
-                className="bg-blue-50 p-4 rounded-xl border-2 border-dashed border-blue-300 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
+                className="bg-blue-50 p-4 rounded-xl border-2 border-dashed border-blue-300 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors touch-manipulation active:scale-95"
                 onClick={() => setShowQRScanner(true)}
+                onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
                 <QrCode className="text-blue-400 text-2xl mb-2" />
                 <p className="text-blue-500 text-sm font-medium">Scan Pet QR</p>
@@ -265,11 +271,13 @@ export default function Dashboard() {
                   {scannedPets.map((pet, index) => (
                     <Card 
                       key={pet.petId || index} 
-                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      className="cursor-pointer hover:shadow-md transition-shadow touch-manipulation active:scale-98"
                       onClick={() => {
                         console.log("Opening scanned pet viewer for:", pet);
                         setScannedPetData(pet);
                       }}
+                      onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.98)'}
+                      onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start space-x-3">
@@ -378,12 +386,12 @@ export default function Dashboard() {
           data={scannedPetData}
           onClose={() => setScannedPetData(null)}
           onDelete={(petData) => {
-            // Remove from localStorage
-            const savedPets = JSON.parse(localStorage.getItem('asopets_scanned_pets') || '[]');
+            // Remove from localStorage - use consistent key
+            const savedPets = JSON.parse(localStorage.getItem('asopets-scanned-pets') || '[]');
             const updatedPets = savedPets.filter((p: any) => 
               !(p.petId === petData.petId && p.scannedAt === petData.scannedAt)
             );
-            localStorage.setItem('asopets_scanned_pets', JSON.stringify(updatedPets));
+            localStorage.setItem('asopets-scanned-pets', JSON.stringify(updatedPets));
             
             // Update state
             setScannedPets(updatedPets);

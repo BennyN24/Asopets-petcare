@@ -24,7 +24,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   useEffect(() => {
     // Auto-start camera when component mounts
     startCamera();
-    
+
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -56,7 +56,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        
+
         // Wait for video to be ready before starting detection
         videoRef.current.onloadedmetadata = () => {
           console.log("📹 Video metadata loaded, starting QR detection");
@@ -70,7 +70,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
             setIsScanning(false);
           });
         };
-        
+
         // Handle video errors
         videoRef.current.onerror = (err) => {
           console.error("❌ Video error:", err);
@@ -102,20 +102,20 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       if (!scanningActive || !isScanning) return;
 
       const currentTime = Date.now();
-      
+
       // Throttle scanning to avoid excessive processing
       if (currentTime - lastScanTime < 200) {
         requestAnimationFrame(scanFrame);
         return;
       }
-      
+
       lastScanTime = currentTime;
 
       if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0 && video.videoHeight > 0) {
         // Set canvas dimensions to match video
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        
+
         // Draw the current frame
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
@@ -128,7 +128,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           if (code && code.data) {
             console.log("🔍 QR Code detected! Raw data length:", code.data.length);
             console.log("📄 Raw QR code data:", code.data);
-            
+
             try {
               const qrData = JSON.parse(code.data);
               console.log("✅ Successfully parsed QR data:", qrData);
@@ -141,12 +141,12 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 ownerId: qrData.ownerId || qrData.userId,
                 name: qrData.name || qrData.petName
               });
-              
+
               // Check for pet_profile type with required fields
               if (qrData.type === 'pet_profile' && (qrData.petId || qrData.id)) {
                 console.log("🎉 Valid pet QR code detected successfully!");
                 scanningActive = false; // Stop scanning
-                
+
                 // Normalize the data structure
                 const normalizedData = {
                   type: 'pet_profile',
@@ -165,9 +165,9 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   owner: qrData.owner,
                   scannedAt: new Date().toISOString()
                 };
-                
+
                 console.log("📋 Normalized QR data:", normalizedData);
-                
+
                 toast({
                   title: "Pet QR Code Found!",
                   description: `Found ${normalizedData.name || 'pet'} profile with ${normalizedData.medicalRecordCount} records`,
@@ -249,15 +249,15 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
 
           if (code) {
             console.log("QR Code found in uploaded image:", code.data);
-            
+
             try {
               const qrData = JSON.parse(code.data);
               console.log("Parsed QR data from image:", qrData);
-              
+
               // Check for pet_profile type with required fields
               if (qrData.type === 'pet_profile' && (qrData.petId || qrData.id)) {
                 console.log("Valid pet QR code detected in uploaded image!");
-                
+
                 // Normalize the data structure
                 const normalizedData = {
                   type: 'pet_profile',
@@ -275,7 +275,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   lastUpdated: qrData.lastUpdated || qrData.timestamp,
                   owner: qrData.owner
                 };
-                
+
                 toast({
                   title: "Pet QR Code Found!",
                   description: `Found ${normalizedData.name || 'pet'} profile from uploaded image`,
@@ -326,13 +326,13 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
               <p className="text-sm text-gray-600">
                 Scan a pet's QR code to view their profile and medical records.
               </p>
-              
+
               <div className="grid grid-cols-1 gap-3">
                 <Button onClick={startCamera} disabled className="w-full">
                   <Camera className="w-4 h-4 mr-2" />
                   Starting Camera...
                 </Button>
-                
+
                 <Button onClick={handleUploadClick} variant="outline" className="w-full">
                   <Upload className="w-4 h-4 mr-2" />
                   Upload QR Image
@@ -361,7 +361,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   ref={canvasRef}
                   className="hidden"
                 />
-                
+
                 {/* QR Code overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-48 h-48 border-2 border-white border-dashed rounded-lg opacity-70"></div>
