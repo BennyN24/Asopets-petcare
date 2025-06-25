@@ -102,33 +102,33 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="flex items-center">
-                <Heart className="w-5 h-5 mr-2 text-primary" />
-                Pet Profile
-              </CardTitle>
-              {(currentData.owner || petProfile?.owner) && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Owner: {currentData.owner?.name || petProfile?.owner?.name}
-                </p>
-              )}
-            </div>
-            <div className="flex space-x-1">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-2 z-50 overflow-y-auto">
+      <Card className="w-full max-w-2xl min-h-fit my-4 mx-2">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center text-lg">
+              <QrCode className="w-5 h-5 mr-2" />
+              Pet Profile
+            </CardTitle>
+            <div className="flex items-center space-x-2">
               {onDelete && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => onDelete(data)}
-                  className="text-red-500 hover:text-red-700"
+                  className="touch-manipulation"
+                  style={{ fontSize: '16px' }}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               )}
-              <Button variant="ghost" size="sm" onClick={onClose}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={onClose}
+                className="touch-manipulation"
+                style={{ fontSize: '16px' }}
+              >
                 <X className="w-4 h-4" />
               </Button>
             </div>

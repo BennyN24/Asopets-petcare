@@ -22,10 +22,13 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Auto-start camera when component mounts
-    startCamera();
+    // Add delay for mobile browsers to properly initialize
+    const timer = setTimeout(() => {
+      startCamera();
+    }, 300);
 
     return () => {
+      clearTimeout(timer);
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
@@ -45,12 +48,17 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       setError(null);
       setIsScanning(true);
 
+      // Check for camera permissions first
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera not supported in this browser");
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "environment", // Use back camera on mobile
-          width: { ideal: 1920, min: 640 },
-          height: { ideal: 1080, min: 480 },
-          frameRate: { ideal: 30, min: 15 }
+          facingMode: { ideal: "environment" }, // Use back camera on mobile
+          width: { ideal: 1280, max: 1920, min: 480 },
+          height: { ideal: 720, max: 1080, min: 360 },
+          frameRate: { ideal: 24, max: 30, min: 10 }
         }
       });
 
@@ -81,9 +89,22 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
 
       setStream(mediaStream);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("📷 Camera error:", err);
-      setError("Camera access denied or not available");
+      
+      let errorMessage = "Camera access denied or not available";
+      
+      if (err.name === 'NotAllowedError') {
+        errorMessage = "Camera permission denied. Please allow camera access and try again.";
+      } else if (err.name === 'NotFoundError') {
+        errorMessage = "No camera found on this device.";
+      } else if (err.name === 'NotSupportedError') {
+        errorMessage = "Camera not supported in this browser.";
+      } else if (err.name === 'NotReadableError') {
+        errorMessage = "Camera is being used by another application.";
+      }
+      
+      setError(errorMessage);
       setIsScanning(false);
     }
   };

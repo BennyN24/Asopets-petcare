@@ -3,29 +3,13 @@ import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-
 import { useAuth } from "@/hooks/useAuth";
-import { ErrorBoundary } from "@/components/error-boundary";
-import { PageLoader } from "@/components/loading-spinner";
-import { OfflineIndicator } from "@/components/offline-indicator";
-import MedicationReminderManager from "@/components/medication-reminder-manager";
-import NotFound from "@/pages/not-found";
-import Login from "@/pages/login";
-import Signup from "@/pages/signup";
+import ProtectedRoute from "@/components/protected-route";
+import ErrorBoundary from "@/components/error-boundary";
+
+// Pages
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
-import Welcome from "@/pages/welcome";
-import ResetPassword from "@/pages/reset-password";
-import ForgotPassword from "@/pages/forgot-password";
-import EmailConfirmed from "@/pages/email-confirmed";
-import PrivacyPolicy from "@/pages/privacy-policy";
-import TermsOfService from "@/pages/terms-of-service";
-import FAQ from "@/pages/faq";
-
-// Import authenticated pages directly to avoid lazy loading issues
-import Schedule from "@/pages/schedule";
-import Expenses from "@/pages/expenses";
-import Profile from "@/pages/profile";
 import AddPet from "@/pages/add-pet";
 import PetProfile from "@/pages/pet-profile";
 import VaccineForm from "@/pages/vaccine-form";
@@ -35,8 +19,26 @@ import SurgeryForm from "@/pages/surgery-form";
 import CheckupForm from "@/pages/checkup-form";
 import LabTestForm from "@/pages/lab-test-form";
 import GroomingForm from "@/pages/grooming-form";
-import VetClinicsPage from "@/pages/vet-clinics";
+import Schedule from "@/pages/schedule";
+import Expenses from "@/pages/expenses";
+import Profile from "@/pages/profile";
+import NotFound from "@/pages/not-found";
+import Welcome from "@/pages/welcome";
+import EmailConfirmed from "@/pages/email-confirmed";
+import ResetPassword from "@/pages/reset-password";
+import ForgotPassword from "@/pages/forgot-password";
+import FAQ from "@/pages/faq";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import TermsOfService from "@/pages/terms-of-service";
 import QRScannerPage from "@/pages/qr-scanner";
+import VetClinicsPage from "@/pages/vet-clinics";
+import Premium from "@/pages/premium";
+
+// Mobile debugging
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+console.log("📱 Mobile detection:", { isMobile, isIOS, userAgent: navigator.userAgent });
 
 function Router() {
   const { isAuthenticated, isLoading, user, error } = useAuth();
@@ -48,15 +50,15 @@ function Router() {
   // Handle authentication-based redirects - always call useEffect
   useEffect(() => {
     if (isLoading) return; // Don't redirect while loading
-    
+
     const currentPath = window.location.pathname;
-    
+
     if (!isAuthenticated && !["/", "/signup", "/forgot-password", "/reset-password", "/email-confirmed", "/landing"].includes(currentPath)) {
       console.log('Unauthenticated user accessing protected route, redirecting to login');
       setLocation("/");
       return;
     }
-    
+
     if (isAuthenticated && ["/", "/signup", "/forgot-password", "/reset-password", "/landing"].includes(currentPath)) {
       console.log('Authenticated user accessing auth routes, redirecting to dashboard');
       setLocation("/dashboard");

@@ -344,7 +344,7 @@ export default function Dashboard() {
           onScanSuccess={(data) => {
             console.log("QR Scanner - Raw scanned data:", data);
             setShowQRScanner(false);
-            
+
             if (data && data.type === "pet_profile" && data.petId) {
               // Add to scanned pets list if not already present
               const exists = scannedPets.some(pet => pet.petId === data.petId);
@@ -392,7 +392,7 @@ export default function Dashboard() {
               !(p.petId === petData.petId && p.scannedAt === petData.scannedAt)
             );
             localStorage.setItem('asopets-scanned-pets', JSON.stringify(updatedPets));
-            
+
             // Update state
             setScannedPets(updatedPets);
             setScannedPetData(null);

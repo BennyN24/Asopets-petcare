@@ -191,14 +191,46 @@
   input[type="password"],
   input[type="number"],
   textarea,
-  select {
+  select,
+  button {
     font-size: 16px;
+  }
+  
+  /* Prevent zoom on button tap */
+  button, .touch-manipulation {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Fix mobile scrolling issues */
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
   }
 }
 
 /* Fix viewport issues on mobile browsers */
 @supports (-webkit-touch-callout: none) {
   .mobile-container {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Mobile Safari viewport fix */
+html {
+  height: -webkit-fill-available;
+}
+
+/* Fix mobile browser address bar height issues */
+@media screen and (max-width: 768px) {
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  .mobile-container {
+    min-height: 100vh;
     min-height: -webkit-fill-available;
   }
 }
