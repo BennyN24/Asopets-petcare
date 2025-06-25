@@ -156,7 +156,7 @@ export default function Dashboard() {
     <div className="mobile-container mobile-safe touch-manipulation">
       {/* Header */}
       <div className="bg-primary text-white p-4 safe-area-top">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-[0px] mb-[0px] pt-[10px] pb-[10px]">
           <div>
             <h1 className="text-xl font-bold pt-[0px] pb-[0px] mt-[0px] mb-[0px]">Welcome back!</h1>
             <p className="text-white/80 text-sm">
