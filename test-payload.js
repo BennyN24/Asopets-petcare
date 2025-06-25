@@ -1,6 +1,6 @@
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import fetch from 'node-fetch';
 
 // Test configuration
 const TEST_CONFIG = {
@@ -360,11 +360,6 @@ class PayloadTester {
       this.generateReport();
     }
   }
-}
-
-// Add fetch polyfill for Node.js
-if (typeof fetch === 'undefined') {
-  global.fetch = require('node-fetch');
 }
 
 // Run the test
