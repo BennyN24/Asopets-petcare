@@ -2,40 +2,1139 @@
   "summary": {
     "petsCreated": 0,
     "recordsCreated": 0,
-    "totalApiCalls": 2,
-    "errorCount": 2,
-    "testDate": "2025-06-25T02:13:25.712Z"
+    "totalApiCalls": 55,
+    "errorCount": 106,
+    "testDate": "2025-06-25T02:15:58.636Z"
   },
   "timings": [
     {
       "endpoint": "/api/auth/signup",
       "method": "POST",
-      "responseTime": 1561,
-      "status": 201,
-      "timestamp": "2025-06-25T02:13:25.589Z"
+      "responseTime": 2901,
+      "status": 400,
+      "timestamp": "2025-06-25T02:15:56.544Z"
     },
     {
       "endpoint": "/api/auth/login",
       "method": "POST",
-      "responseTime": 118,
+      "responseTime": 117,
       "status": 401,
-      "timestamp": "2025-06-25T02:13:25.709Z"
+      "timestamp": "2025-06-25T02:15:56.662Z"
+    },
+    {
+      "endpoint": "/api/auth/resend-confirmation",
+      "method": "POST",
+      "responseTime": 655,
+      "status": 200,
+      "timestamp": "2025-06-25T02:15:57.318Z"
+    },
+    {
+      "endpoint": "/api/auth/test-confirm",
+      "method": "POST",
+      "responseTime": 28,
+      "status": 200,
+      "timestamp": "2025-06-25T02:15:57.346Z"
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "responseTime": 577,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:57.924Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 10,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:57.936Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 181,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.118Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 197,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.124Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 198,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.125Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 198,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.126Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 199,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.129Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 443,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.562Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 4,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.566Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 634,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.572Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 634,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.573Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 634,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.574Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 8,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.575Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 639,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.580Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 18,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.581Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 18,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.581Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 20,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.583Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 21,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.584Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 465,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.584Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 465,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.585Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 465,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.586Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 466,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.587Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 13,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.588Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 16,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.591Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 15,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.592Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 16,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.593Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 8,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.596Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 14,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.602Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 15,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.604Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 16,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.605Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 16,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.606Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 10,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.606Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 42,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.609Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 44,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.611Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 44,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.612Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 44,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.613Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 36,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.613Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 18,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.614Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 18,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.614Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 18,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.615Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 15,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.615Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 10,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.616Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 13,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.620Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 14,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.621Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 14,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.621Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 15,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.622Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 6,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.623Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 7,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.624Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 8,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.625Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "responseTime": 7,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.625Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "GET",
+      "responseTime": 4,
+      "status": 401,
+      "timestamp": "2025-06-25T02:15:58.627Z"
     }
   ],
   "errors": [
+    {
+      "endpoint": "/api/auth/signup",
+      "method": "POST",
+      "status": 400,
+      "error": "Email already registered",
+      "timestamp": "2025-06-25T02:15:56.544Z"
+    },
+    {
+      "endpoint": "/api/auth/signup",
+      "method": "POST",
+      "error": "HTTP 400: Email already registered",
+      "responseTime": 2902,
+      "timestamp": "2025-06-25T02:15:56.544Z"
+    },
     {
       "endpoint": "/api/auth/login",
       "method": "POST",
       "status": 401,
       "error": "Email not confirmed",
-      "timestamp": "2025-06-25T02:13:25.709Z"
+      "timestamp": "2025-06-25T02:15:56.662Z"
     },
     {
       "endpoint": "/api/auth/login",
       "method": "POST",
       "error": "HTTP 401: Email not confirmed",
-      "responseTime": 119,
-      "timestamp": "2025-06-25T02:13:25.709Z"
+      "responseTime": 117,
+      "timestamp": "2025-06-25T02:15:56.662Z"
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "status": 401,
+      "error": "Email not confirmed",
+      "timestamp": "2025-06-25T02:15:57.924Z"
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "error": "HTTP 401: Email not confirmed",
+      "responseTime": 577,
+      "timestamp": "2025-06-25T02:15:57.924Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:57.936Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 10,
+      "timestamp": "2025-06-25T02:15:57.936Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.118Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 181,
+      "timestamp": "2025-06-25T02:15:58.118Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.124Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 197,
+      "timestamp": "2025-06-25T02:15:58.124Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.125Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 198,
+      "timestamp": "2025-06-25T02:15:58.125Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.126Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 198,
+      "timestamp": "2025-06-25T02:15:58.126Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.129Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 200,
+      "timestamp": "2025-06-25T02:15:58.129Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.562Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 443,
+      "timestamp": "2025-06-25T02:15:58.562Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.566Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 4,
+      "timestamp": "2025-06-25T02:15:58.566Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.572Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 635,
+      "timestamp": "2025-06-25T02:15:58.572Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.573Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 634,
+      "timestamp": "2025-06-25T02:15:58.573Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.574Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 634,
+      "timestamp": "2025-06-25T02:15:58.574Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.575Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 8,
+      "timestamp": "2025-06-25T02:15:58.575Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.580Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 639,
+      "timestamp": "2025-06-25T02:15:58.580Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.581Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 19,
+      "timestamp": "2025-06-25T02:15:58.581Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.581Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 18,
+      "timestamp": "2025-06-25T02:15:58.581Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.583Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 20,
+      "timestamp": "2025-06-25T02:15:58.583Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.584Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 21,
+      "timestamp": "2025-06-25T02:15:58.584Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.584Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 465,
+      "timestamp": "2025-06-25T02:15:58.584Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.585Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 465,
+      "timestamp": "2025-06-25T02:15:58.585Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.586Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 465,
+      "timestamp": "2025-06-25T02:15:58.586Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.587Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 466,
+      "timestamp": "2025-06-25T02:15:58.587Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.588Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 13,
+      "timestamp": "2025-06-25T02:15:58.588Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.591Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 16,
+      "timestamp": "2025-06-25T02:15:58.591Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.592Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 15,
+      "timestamp": "2025-06-25T02:15:58.592Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.593Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 16,
+      "timestamp": "2025-06-25T02:15:58.593Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.596Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 8,
+      "timestamp": "2025-06-25T02:15:58.596Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.602Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 14,
+      "timestamp": "2025-06-25T02:15:58.602Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.604Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 15,
+      "timestamp": "2025-06-25T02:15:58.604Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.605Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 16,
+      "timestamp": "2025-06-25T02:15:58.605Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.606Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 17,
+      "timestamp": "2025-06-25T02:15:58.606Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.606Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 10,
+      "timestamp": "2025-06-25T02:15:58.606Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.609Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 42,
+      "timestamp": "2025-06-25T02:15:58.609Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.611Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 44,
+      "timestamp": "2025-06-25T02:15:58.611Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.612Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 44,
+      "timestamp": "2025-06-25T02:15:58.612Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.613Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 44,
+      "timestamp": "2025-06-25T02:15:58.613Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.613Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 36,
+      "timestamp": "2025-06-25T02:15:58.613Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.614Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 18,
+      "timestamp": "2025-06-25T02:15:58.614Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.614Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 18,
+      "timestamp": "2025-06-25T02:15:58.614Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.615Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 18,
+      "timestamp": "2025-06-25T02:15:58.615Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.615Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 15,
+      "timestamp": "2025-06-25T02:15:58.615Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.616Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 11,
+      "timestamp": "2025-06-25T02:15:58.617Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.620Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 13,
+      "timestamp": "2025-06-25T02:15:58.620Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.621Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 14,
+      "timestamp": "2025-06-25T02:15:58.621Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.621Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 14,
+      "timestamp": "2025-06-25T02:15:58.621Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.622Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 15,
+      "timestamp": "2025-06-25T02:15:58.622Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.623Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 6,
+      "timestamp": "2025-06-25T02:15:58.623Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.624Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 7,
+      "timestamp": "2025-06-25T02:15:58.624Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.625Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 8,
+      "timestamp": "2025-06-25T02:15:58.625Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.625Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "POST",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 8,
+      "timestamp": "2025-06-25T02:15:58.626Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "GET",
+      "status": 401,
+      "error": "Unauthorized",
+      "timestamp": "2025-06-25T02:15:58.627Z"
+    },
+    {
+      "endpoint": "/api/pets",
+      "method": "GET",
+      "error": "HTTP 401: Unauthorized",
+      "responseTime": 4,
+      "timestamp": "2025-06-25T02:15:58.627Z"
     }
   ],
   "createdPets": [],
