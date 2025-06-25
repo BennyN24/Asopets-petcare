@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -134,10 +134,28 @@ function Router() {
   );
 }
 
-function App() {
+function AppContent() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const { showWelcome, markWelcomeSeen } = useWelcome();
 
+  return (
+    <>
+      <OfflineIndicator />
+      <Toaster />
+      <Router />
+
+      {/* Welcome Overlay for New Users */}
+      {showWelcome && (
+        <WelcomeOverlay 
+          onClose={markWelcomeSeen}
+          userName={(user as any)?.firstName || (user as any)?.displayName}
+        />
+      )}
+    </>
+  );
+}
+
+function App() {
   // Ensure React is available to child components
   useEffect(() => {
     if (!(window as any).React) {
@@ -148,17 +166,7 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <OfflineIndicator />
-        <Toaster />
-        <Router />
-
-        {/* Welcome Overlay for New Users */}
-        {showWelcome && (
-          <WelcomeOverlay 
-            onClose={markWelcomeSeen}
-            userName={(user as any)?.firstName || (user as any)?.displayName}
-          />
-        )}
+        <AppContent />
       </QueryClientProvider>
     </ErrorBoundary>
   );
