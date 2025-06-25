@@ -48,9 +48,10 @@ interface ScannedPetViewerProps {
   data: ScannedPetData;
   onClose: () => void;
   onDelete?: (petData: ScannedPetData) => void;
+  onTransfer?: (petData: ScannedPetData) => void;
 }
 
-export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPetViewerProps) {
+export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }: ScannedPetViewerProps) {
   const categoryColors = {
     dog: "bg-blue-100 text-blue-800",
     cat: "bg-purple-100 text-purple-800", 
@@ -129,6 +130,18 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
               Pet Profile
             </CardTitle>
             <div className="flex items-center space-x-2">
+              {onTransfer && (
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => onTransfer(data)}
+                  className="touch-manipulation bg-blue-600 hover:bg-blue-700 text-white"
+                  style={{ fontSize: '16px' }}
+                >
+                  <Heart className="w-4 h-4 mr-1" />
+                  Add to My Pets
+                </Button>
+              )}
               {onDelete && (
                 <Button 
                   variant="ghost" 
@@ -154,9 +167,9 @@ export default function ScannedPetViewer({ data, onClose, onDelete }: ScannedPet
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center">
-            {(currentData.imageUrl || petProfile?.imageUrl) ? (
+            {currentData.imageUrl ? (
               <img
-                src={currentData.imageUrl || petProfile?.imageUrl}
+                src={currentData.imageUrl}
                 alt={petName}
                 className="w-20 h-20 rounded-full mx-auto object-cover"
               />
