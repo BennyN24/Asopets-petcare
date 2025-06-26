@@ -279,10 +279,45 @@ export const userSubscriptionsRelations = relations(userSubscriptions, ({ one })
   }),
 }));
 
+// Scanned pets table for persistent storage of QR scanned pet profiles
+export const scannedPets = pgTable("scanned_pets", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  petId: text("pet_id").notNull(),
+  ownerId: text("owner_id"),
+  type: text("type").notNull().default("pet_profile"),
+  name: text("name"),
+  petName: text("pet_name"),
+  category: text("category"),
+  breed: text("breed"),
+  dateOfBirth: text("date_of_birth"),
+  age: integer("age"),
+  imageUrl: text("image_url"),
+  microchipId: text("microchip_id"),
+  birthmarks: text("birthmarks"),
+  medicalRecordCount: integer("medical_record_count").default(0),
+  lastUpdated: text("last_updated"),
+  ownerName: text("owner_name"),
+  ownerPhone: text("owner_phone"),
+  ownerEmail: text("owner_email"),
+  emergencyContact: text("emergency_contact"),
+  emergencyPhone: text("emergency_phone"),
+  scannedAt: timestamp("scanned_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const scannedPetsRelations = relations(scannedPets, ({ one }) => ({
+  user: one(users, {
+    fields: [scannedPets.userId],
+    references: [users.id],
+  }),
+}));
+
 // Users relations - consolidated with pets and subscriptions
 export const usersRelations = relations(users, ({ many }) => ({
   pets: many(pets),
   subscriptions: many(userSubscriptions),
+  scannedPets: many(scannedPets),
 }));
 
 // Types
@@ -301,5 +336,7 @@ export type VetClinic = typeof vetClinics.$inferSelect;
 export type InsertVetClinic = z.infer<typeof insertVetClinicSchema>;
 export type ClinicRating = typeof clinicRatings.$inferSelect;
 export type InsertClinicRating = z.infer<typeof insertClinicRatingSchema>;
+export type ScannedPet = typeof scannedPets.$inferSelect;
+export type InsertScannedPet = z.infer<typeof insertScannedPetSchema>;
 export type PetCategory = typeof petCategories[number];
 export type MedicalRecordType = typeof medicalRecordTypes[number];

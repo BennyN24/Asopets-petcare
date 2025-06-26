@@ -29,6 +29,7 @@ import VetClinics from "@/components/vet-clinics";
 import QRScanner from "@/components/qr-scanner";
 import ScannedPetViewer from "@/components/scanned-pet-viewer";
 import ScannedPetTransfer from "@/components/scanned-pet-transfer";
+import { apiRequest } from "@/lib/queryClient";
 import MedicationReminderManager from "@/components/medication-reminder-manager";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
@@ -347,19 +348,35 @@ export default function Dashboard() {
             setShowQRScanner(false);
 
             if (data && data.type === "pet_profile" && data.petId) {
-              // Add to scanned pets list if not already present
+              // Check if pet is already scanned
               const exists = scannedPets.some(pet => pet.petId === data.petId);
               if (!exists) {
-                const scannedPet = {
-                  ...data,
-                  scannedAt: new Date().toISOString()
+                // Prepare scanned pet data for database
+                const scannedPetData = {
+                  petId: data.petId,
+                  ownerId: data.ownerId,
+                  type: data.type,
+                  name: data.name,
+                  petName: data.petName,
+                  category: data.category,
+                  breed: data.breed,
+                  dateOfBirth: data.dateOfBirth,
+                  age: data.age,
+                  imageUrl: data.imageUrl,
+                  microchipId: data.microchipId,
+                  birthmarks: data.birthmarks,
+                  medicalRecordCount: data.medicalRecordCount,
+                  lastUpdated: data.lastUpdated,
+                  ownerName: data.owner?.name,
+                  ownerPhone: data.owner?.phone,
+                  ownerEmail: data.owner?.email,
+                  emergencyContact: data.owner?.emergencyContact,
+                  emergencyPhone: data.owner?.emergencyPhone,
                 };
-                console.log("Adding new scanned pet:", scannedPet);
-                setScannedPets(prev => {
-                  const updated = [...prev, scannedPet];
-                  console.log("Updated scanned pets list:", updated);
-                  return updated;
-                });
+
+                console.log("Adding new scanned pet to database:", scannedPetData);
+                createScannedPetMutation.mutate(scannedPetData);
+                
                 toast({
                   title: "Pet Profile Scanned",
                   description: `Added ${data.name || data.petName || 'pet'} to Other Pets section`,
@@ -386,16 +403,51 @@ export default function Dashboard() {
           data={scannedPetData}
           onClose={() => setScannedPetData(null)}
           onDelete={(petData) => {
-            // Remove from localStorage - use consistent key
-            const savedPets = JSON.parse(localStorage.getItem('asopets-scanned-pets') || '[]');
-            const updatedPets = savedPets.filter((p: any) => 
-              !(p.petId === petData.petId && p.scannedAt === petData.scannedAt)
-            );
-            localStorage.setItem('asopets-scanned-pets', JSON.stringify(updatedPets));
-
-            // Update state
-            setScannedPets(updatedPets);
+            console.log("Deleting scanned pet:", petData.petId);
+            deleteScannedPetMutation.mutate(petData.petId);
             setScannedPetData(null);
+            
+            toast({
+              title: "Pet Removed",
+              description: "Scanned pet has been removed from your list.",
+            });
+          }}
+          onTransfer={async (petData) => {
+            try {
+              const petProfile = petData.pet || petData;
+              
+              const newPetData = {
+                name: petProfile.name || petData.petName || 'Transferred Pet',
+                category: petProfile.category || 'other',
+                breed: petProfile.breed || '',
+                dateOfBirth: petProfile.dateOfBirth || new Date().toISOString().split('T')[0],
+                age: petProfile.age || 0,
+                microchipId: petProfile.microchipId || '',
+                birthmarks: petProfile.birthmarks || '',
+                imageUrl: petProfile.imageUrl || ''
+              };
+
+              console.log('Transferring pet data:', newPetData);
+
+              await apiRequest("POST", "/api/pets", newPetData);
+              queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+              
+              // Delete from scanned pets after successful transfer
+              deleteScannedPetMutation.mutate(petData.petId);
+              setScannedPetData(null);
+              
+              toast({
+                title: "Pet Added Successfully!",
+                description: `${newPetData.name} has been added to your pets.`,
+              });
+            } catch (error: any) {
+              console.error('Transfer pet error:', error);
+              toast({
+                title: "Transfer Failed",
+                description: error.message || "Failed to add pet to your profile.",
+                variant: "destructive",
+              });
+            }
           }}
         />
       )}
