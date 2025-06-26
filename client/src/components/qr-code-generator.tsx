@@ -157,7 +157,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
 
   const shareWebLink = async () => {
     try {
-      const shareUrl = `${window.location.origin}/share/pet/${pet.id}`;
+      const shareUrl = `https://asopets.com/share/pet/${pet.id}`;
       
       if (navigator.share) {
         await navigator.share({
@@ -324,7 +324,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
           <p>QR code contains complete pet profile data for scanning and sharing</p>
           <p>Compatible with ASOPETS mobile app scanner</p>
           <p className="text-blue-600">
-            Share Link: {window.location.origin}/share/pet/{pet.id}
+            Share Link: https://asopets.com/share/pet/{pet.id}
           </p>
           <p>Generated on {new Date().toLocaleDateString()}</p>
         </div>

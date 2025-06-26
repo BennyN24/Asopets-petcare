@@ -18,6 +18,16 @@ import {
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
+interface RecentMedicalRecord {
+  id: number;
+  type: string;
+  title?: string;
+  date: string;
+  veterinarian?: string;
+  clinic?: string;
+  cost?: number;
+}
+
 interface ShareablePetProfile {
   id: number;
   name: string;
@@ -29,6 +39,7 @@ interface ShareablePetProfile {
   birthmarks?: string;
   imageUrl?: string;
   medicalRecordCount: number;
+  recentMedicalRecords?: RecentMedicalRecord[];
   owner: {
     name: string;
     email?: string;
@@ -233,6 +244,61 @@ END:VCARD`;
                 </div>
               )}
             </div>
+
+            {/* Recent Medical Records */}
+            {petProfile.recentMedicalRecords && petProfile.recentMedicalRecords.length > 0 && (
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center mb-4">
+                  <FileText className="w-5 h-5 mr-2 text-green-500" />
+                  Recent Medical Records
+                </h3>
+                
+                <div className="space-y-3">
+                  {petProfile.recentMedicalRecords.map((record) => (
+                    <div key={record.id} className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <Badge className={`text-xs ${
+                            record.type === 'vaccine' ? 'bg-green-100 text-green-800' :
+                            record.type === 'deworming' ? 'bg-blue-100 text-blue-800' :
+                            record.type === 'treatment' ? 'bg-orange-100 text-orange-800' :
+                            record.type === 'surgery' ? 'bg-red-100 text-red-800' :
+                            record.type === 'checkup' ? 'bg-purple-100 text-purple-800' :
+                            record.type === 'lab-test' ? 'bg-yellow-100 text-yellow-800' :
+                            record.type === 'grooming' ? 'bg-pink-100 text-pink-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {record.type}
+                          </Badge>
+                          <span className="text-sm font-medium">{record.title || 'Medical Record'}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          {format(new Date(record.date), 'MMM dd, yyyy')}
+                        </span>
+                      </div>
+                      
+                      <div className="text-sm text-gray-600 space-y-1">
+                        {record.veterinarian && (
+                          <div>Dr. {record.veterinarian}</div>
+                        )}
+                        {record.clinic && (
+                          <div>{record.clinic}</div>
+                        )}
+                        {record.cost && (
+                          <div className="font-medium">{record.cost}</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {petProfile.medicalRecordCount > 5 && (
+                    <div className="text-center text-sm text-gray-500 mt-3">
+                      +{petProfile.medicalRecordCount - 5} more medical records available
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Owner Contact Information */}
             <div className="border-t pt-6">

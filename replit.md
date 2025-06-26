@@ -409,6 +409,9 @@ Changelog:
   * Added comprehensive shared pet profile page with owner contact information and emergency details
   * Enhanced QR code generator with "Share Link" functionality alongside QR download and print options
   * Fixed database errors with proper pet ID validation preventing "invalid input syntax for type integer" errors
+  * Updated shareable link domain to use production domain (asopets.com) for live deployment
+  * Enhanced shared pet profiles to include recent medical records (last 5) for public viewing
+  * Made shared pet profiles fully accessible to public without authentication requirements
 - June 23, 2025. Authentication system debugging and complete resolution:
   * Systematically resolved /api/login endpoint conflicts between email/password and Replit OIDC authentication
   * Renamed conflicting GET /api/login to /api/replit-login to eliminate authentication route conflicts

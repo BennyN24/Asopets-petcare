@@ -711,10 +711,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Owner not found" });
       }
 
-      // Get medical records count
+      // Get medical records with recent records for public sharing
       const medicalRecords = await storage.getMedicalRecordsByPetId(petId);
+      
+      // Get recent medical records (last 5) for public display
+      const recentMedicalRecords = medicalRecords
+        .sort((a, b) => new Date(b.dateAdministered).getTime() - new Date(a.dateAdministered).getTime())
+        .slice(0, 5)
+        .map(record => ({
+          id: record.id,
+          type: record.type,
+          title: record.title,
+          date: record.dateAdministered,
+          veterinarian: record.veterinarian,
+          clinic: record.clinic,
+          cost: record.cost
+        }));
 
-      // Return shareable pet profile data
+      // Return shareable pet profile data with recent medical records
       const shareableProfile = {
         id: pet.id,
         name: pet.name,
@@ -726,6 +740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthmarks: pet.birthmarks,
         imageUrl: pet.imageUrl,
         medicalRecordCount: medicalRecords.length,
+        recentMedicalRecords: recentMedicalRecords,
         owner: {
           name: `${owner.firstName} ${owner.lastName}`.trim(),
           email: owner.email,
@@ -734,7 +749,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           emergencyPhone: owner.emergencyPhone
         },
         lastUpdated: pet.updatedAt || pet.createdAt,
-        shareUrl: `${req.protocol}://${req.get('host')}/share/pet/${pet.id}`
+        shareUrl: `https://asopets.com/share/pet/${pet.id}`
       };
 
       res.json(shareableProfile);
