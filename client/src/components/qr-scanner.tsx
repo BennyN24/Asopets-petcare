@@ -622,22 +622,48 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   ref={canvasRef}
                   className="hidden"
                 />
+                <canvas
+                  ref={overlayCanvasRef}
+                  className="absolute inset-0 w-full h-64 pointer-events-none"
+                />
 
-                {/* QR Code overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-48 h-48 border-2 border-white border-dashed rounded-lg opacity-70"></div>
+                {/* Scanning status overlay */}
+                <div className="absolute top-2 left-2 right-2 bg-black bg-opacity-60 text-white text-xs p-2 rounded">
+                  <div className="flex justify-between items-center">
+                    <span>{scanningStatus}</span>
+                    <span className="text-green-400">{detectionAttempts} scans</span>
+                  </div>
+                </div>
+
+                {/* Center targeting guide */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-48 h-48 border-2 border-green-400 rounded-lg animate-pulse">
+                    <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-green-400"></div>
+                    <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-green-400"></div>
+                    <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-green-400"></div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-green-400"></div>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-center">
-                <Button onClick={stopCamera} variant="outline">
+              <div className="flex justify-between items-center">
+                <Button onClick={stopCamera} variant="outline" size="sm">
                   Stop Camera
+                </Button>
+                <Button onClick={handleUploadClick} variant="ghost" size="sm">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Image
                 </Button>
               </div>
 
-              <p className="text-xs text-gray-500 text-center">
-                Position the QR code within the frame to scan
-              </p>
+              <div className="text-center space-y-2">
+                <p className="text-xs text-gray-500">
+                  Position the QR code within the green frame
+                </p>
+                <p className="text-xs text-blue-600">
+                  Enhanced scanning with multiple detection methods active
+                </p>
+              </div>
             </div>
           )}
 
