@@ -48,22 +48,7 @@ export default function Dashboard() {
   const [scannedPets, setScannedPets] = useState<any[]>([]);
   const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
 
-  // Load scanned pets from localStorage on mount
-  useEffect(() => {
-    const savedScannedPets = localStorage.getItem('asopets-scanned-pets');
-    if (savedScannedPets) {
-      try {
-        setScannedPets(JSON.parse(savedScannedPets));
-      } catch (error) {
-        console.error('Failed to parse saved scanned pets:', error);
-      }
-    }
-  }, []);
-
-  // Save scanned pets to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('asopets-scanned-pets', JSON.stringify(scannedPets));
-  }, [scannedPets]);
+  // Remove localStorage scanned pets logic since we're using database now
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -100,24 +85,25 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  // Fetch all medical records for insights
-  const allMedicalRecordsQueries = useQuery({
-    queryKey: ["/api/medical-records/all"],
-    queryFn: async () => {
-      const allRecords: MedicalRecord[] = [];
-      for (const pet of pets) {
-        const response = await fetch(`/api/pets/${pet.id}/medical-records`);
-        if (response.ok) {
-          const records = await response.json();
-          allRecords.push(...records);
-        }
-      }
-      return allRecords;
+  // Create scanned pet mutation
+  const createScannedPetMutation = useMutation({
+    mutationFn: async (scannedPetData: any) => {
+      return await apiRequest("POST", "/api/scanned-pets", scannedPetData);
     },
-    enabled: !!user && pets.length > 0,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/scanned-pets"] });
+    },
   });
 
-  const allMedicalRecords = allMedicalRecordsQueries.data || [];
+  // Delete scanned pet mutation
+  const deleteScannedPetMutation = useMutation({
+    mutationFn: async (petId: string) => {
+      return await apiRequest("DELETE", `/api/scanned-pets/by-pet/${petId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/scanned-pets"] });
+    },
+  });
 
   // Delete pet mutation
   const deletePetMutation = useMutation({

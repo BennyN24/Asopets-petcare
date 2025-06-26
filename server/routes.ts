@@ -8,6 +8,9 @@ import {
   insertPetSchema,
   insertMedicalRecordSchema,
   insertReminderSchema,
+  insertVetClinicSchema,
+  insertClinicRatingSchema,
+  insertScannedPetSchema,
   updateUserSchema,
 } from "@shared/schema";
 import { env, isDevelopment } from "./config";
@@ -1303,6 +1306,68 @@ Reply directly to this email to respond to the user.
 
   // Only handle 404 for unmatched API routes - let Vite handle all client routes
   // This ensures client-side routing works properly in development
+
+  // === Scanned Pets Routes ===
+  app.get("/api/scanned-pets", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId || (req.user?.id);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const scannedPets = await storage.getScannedPetsByUserId(userId);
+      res.json(scannedPets);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/scanned-pets", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId || (req.user?.id);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const scannedPetData = insertScannedPetSchema.parse({
+        ...req.body,
+        userId: userId,
+      });
+
+      const scannedPet = await storage.createScannedPet(scannedPetData);
+      res.status(201).json(scannedPet);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Invalid scanned pet data", errors: error.errors });
+      }
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/scanned-pets/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const scannedPetId = parseInt(req.params.id);
+      await storage.deleteScannedPet(scannedPetId);
+      res.json({ message: "Scanned pet deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/scanned-pets/by-pet/:petId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId || (req.user?.id);
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const petId = req.params.petId;
+      await storage.deleteScannedPetByUserIdAndPetId(userId, petId);
+      res.json({ message: "Scanned pet deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
