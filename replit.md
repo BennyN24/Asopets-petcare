@@ -405,6 +405,10 @@ Changelog:
   * Updated scanned-pet-viewer for production by removing debug information and test features
   * Enhanced data validation to only display authentic pet information without fallback synthetic data
   * Improved medical records display with proper count indicators and professional error handling
+  * Created shareable pet profile links as QR alternative with dedicated public route /share/pet/:id
+  * Added comprehensive shared pet profile page with owner contact information and emergency details
+  * Enhanced QR code generator with "Share Link" functionality alongside QR download and print options
+  * Fixed database errors with proper pet ID validation preventing "invalid input syntax for type integer" errors
 - June 23, 2025. Authentication system debugging and complete resolution:
   * Systematically resolved /api/login endpoint conflicts between email/password and Replit OIDC authentication
   * Renamed conflicting GET /api/login to /api/replit-login to eliminate authentication route conflicts

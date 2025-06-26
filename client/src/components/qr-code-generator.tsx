@@ -155,6 +155,38 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     });
   };
 
+  const shareWebLink = async () => {
+    try {
+      const shareUrl = `${window.location.origin}/share/pet/${pet.id}`;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: `${pet.name} - Pet Profile`,
+          text: `View ${pet.name}'s pet profile and contact information`,
+          url: shareUrl
+        });
+        
+        toast({
+          title: "Profile Shared",
+          description: `Shared ${pet.name}'s profile link`,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: "Link Copied",
+          description: "Pet profile link copied to clipboard",
+        });
+      }
+    } catch (error) {
+      console.error("Share link error:", error);
+      toast({
+        title: "Share Failed",
+        description: "Could not share profile link",
+        variant: "destructive"
+      });
+    }
+  };
+
   const shareQRCode = async () => {
     if (!qrCodeUrl) return;
 
@@ -244,7 +276,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2 mb-3">
           <Button
             variant="outline"
             size="sm"
@@ -264,7 +296,9 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
             <Share className="w-4 h-4 mr-1" />
             Share
           </Button>
-          
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -274,11 +308,24 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
             <Printer className="w-4 h-4 mr-1" />
             Print
           </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={shareWebLink}
+            disabled={isGenerating}
+          >
+            <Share className="w-4 h-4 mr-1" />
+            Share Link
+          </Button>
         </div>
 
         <div className="text-xs text-gray-500 text-center space-y-1">
           <p>QR code contains complete pet profile data for scanning and sharing</p>
           <p>Compatible with ASOPETS mobile app scanner</p>
+          <p className="text-blue-600">
+            Share Link: {window.location.origin}/share/pet/{pet.id}
+          </p>
           <p>Generated on {new Date().toLocaleDateString()}</p>
         </div>
       </CardContent>

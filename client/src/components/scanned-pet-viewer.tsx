@@ -77,7 +77,7 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
   });
 
   // Use fetched profile data if available, otherwise fall back to scanned data
-  const currentData = petProfile?.pet || petProfile || data.pet || data;
+  const currentData = completeProfile || data;
   const petName = currentData.petName || currentData.name || 'Unknown Pet';
   const petCategory = currentData.category || 'other';
   
@@ -232,12 +232,10 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
                     <span className="font-medium font-mono text-xs">{currentData.microchipId}</span>
                   </div>
                 )}
-                {(medicalRecords?.length || currentData.medicalRecordCount) && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Medical Records:</span>
-                    <span className="font-medium">{medicalRecords?.length || currentData.medicalRecordCount}</span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Medical Records:</span>
+                  <span className="font-medium">{medicalRecords?.length || currentData.medicalRecordCount || 0}</span>
+                </div>
               </div>
             </div>
 

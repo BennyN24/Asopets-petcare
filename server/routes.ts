@@ -644,6 +644,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pets/public/:id", async (req, res) => {
     try {
       const petId = parseInt(req.params.id);
+      
+      if (isNaN(petId)) {
+        return res.status(400).json({ message: "Invalid pet ID" });
+      }
 
       const pet = await storage.getPetById(petId);
       if (!pet) {
@@ -687,10 +691,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Shareable pet profile endpoint
+  app.get("/api/pets/share/:id", async (req, res) => {
+    try {
+      const petId = parseInt(req.params.id);
+      
+      if (isNaN(petId)) {
+        return res.status(400).json({ message: "Invalid pet ID" });
+      }
+
+      const pet = await storage.getPetById(petId);
+      if (!pet) {
+        return res.status(404).json({ message: "Pet not found" });
+      }
+
+      // Get owner information
+      const owner = await storage.getUser(pet.userId);
+      if (!owner) {
+        return res.status(404).json({ message: "Owner not found" });
+      }
+
+      // Get medical records count
+      const medicalRecords = await storage.getMedicalRecordsByPetId(petId);
+
+      // Return shareable pet profile data
+      const shareableProfile = {
+        id: pet.id,
+        name: pet.name,
+        category: pet.category,
+        breed: pet.breed,
+        age: pet.age,
+        dateOfBirth: pet.dateOfBirth,
+        microchipId: pet.microchipId,
+        birthmarks: pet.birthmarks,
+        imageUrl: pet.imageUrl,
+        medicalRecordCount: medicalRecords.length,
+        owner: {
+          name: `${owner.firstName} ${owner.lastName}`.trim(),
+          email: owner.email,
+          phone: owner.phone,
+          emergencyContact: owner.emergencyContact,
+          emergencyPhone: owner.emergencyPhone
+        },
+        lastUpdated: pet.updatedAt || pet.createdAt,
+        shareUrl: `${req.protocol}://${req.get('host')}/share/pet/${pet.id}`
+      };
+
+      res.json(shareableProfile);
+    } catch (error) {
+      console.error("Error fetching shareable pet profile:", error);
+      res.status(500).json({ message: "Failed to fetch pet profile" });
+    }
+  });
+
   // Public endpoint for fetching medical records (limited data for emergency situations)
   app.get("/api/pets/public/:id/medical-records", async (req, res) => {
     try {
       const petId = parseInt(req.params.id);
+      
+      if (isNaN(petId)) {
+        return res.status(400).json({ message: "Invalid pet ID" });
+      }
 
       // Verify pet exists
       const pet = await storage.getPetById(petId);

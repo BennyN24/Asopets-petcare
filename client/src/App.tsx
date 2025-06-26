@@ -39,6 +39,7 @@ import TermsOfService from "@/pages/terms-of-service";
 import QRScannerPage from "@/pages/qr-scanner";
 import VetClinicsPage from "@/pages/vet-clinics";
 import Premium from "@/pages/premium";
+import SharedPetProfile from "@/pages/shared-pet-profile";
 
 // Mobile debugging
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
