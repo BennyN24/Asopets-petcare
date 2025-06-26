@@ -274,20 +274,11 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
             <Printer className="w-4 h-4 mr-1" />
             Print
           </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={copyQRData}
-            className="col-span-2"
-          >
-            <Copy className="w-4 h-4 mr-1" />
-            Copy Data
-          </Button>
         </div>
 
-        <div className="text-xs text-gray-500 text-center">
-          <p>QR code contains pet profile data for scanning and sharing</p>
+        <div className="text-xs text-gray-500 text-center space-y-1">
+          <p>QR code contains complete pet profile data for scanning and sharing</p>
+          <p>Compatible with ASOPETS mobile app scanner</p>
           <p>Generated on {new Date().toLocaleDateString()}</p>
         </div>
       </CardContent>
