@@ -57,6 +57,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import type { User as UserType, Pet, Reminder, MedicalRecord } from "@shared/schema";
+import StandardHeader from "@/components/standard-header";
 
 interface UserProfile {
   id: string;
@@ -134,7 +135,7 @@ export default function Profile() {
     isEnrolled: hasBiometric,
     error: biometricError,
   } = useBiometric();
-  
+
   const [biometricLoading, setBiometricLoading] = useState(false);
 
   // Initialize profile data when user loads
@@ -462,7 +463,7 @@ export default function Profile() {
   const handleSetupBiometric = async () => {
     if (!profileData?.id || !profileData?.email) return;
     setBiometricLoading(true);
-    
+
     try {
       const credential = await registerBiometric(profileData.id, profileData.email);
       if (credential) {
@@ -485,7 +486,7 @@ export default function Profile() {
   const handleRemoveBiometric = async () => {
     if (!profileData?.id) return;
     setBiometricLoading(true);
-    
+
     try {
       // Remove biometric data from local storage or server
       localStorage.removeItem(`biometric_${profileData.id}`);
@@ -545,36 +546,20 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-50 safe-container">
       <div className="max-w-md mx-auto bg-white min-h-screen relative mobile-safe-padding pl-[0px] pr-[0px]">
-        {/* Header */}
-      <div className="bg-primary text-white p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <User className="w-6 h-6 mr-3" />
-            <div>
-              <h1 className="text-xl font-bold">Profile</h1>
-              <p className="text-white/80 text-sm">Account & Settings</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 p-2"
-              onClick={handleExportData}
-            >
-              <Download className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 p-2"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
+         <StandardHeader
+          title="Profile"
+          backLink="/"
+          actionButtons={[
+            {
+              icon: <Download className="w-5 h-5" />,
+              onClick: handleExportData,
+            },
+            {
+              icon: <LogOut className="w-5 h-5" />,
+              onClick: handleLogout,
+            },
+          ]}
+        />
 
       <div className="p-4 space-y-6">
         {/* User Info Card */}
@@ -1020,8 +1005,7 @@ export default function Profile() {
 
             <Button
               variant="destructive"
-              className="w-full justify-start"
-              onClick={handleLogout}
+              className="w-full justify-start"The task is to replace the custom header in the Profile component with the StandardHeader component, ensuring layout consistency with other pages.              onClick={handleLogout}
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
@@ -1146,7 +1130,7 @@ export default function Profile() {
                   <li>• Your account and personal information</li>
                 </ul>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Type "DELETE MY ACCOUNT" to confirm:
@@ -1164,7 +1148,7 @@ export default function Profile() {
                 <Button
                   variant="outline"
                   className="flex-1"
-                  onClick={() => {
+                  onClick={()={() => {
                     setShowDeleteConfirmation(false);
                     setDeleteConfirmationText("");
                   }}
