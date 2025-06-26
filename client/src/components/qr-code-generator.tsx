@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { QrCode, Share, Download, Copy } from "lucide-react";
+import { QrCode, Share, Download, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import QRCode from "qrcode";
 import type { Pet, MedicalRecord } from "@shared/schema";
@@ -49,13 +49,13 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     try {
       const qrData = generateQRData();
       const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
-        width: 300,
+        width: 600,
         margin: 4,
         color: {
-          dark: '#000000',
-          light: '#FFFFFF'
+          dark: '#1a1a1a',
+          light: '#ffffff'
         },
-        errorCorrectionLevel: 'H' // Higher error correction for better scanning
+        errorCorrectionLevel: 'H' // High error correction for reliable mobile scanning
       });
       setQrCodeUrl(qrCodeDataUrl);
     } catch (error) {
@@ -74,32 +74,85 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
     
     const link = document.createElement('a');
     link.href = qrCodeUrl;
-    link.download = `${pet.name}-complete-qr-code.png`;
+    link.download = `${pet.name.replace(/[^a-zA-Z0-9]/g, '_')}-profile-qr.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
     toast({
-      title: "QR Code downloaded",
-      description: "The QR code has been saved to your device.",
+      title: "QR Code Downloaded",
+      description: `${pet.name}'s QR code saved to your device`,
     });
   };
 
-  const copyQRData = async () => {
-    try {
-      const qrData = generateQRData();
-      await navigator.clipboard.writeText(qrData);
-      toast({
-        title: "Data copied",
-        description: "QR code data has been copied to clipboard.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to copy data to clipboard.",
-        variant: "destructive",
-      });
+  const printQR = () => {
+    if (!qrCodeUrl) return;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${pet.name} - Pet Profile QR Code</title>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                text-align: center; 
+                padding: 20px;
+                margin: 0;
+              }
+              .header { 
+                margin-bottom: 20px;
+                border-bottom: 2px solid #333;
+                padding-bottom: 20px;
+              }
+              .qr-container { 
+                margin: 30px 0;
+              }
+              .footer {
+                margin-top: 30px;
+                font-size: 12px;
+                color: #666;
+                border-top: 1px solid #ccc;
+                padding-top: 20px;
+              }
+              img { 
+                max-width: 400px; 
+                height: auto;
+                border: 2px solid #333;
+                padding: 10px;
+                background: white;
+              }
+              @media print {
+                body { margin: 0; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>${pet.name}</h1>
+              <h2>Pet Profile QR Code</h2>
+              <p><strong>Category:</strong> ${pet.category} | <strong>Breed:</strong> ${pet.breed || 'Mixed'}</p>
+              ${pet.microchipId ? `<p><strong>Microchip ID:</strong> ${pet.microchipId}</p>` : ''}
+            </div>
+            <div class="qr-container">
+              <img src="${qrCodeUrl}" alt="${pet.name} QR Code" />
+            </div>
+            <div class="footer">
+              <p>Scan this QR code with the ASOPETS app to view ${pet.name}'s complete profile and medical records.</p>
+              <p>Generated on ${new Date().toLocaleDateString()}</p>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
     }
+
+    toast({
+      title: "Print QR Code",
+      description: `Print dialog opened for ${pet.name}'s QR code`,
+    });
   };
 
   const shareQRCode = async () => {
@@ -109,12 +162,12 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
       // Convert data URL to blob
       const response = await fetch(qrCodeUrl);
       const blob = await response.blob();
-      const file = new File([blob], `${pet.name}-complete-qr.png`, { type: 'image/png' });
+      const file = new File([blob], `${pet.name.replace(/[^a-zA-Z0-9]/g, '_')}-profile-qr.png`, { type: 'image/png' });
 
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `${pet.name} - Complete Profile & Medical Records`,
-          text: `QR code for ${pet.name}'s complete profile and medical records`,
+          title: `${pet.name} Profile QR Code`,
+          text: `Scan this QR code to view ${pet.name}'s pet profile and medical records`,
           files: [file],
         });
       } else {
@@ -148,7 +201,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
             <QrCode className="w-5 h-5 mr-2 text-primary" />
             <span>QR Code</span>
           </div>
-          <Badge variant="outline">
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
             Complete Profile & Records
           </Badge>
         </CardTitle>
@@ -160,11 +213,18 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : qrCodeUrl ? (
-            <img 
-              src={qrCodeUrl} 
-              alt={`QR Code for ${pet.name}`}
-              className="w-64 h-64 mx-auto border rounded-lg"
-            />
+            <div className="relative">
+              <img 
+                src={qrCodeUrl} 
+                alt={`QR Code for ${pet.name}`}
+                className="w-64 h-64 mx-auto border-2 border-gray-200 rounded-lg shadow-sm bg-white p-2"
+              />
+              <div className="absolute top-2 right-2">
+                <Badge variant="secondary" className="text-xs">
+                  HD
+                </Badge>
+              </div>
+            </div>
           ) : (
             <div className="w-64 h-64 flex items-center justify-center bg-gray-100 rounded-lg mx-auto">
               <QrCode className="w-12 h-12 text-gray-400" />
@@ -172,13 +232,19 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
           )}
         </div>
 
-        <div className="text-center text-sm text-gray-600">
-          <p className="font-medium">{pet.name}'s Profile QR Code</p>
-          <p>Scan to view pet information and {medicalRecords.length} medical record{medicalRecords.length !== 1 ? 's' : ''}</p>
-          <p className="text-xs text-gray-500 mt-1">Pet ID: {pet.id}</p>
+        <div className="text-center text-sm text-gray-600 space-y-1">
+          <p className="font-medium text-lg text-gray-800">{pet.name}'s Profile QR Code</p>
+          <p className="text-gray-600">Scan to view pet information and {medicalRecords.length} medical record{medicalRecords.length !== 1 ? 's' : ''}</p>
+          <div className="flex justify-center items-center space-x-4 text-xs text-gray-500 mt-2">
+            <span>Pet ID: {pet.id}</span>
+            <span>•</span>
+            <span>High Quality</span>
+            <span>•</span>
+            <span>Mobile Optimized</span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -197,6 +263,16 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
           >
             <Share className="w-4 h-4 mr-1" />
             Share
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={printQR}
+            disabled={!qrCodeUrl}
+          >
+            <Printer className="w-4 h-4 mr-1" />
+            Print
           </Button>
           
           <Button
