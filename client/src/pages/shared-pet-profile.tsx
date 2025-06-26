@@ -157,6 +157,7 @@ END:VCARD`;
   }
 
   if (error || !petProfile) {
+    console.error('Error loading pet profile:', error);
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -165,6 +166,9 @@ END:VCARD`;
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Pet Profile Not Found</h2>
             <p className="text-gray-600 mb-4">
               The pet profile you're looking for could not be found or is no longer available.
+            </p>
+            <p className="text-sm text-gray-500 mb-4">
+              Token: {shareToken}
             </p>
             <Button onClick={() => window.history.back()} variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />

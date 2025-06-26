@@ -4,6 +4,9 @@ import { queryClient } from "@/lib/queryClient";
 
 export function useAuth() {
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Skip auth check for public share routes
+  const isPublicShareRoute = window.location.pathname.startsWith('/share/pet/');
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
@@ -13,6 +16,7 @@ export function useAuth() {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
+    enabled: !isPublicShareRoute, // Skip auth for public routes
   });
 
   useEffect(() => {

@@ -58,9 +58,9 @@ function Router() {
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error, isPublicShareRoute, location });
 
-  // Handle authentication-based redirects - always call useEffect
+  // Handle authentication-based redirects - skip for public routes
   useEffect(() => {
-    if (isLoading) return; // Don't redirect while loading
+    if (isLoading || isPublicShareRoute) return; // Don't redirect while loading or for public routes
 
     const currentPath = window.location.pathname;
 
@@ -75,10 +75,10 @@ function Router() {
       setLocation("/dashboard");
       return;
     }
-  }, [isAuthenticated, isLoading, setLocation]);
+  }, [isAuthenticated, isLoading, setLocation, isPublicShareRoute]);
 
-  // Show loading while authentication is being determined
-  if (isLoading) {
+  // Show loading while authentication is being determined (skip for public routes)
+  if (isLoading && !isPublicShareRoute) {
     console.log('Showing loader - authentication in progress');
     return <LoadingSpinner />;
   }
@@ -92,11 +92,14 @@ function Router() {
 
   // Render public share route immediately without authentication
   if (isPublicShareRoute) {
+    console.log('Rendering public share route directly');
     return (
-      <Switch>
-        <Route path="/share/pet/:id" component={SharedPetProfile} />
-        <Route component={NotFound} />
-      </Switch>
+      <div className="min-h-screen">
+        <Switch>
+          <Route path="/share/pet/:id" component={SharedPetProfile} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
     );
   }
 
