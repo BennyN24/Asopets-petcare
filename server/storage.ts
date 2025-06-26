@@ -502,6 +502,35 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Scanned pet operations
+  async getScannedPetsByUserId(userId: string): Promise<ScannedPet[]> {
+    return await db
+      .select()
+      .from(scannedPets)
+      .where(eq(scannedPets.userId, userId))
+      .orderBy(desc(scannedPets.scannedAt));
+  }
+
+  async createScannedPet(scannedPet: InsertScannedPet): Promise<ScannedPet> {
+    const [result] = await db
+      .insert(scannedPets)
+      .values(scannedPet)
+      .returning();
+    return result;
+  }
+
+  async deleteScannedPet(id: number): Promise<void> {
+    await db
+      .delete(scannedPets)
+      .where(eq(scannedPets.id, id));
+  }
+
+  async deleteScannedPetByUserIdAndPetId(userId: string, petId: string): Promise<void> {
+    await db
+      .delete(scannedPets)
+      .where(and(eq(scannedPets.userId, userId), eq(scannedPets.petId, petId)));
+  }
+
   // Helper methods
   private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371; // Earth's radius in km

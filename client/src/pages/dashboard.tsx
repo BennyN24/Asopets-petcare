@@ -45,7 +45,7 @@ export default function Dashboard() {
   const [scannedPetData, setScannedPetData] = useState<any>(null);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [transferPetData, setTransferPetData] = useState<any>(null);
-  const [scannedPets, setScannedPets] = useState<any[]>([]);
+
   const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
 
   // Remove localStorage scanned pets logic since we're using database now
@@ -84,6 +84,31 @@ export default function Dashboard() {
     queryKey: ["/api/reminders/overdue"],
     enabled: !!user,
   });
+
+  // Fetch scanned pets from database
+  const { data: scannedPets = [] } = useQuery({
+    queryKey: ["/api/scanned-pets"],
+    enabled: !!user,
+  });
+
+  // Fetch all medical records for insights
+  const allMedicalRecordsQueries = useQuery({
+    queryKey: ["/api/medical-records/all"],
+    queryFn: async () => {
+      const allRecords: MedicalRecord[] = [];
+      for (const pet of pets) {
+        const response = await fetch(`/api/pets/${pet.id}/medical-records`);
+        if (response.ok) {
+          const records = await response.json();
+          allRecords.push(...records);
+        }
+      }
+      return allRecords;
+    },
+    enabled: !!user && pets.length > 0,
+  });
+
+  const allMedicalRecords = allMedicalRecordsQueries.data || [];
 
   // Create scanned pet mutation
   const createScannedPetMutation = useMutation({
@@ -400,17 +425,15 @@ export default function Dashboard() {
           }}
           onTransfer={async (petData) => {
             try {
-              const petProfile = petData.pet || petData;
-              
               const newPetData = {
-                name: petProfile.name || petData.petName || 'Transferred Pet',
-                category: petProfile.category || 'other',
-                breed: petProfile.breed || '',
-                dateOfBirth: petProfile.dateOfBirth || new Date().toISOString().split('T')[0],
-                age: petProfile.age || 0,
-                microchipId: petProfile.microchipId || '',
-                birthmarks: petProfile.birthmarks || '',
-                imageUrl: petProfile.imageUrl || ''
+                name: petData.name || petData.petName || 'Transferred Pet',
+                category: petData.category || 'other',
+                breed: petData.breed || '',
+                dateOfBirth: petData.dateOfBirth || new Date().toISOString().split('T')[0],
+                age: petData.age || 0,
+                microchipId: petData.microchipId || '',
+                birthmarks: petData.birthmarks || '',
+                imageUrl: petData.imageUrl || ''
               };
 
               console.log('Transferring pet data:', newPetData);

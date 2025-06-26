@@ -320,6 +320,12 @@ export const usersRelations = relations(users, ({ many }) => ({
   scannedPets: many(scannedPets),
 }));
 
+// Additional schemas that depend on table definitions
+export const insertScannedPetSchema = createInsertSchema(scannedPets).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
