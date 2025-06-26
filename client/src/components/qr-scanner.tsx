@@ -16,9 +16,12 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [scanningStatus, setScanningStatus] = useState<string>("Initializing camera...");
+  const [detectionAttempts, setDetectionAttempts] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,27 +56,31 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
         throw new Error("Camera not supported in this browser");
       }
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
+      // Enhanced camera constraints for better QR detection
+      const constraints = {
         video: {
           facingMode: { ideal: "environment" }, // Use back camera on mobile
-          width: { ideal: 1280, max: 1920, min: 480 },
-          height: { ideal: 720, max: 1080, min: 360 },
-          frameRate: { ideal: 24, max: 30, min: 10 }
+          width: { ideal: 1920, max: 2560, min: 640 },
+          height: { ideal: 1080, max: 1440, min: 480 },
+          frameRate: { ideal: 30, max: 60, min: 15 }
         }
-      });
+      };
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
 
         // Wait for video to be ready before starting detection
         videoRef.current.onloadedmetadata = () => {
-          console.log("📹 Video metadata loaded, starting QR detection");
+          console.log("Video metadata loaded, starting QR detection");
+          setScanningStatus("Camera ready, scanning for QR codes...");
           videoRef.current?.play().then(() => {
-            console.log("▶️ Video playing, dimensions:", videoRef.current?.videoWidth, "x", videoRef.current?.videoHeight);
+            console.log("Video playing, dimensions:", videoRef.current?.videoWidth, "x", videoRef.current?.videoHeight);
             // Start scanning immediately when video starts playing
             startQRDetection();
           }).catch((playError) => {
-            console.error("❌ Video play error:", playError);
+            console.error("Video play error:", playError);
             setError("Failed to start video playback");
             setIsScanning(false);
           });
@@ -109,23 +116,139 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     }
   };
 
+  const enhanceCameraFrame = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    // Apply contrast and brightness enhancement
+    const contrast = 1.2;
+    const brightness = 10;
+
+    for (let i = 0; i < data.length; i += 4) {
+      // Enhance contrast and brightness
+      data[i] = Math.min(255, Math.max(0, contrast * (data[i] - 128) + 128 + brightness));     // red
+      data[i + 1] = Math.min(255, Math.max(0, contrast * (data[i + 1] - 128) + 128 + brightness)); // green
+      data[i + 2] = Math.min(255, Math.max(0, contrast * (data[i + 2] - 128) + 128 + brightness)); // blue
+    }
+
+    context.putImageData(imageData, 0, 0);
+    return imageData;
+  };
+
+  const drawScanningOverlay = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
+    // Clear overlay
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw scanning frame
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const frameSize = Math.min(canvas.width, canvas.height) * 0.6;
+    const frameX = centerX - frameSize / 2;
+    const frameY = centerY - frameSize / 2;
+    
+    context.strokeStyle = '#00ff00';
+    context.lineWidth = 3;
+    context.strokeRect(frameX, frameY, frameSize, frameSize);
+    
+    // Draw corner markers
+    const cornerLength = 20;
+    context.lineWidth = 4;
+    
+    // Top-left corner
+    context.beginPath();
+    context.moveTo(frameX, frameY + cornerLength);
+    context.lineTo(frameX, frameY);
+    context.lineTo(frameX + cornerLength, frameY);
+    context.stroke();
+    
+    // Top-right corner
+    context.beginPath();
+    context.moveTo(frameX + frameSize - cornerLength, frameY);
+    context.lineTo(frameX + frameSize, frameY);
+    context.lineTo(frameX + frameSize, frameY + cornerLength);
+    context.stroke();
+    
+    // Bottom-left corner
+    context.beginPath();
+    context.moveTo(frameX, frameY + frameSize - cornerLength);
+    context.lineTo(frameX, frameY + frameSize);
+    context.lineTo(frameX + cornerLength, frameY + frameSize);
+    context.stroke();
+    
+    // Bottom-right corner
+    context.beginPath();
+    context.moveTo(frameX + frameSize - cornerLength, frameY + frameSize);
+    context.lineTo(frameX + frameSize, frameY + frameSize);
+    context.lineTo(frameX + frameSize, frameY + frameSize - cornerLength);
+    context.stroke();
+  };
+
+  const multiScaleQRDetection = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+    // Try detection at multiple scales and regions
+    const scales = [1, 0.8, 0.6, 1.2];
+    const regions = [
+      // Full frame
+      { x: 0, y: 0, w: 1, h: 1 },
+      // Center region (common QR placement)
+      { x: 0.2, y: 0.2, w: 0.6, h: 0.6 },
+      // Upper half
+      { x: 0, y: 0, w: 1, h: 0.5 },
+      // Lower half
+      { x: 0, y: 0.5, w: 1, h: 0.5 }
+    ];
+
+    for (const scale of scales) {
+      for (const region of regions) {
+        try {
+          const x = Math.floor(region.x * canvas.width);
+          const y = Math.floor(region.y * canvas.height);
+          const w = Math.floor(region.w * canvas.width * scale);
+          const h = Math.floor(region.h * canvas.height * scale);
+
+          if (w > 100 && h > 100) { // Minimum size check
+            const imageData = context.getImageData(x, y, w, h);
+            
+            // Try with different detection methods
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "attemptBoth"
+            });
+            
+            if (code) {
+              console.log(`QR detected at scale ${scale}, region ${JSON.stringify(region)}`);
+              return code;
+            }
+          }
+        } catch (err) {
+          // Continue to next attempt
+        }
+      }
+    }
+    return null;
+  };
+
   const startQRDetection = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
+    const overlayCanvas = overlayCanvasRef.current;
     const context = canvas?.getContext('2d');
+    const overlayContext = overlayCanvas?.getContext('2d');
 
-    if (!canvas || !video || !context) return;
+    if (!canvas || !video || !context || !overlayCanvas || !overlayContext) return;
 
     let scanningActive = true;
     let lastScanTime = 0;
+    let frameCount = 0;
 
     const scanFrame = () => {
       if (!scanningActive || !isScanning) return;
 
       const currentTime = Date.now();
+      frameCount++;
 
-      // Throttle scanning to avoid excessive processing
-      if (currentTime - lastScanTime < 200) {
+      // Dynamic throttling - scan faster initially, then slow down
+      const throttleTime = frameCount < 30 ? 100 : 150;
+      
+      if (currentTime - lastScanTime < throttleTime) {
         requestAnimationFrame(scanFrame);
         return;
       }
@@ -136,24 +259,47 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
         // Set canvas dimensions to match video
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+        overlayCanvas.width = video.videoWidth;
+        overlayCanvas.height = video.videoHeight;
 
         // Draw the current frame
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Draw scanning overlay
+        drawScanningOverlay(overlayCanvas, overlayContext);
+
+        // Update detection attempts counter
+        setDetectionAttempts(prev => prev + 1);
+        
+        // Update status every 10 frames
+        if (frameCount % 10 === 0) {
+          setScanningStatus(`Scanning... (${Math.floor(frameCount / 10)} attempts)`);
+        }
 
         try {
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          // First try standard detection
+          let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          let code = jsQR(imageData.data, imageData.width, imageData.height, {
             inversionAttempts: "attemptBoth",
           });
 
+          // If no QR found, try enhanced detection
+          if (!code) {
+            // Apply image enhancement
+            enhanceCameraFrame(context, canvas);
+            
+            // Try multi-scale detection
+            code = multiScaleQRDetection(context, canvas);
+          }
+
           if (code && code.data) {
-            console.log("🔍 QR Code detected! Raw data length:", code.data.length);
-            console.log("📄 Raw QR code data:", code.data);
+            console.log("QR Code detected! Raw data length:", code.data.length);
+            console.log("Raw QR code data:", code.data);
 
             try {
               const qrData = JSON.parse(code.data);
-              console.log("✅ Successfully parsed QR data:", qrData);
-              console.log("🔍 QR Data validation check:", {
+              console.log("Successfully parsed QR data:", qrData);
+              console.log("QR Data validation check:", {
                 hasType: !!qrData.type,
                 type: qrData.type,
                 hasPetId: !!(qrData.petId || qrData.id),
@@ -165,7 +311,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
 
               // Check for pet_profile type with required fields
               if (qrData.type === 'pet_profile' && (qrData.petId || qrData.id)) {
-                console.log("🎉 Valid pet QR code detected successfully!");
+                console.log("Valid pet QR code detected successfully!");
                 scanningActive = false; // Stop scanning
 
                 // Normalize the data structure
@@ -187,7 +333,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   scannedAt: new Date().toISOString()
                 };
 
-                console.log("📋 Normalized QR data:", normalizedData);
+                console.log("Normalized QR data:", normalizedData);
 
                 toast({
                   title: "Pet QR Code Found!",
@@ -197,7 +343,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 onScanSuccess(normalizedData);
                 return;
               } else {
-                console.log("❌ QR code validation failed:", {
+                console.log("QR code validation failed:", {
                   typeMatch: qrData.type === 'pet_profile',
                   hasPetId: !!(qrData.petId || qrData.id),
                   hasOwnerId: !!(qrData.ownerId || qrData.userId),
@@ -207,13 +353,13 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 });
               }
             } catch (parseError) {
-              console.error("❌ QR JSON parsing failed:", parseError);
-              console.log("📄 Raw data that failed to parse:", code.data);
-              console.log("📝 First 100 chars:", code.data.substring(0, 100));
+              console.error("QR JSON parsing failed:", parseError);
+              console.log("Raw data that failed to parse:", code.data);
+              console.log("First 100 chars:", code.data.substring(0, 100));
             }
           }
         } catch (err) {
-          console.error("🚨 QR detection error:", err);
+          console.error("QR detection error:", err);
         }
       }
 
