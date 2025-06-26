@@ -72,6 +72,7 @@ export const pets = pgTable("pets", {
   microchipId: varchar("microchip_id"),
   birthmarks: text("birthmarks"),
   imageUrl: varchar("image_url"),
+  shareToken: varchar("share_token", { length: 12 }).unique(), // Unique token for shareable links
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -205,7 +205,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPet(pet: InsertPet): Promise<Pet> {
-    const [newPet] = await db.insert(pets).values(pet).returning();
+    // Generate unique share token
+    const shareToken = this.generateShareToken();
+    
+    const [newPet] = await db.insert(pets).values({
+      ...pet,
+      shareToken
+    }).returning();
     return newPet;
   }
 
