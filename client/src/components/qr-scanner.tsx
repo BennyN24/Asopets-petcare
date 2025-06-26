@@ -726,62 +726,7 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     fileInputRef.current?.click();
   };
 
-  const generateTestQR = async () => {
-    console.log("Generating test QR code for debugging...");
-    
-    // Create a simple, reliable test QR code
-    const testPetData = {
-      type: "pet_profile",
-      petId: "test-123",
-      name: "Buddy",
-      petName: "Buddy",
-      category: "dog",
-      breed: "Golden Retriever",
-      age: 24,
-      medicalRecordCount: 3,
-      owner: {
-        name: "Test Owner",
-        email: "test@example.com"
-      }
-    };
 
-    const qrDataString = JSON.stringify(testPetData);
-    console.log("Test QR data:", qrDataString);
-    console.log("Data length:", qrDataString.length);
-
-    // Import QRCode dynamically
-    try {
-      const QRCode = (await import('qrcode')).default;
-      
-      // Generate QR code as data URL
-      const qrDataURL = await QRCode.toDataURL(qrDataString, {
-        width: 400,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        },
-        errorCorrectionLevel: 'H'
-      });
-
-      console.log("QR code generated successfully");
-
-      // Create a downloadable link
-      const link = document.createElement('a');
-      link.href = qrDataURL;
-      link.download = 'test-pet-qr-code.png';
-      link.click();
-
-      toast({
-        title: "Test QR Code Generated",
-        description: "Download started. Use this QR code to test scanning functionality.",
-      });
-
-    } catch (err) {
-      console.error("Failed to generate test QR code:", err);
-      setError("Failed to generate test QR code");
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -813,10 +758,6 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 <Button onClick={handleUploadClick} variant="outline" className="w-full">
                   <Upload className="w-4 h-4 mr-2" />
                   Upload QR Image
-                </Button>
-                
-                <Button onClick={generateTestQR} variant="ghost" className="w-full text-xs">
-                  Generate Test QR Code
                 </Button>
               </div>
 
