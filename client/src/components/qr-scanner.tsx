@@ -729,26 +729,20 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
   const generateTestQR = async () => {
     console.log("Generating test QR code for debugging...");
     
+    // Create a simple, reliable test QR code
     const testPetData = {
       type: "pet_profile",
-      petId: "debug-test-123",
-      ownerId: "owner-test-456", 
-      name: "Debug Dog",
-      petName: "Debug Dog",
+      petId: "test-123",
+      name: "Buddy",
+      petName: "Buddy",
       category: "dog",
-      breed: "Test Breed",
-      dateOfBirth: "2022-01-01",
-      age: 36,
-      microchipId: "TEST123456789",
-      birthmarks: "Test markings for debugging",
-      medicalRecordCount: 5,
-      lastUpdated: "2025-06-26T15:00:00.000Z",
+      breed: "Golden Retriever",
+      age: 24,
+      medicalRecordCount: 3,
       owner: {
         name: "Test Owner",
-        email: "test@example.com",
-        phone: "+1234567890"
-      },
-      timestamp: "2025-06-26T15:00:00.000Z"
+        email: "test@example.com"
+      }
     };
 
     const qrDataString = JSON.stringify(testPetData);
