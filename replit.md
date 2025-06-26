@@ -384,6 +384,16 @@ Changelog:
   * Overall system grade: A+ (Production Ready) with all requested features implemented
   * Fixed Delete Account button functionality with proper confirmation modal and cascading data removal
   * Added biometric login option to main login page with WebAuthn platform authenticator integration
+- June 26, 2025. Implemented unique token-based shareable pet profile links:
+  * Replaced database IDs with unique 12-character alphanumeric tokens for secure sharing
+  * Added shareToken field to pets database schema with unique constraint
+  * Generated secure tokens (e.g., 27354C53cbde) for all existing pets using MD5 hash combination
+  * Updated API endpoints to use share tokens instead of exposing database IDs
+  * Enhanced QR code generator with secure shareable links using asopets.com domain
+  * Fixed shared pet profile page to display unique share URLs publicly
+  * Maintained backward compatibility for pets without tokens
+  * Created public access endpoints for shareable pet profiles without authentication
+  * Updated frontend components to properly display and use new token format
 - June 26, 2025. Enhanced QR scanner functionality with advanced detection capabilities:
   * Implemented persistent storage for scanned pet profiles using PostgreSQL database
   * Fixed QR code detection issues in uploaded images with multiple processing strategies

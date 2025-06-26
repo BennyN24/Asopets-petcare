@@ -157,7 +157,7 @@ export default function QRCodeGenerator({ pet, medicalRecords = [] }: QRCodeGene
 
   const shareWebLink = async () => {
     try {
-      const shareUrl = `https://asopets.com/share/pet/${pet.shareToken || `${pet.id}`.padStart(12, '0')}`;
+      const shareUrl = `https://asopets.com/share/pet/${pet.shareToken || pet.id}`;
       
       if (navigator.share) {
         await navigator.share({
