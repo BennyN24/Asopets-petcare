@@ -48,11 +48,15 @@ const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 console.log("📱 Mobile detection:", { isMobile, isIOS, userAgent: navigator.userAgent });
 
 function Router() {
+  const [location] = useLocation();
+  const isPublicShareRoute = location.startsWith('/share/pet/');
+  
+  // Skip authentication for public share routes
   const { isAuthenticated, isLoading, user, error } = useAuth();
   const [, setLocation] = useLocation();
 
   // Debug authentication state
-  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error });
+  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error, isPublicShareRoute, location });
 
   // Handle authentication-based redirects - always call useEffect
   useEffect(() => {
@@ -86,6 +90,16 @@ function Router() {
 
   console.log('Rendering routes with auth state:', { isAuthenticated, isLoading });
 
+  // Render public share route immediately without authentication
+  if (isPublicShareRoute) {
+    return (
+      <Switch>
+        <Route path="/share/pet/:id" component={SharedPetProfile} />
+        <Route component={NotFound} />
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
       {/* Public routes - always available without authentication */}
@@ -94,7 +108,6 @@ function Router() {
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
       <Route path="/faq" component={FAQ} />
-      <Route path="/share/pet/:id" component={SharedPetProfile} />
 
       {/* Authenticated routes */}
       {isAuthenticated ? (
