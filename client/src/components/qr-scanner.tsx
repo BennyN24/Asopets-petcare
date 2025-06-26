@@ -240,9 +240,81 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
     setIsScanning(false);
   };
 
+  const processImageForQR = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): any => {
+    // Try multiple detection strategies for better QR code recognition
+    const strategies = [
+      // Original size
+      () => ctx.getImageData(0, 0, canvas.width, canvas.height),
+      // Resize to standard size for better detection
+      () => {
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        if (!tempCtx) return null;
+        
+        const maxSize = 800;
+        const scale = Math.min(maxSize / canvas.width, maxSize / canvas.height);
+        tempCanvas.width = canvas.width * scale;
+        tempCanvas.height = canvas.height * scale;
+        
+        tempCtx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+        return tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      },
+      // Grayscale conversion for better contrast
+      () => {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+          data[i] = gray;     // red
+          data[i + 1] = gray; // green
+          data[i + 2] = gray; // blue
+        }
+        return imageData;
+      }
+    ];
+
+    for (let i = 0; i < strategies.length; i++) {
+      try {
+        const imageData = strategies[i]();
+        if (!imageData) continue;
+
+        console.log(`Trying QR detection strategy ${i + 1}/3...`);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+
+        if (code) {
+          console.log(`QR Code found using strategy ${i + 1}:`, code.data.substring(0, 100));
+          return code;
+        }
+      } catch (err) {
+        console.log(`Strategy ${i + 1} failed:`, err);
+      }
+    }
+
+    // Try with different jsQR options
+    try {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: "attemptBoth",
+      });
+      if (code) {
+        console.log("QR Code found with inversionAttempts:", code.data.substring(0, 100));
+        return code;
+      }
+    } catch (err) {
+      console.log("Final attempt failed:", err);
+    }
+
+    return null;
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    setError(null);
+    console.log("Processing uploaded image:", file.name, file.type, file.size);
 
     if (!file.type.startsWith('image/')) {
       setError("Please select an image file");
@@ -254,6 +326,8 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
       const img = new Image();
       img.onload = () => {
         try {
+          console.log("Image loaded successfully:", img.width, "x", img.height);
+          
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           if (!ctx) {
@@ -265,8 +339,8 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
 
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
+          console.log("Canvas prepared, attempting QR detection...");
+          const code = processImageForQR(canvas, ctx);
 
           if (code) {
             console.log("QR Code found in uploaded image:", code.data);
@@ -294,7 +368,8 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                   birthmarks: qrData.birthmarks,
                   medicalRecordCount: qrData.medicalRecordCount || 0,
                   lastUpdated: qrData.lastUpdated || qrData.timestamp,
-                  owner: qrData.owner
+                  owner: qrData.owner,
+                  scannedAt: new Date().toISOString()
                 };
 
                 toast({
@@ -304,22 +379,41 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 onScanSuccess(normalizedData);
                 return;
               } else {
-                setError("Invalid pet QR code in the uploaded image");
+                console.log("QR validation failed:", {
+                  type: qrData.type,
+                  hasPetId: !!(qrData.petId || qrData.id),
+                  petId: qrData.petId || qrData.id
+                });
+                setError("This QR code is not a valid pet profile");
               }
             } catch (parseError) {
               console.error("Failed to parse QR data from image:", parseError);
-              setError("Invalid QR code format in the uploaded image");
+              console.log("Raw QR data:", code.data);
+              setError("This QR code contains invalid data format");
             }
           } else {
-            setError("No QR code found in the uploaded image");
+            console.log("No QR code detected in the uploaded image");
+            setError("No QR code found in this image. Please make sure the QR code is clear and visible.");
           }
         } catch (err) {
           console.error("Error processing uploaded image:", err);
           setError("Failed to process the uploaded image");
         }
       };
+      
+      img.onerror = () => {
+        console.error("Failed to load image");
+        setError("Failed to load the selected image");
+      };
+      
       img.src = e.target?.result as string;
     };
+    
+    reader.onerror = () => {
+      console.error("Failed to read file");
+      setError("Failed to read the selected file");
+    };
+    
     reader.readAsDataURL(file);
   };
 
