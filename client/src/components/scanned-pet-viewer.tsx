@@ -77,7 +77,7 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
   });
 
   // Use fetched profile data if available, otherwise fall back to scanned data
-  const currentData = completeProfile || data;
+  const currentData = petProfile || data;
   const petName = currentData.petName || currentData.name || 'Unknown Pet';
   const petCategory = currentData.category || 'other';
   

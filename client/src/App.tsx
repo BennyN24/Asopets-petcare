@@ -94,6 +94,7 @@ function Router() {
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-service" component={TermsOfService} />
       <Route path="/faq" component={FAQ} />
+      <Route path="/share/pet/:id" component={SharedPetProfile} />
 
       {/* Authenticated routes */}
       {isAuthenticated ? (
