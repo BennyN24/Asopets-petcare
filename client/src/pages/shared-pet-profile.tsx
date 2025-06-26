@@ -65,7 +65,7 @@ export default function SharedPetProfile() {
       }
       return response.json();
     },
-    enabled: !!shareToken && shareToken.length === 12,
+    enabled: !!shareToken,
     retry: false
   });
 

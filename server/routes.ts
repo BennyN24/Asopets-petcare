@@ -691,12 +691,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Shareable pet profile endpoint
+  // Shareable pet profile endpoint (public access)
   app.get("/api/pets/share/:token", async (req, res) => {
     try {
       const shareToken = req.params.token;
       
-      if (!shareToken || shareToken.length !== 12) {
+      if (!shareToken) {
         return res.status(400).json({ message: "Invalid share token" });
       }
 
