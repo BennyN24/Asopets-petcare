@@ -189,6 +189,11 @@ END:VCARD`;
               >
                 {petProfile.category}
               </Badge>
+              <div className="mt-3 p-2 bg-blue-50 rounded text-sm">
+                <span className="text-blue-700 font-medium">Share Link:</span>
+                <br />
+                <span className="text-blue-600 font-mono text-xs">{petProfile.shareUrl}</span>
+              </div>
             </div>
           </CardHeader>
 
