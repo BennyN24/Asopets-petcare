@@ -196,14 +196,8 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
               {petCategory}
             </Badge>
             
-            {/* Debug info */}
-            <div className="mt-2 text-xs text-gray-500 border p-2 rounded">
-              <div>Data type: {data.type}</div>
-              <div>Pet ID: {data.petId}</div>
-              <div>Has owner: {!!currentData.owner}</div>
-              <div>Has breed: {!!currentData.breed}</div>
-              <div>Has onTransfer: {!!onTransfer}</div>
-              <div>Current name: {currentData.name}</div>
+            <div className="mt-2 text-xs text-gray-500">
+              <div>Scanned: {format(new Date(data.scannedAt), 'MMM d, yyyy h:mm a')}</div>
             </div>
           </div>
 
@@ -238,15 +232,17 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
                     <span className="font-medium font-mono text-xs">{currentData.microchipId}</span>
                   </div>
                 )}
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Medical Records:</span>
-                  <span className="font-medium">{medicalRecords?.length || currentData.medicalRecordCount || 0}</span>
-                </div>
+                {(medicalRecords?.length || currentData.medicalRecordCount) && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Medical Records:</span>
+                    <span className="font-medium">{medicalRecords?.length || currentData.medicalRecordCount}</span>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Owner Information */}
-            {currentData.owner && (
+            {currentData.owner && (currentData.owner.name || currentData.owner.phone || currentData.owner.email) && (
               <div className="border-t pt-3">
                 <h4 className="font-medium text-gray-900 mb-2 flex items-center">
                   <User className="w-4 h-4 mr-1" />
@@ -363,8 +359,13 @@ export default function ScannedPetViewer({ data, onClose, onDelete, onTransfer }
                       </div>
                     )}
                   </div>
+                ) : currentData.medicalRecordCount ? (
+                  <div className="text-sm text-gray-500 text-center py-4 bg-gray-50 rounded">
+                    <Activity className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                    {currentData.medicalRecordCount} medical records available
+                  </div>
                 ) : (
-                  <div className="text-sm text-gray-500">No medical records found</div>
+                  <div className="text-sm text-gray-500">No medical records available</div>
                 )}
               </div>
             )}
