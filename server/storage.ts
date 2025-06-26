@@ -38,6 +38,7 @@ export interface IStorage {
   // Pet operations
   getPetsByUserId(userId: string, options?: { page?: number; limit?: number; includePhotos?: boolean }): Promise<Pet[]>;
   getPetById(id: number): Promise<Pet | undefined>;
+  getPetByShareToken(shareToken: string): Promise<Pet | undefined>;
   createPet(pet: InsertPet): Promise<Pet>;
   updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet>;
   deletePet(id: number): Promise<void>;

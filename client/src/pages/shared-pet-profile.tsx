@@ -54,18 +54,18 @@ interface ShareablePetProfile {
 export default function SharedPetProfile() {
   const { id } = useParams();
   const { toast } = useToast();
-  const petId = parseInt(id || "0");
+  const shareToken = id || "";
 
   const { data: petProfile, isLoading, error } = useQuery({
-    queryKey: [`/api/pets/share/${petId}`],
+    queryKey: [`/api/pets/share/${shareToken}`],
     queryFn: async (): Promise<ShareablePetProfile> => {
-      const response = await fetch(`/api/pets/share/${petId}`);
+      const response = await fetch(`/api/pets/share/${shareToken}`);
       if (!response.ok) {
         throw new Error('Pet profile not found');
       }
       return response.json();
     },
-    enabled: !!petId && !isNaN(petId),
+    enabled: !!shareToken && shareToken.length === 12,
     retry: false
   });
 

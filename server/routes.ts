@@ -692,15 +692,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Shareable pet profile endpoint
-  app.get("/api/pets/share/:id", async (req, res) => {
+  app.get("/api/pets/share/:token", async (req, res) => {
     try {
-      const petId = parseInt(req.params.id);
+      const shareToken = req.params.token;
       
-      if (isNaN(petId)) {
-        return res.status(400).json({ message: "Invalid pet ID" });
+      if (!shareToken || shareToken.length !== 12) {
+        return res.status(400).json({ message: "Invalid share token" });
       }
 
-      const pet = await storage.getPetById(petId);
+      const pet = await storage.getPetByShareToken(shareToken);
       if (!pet) {
         return res.status(404).json({ message: "Pet not found" });
       }
@@ -712,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get medical records with recent records for public sharing
-      const medicalRecords = await storage.getMedicalRecordsByPetId(petId);
+      const medicalRecords = await storage.getMedicalRecordsByPetId(pet.id);
       
       // Get recent medical records (last 5) for public display
       const recentMedicalRecords = medicalRecords
@@ -749,7 +749,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           emergencyPhone: owner.emergencyPhone
         },
         lastUpdated: pet.updatedAt || pet.createdAt,
-        shareUrl: `https://asopets.com/share/pet/${pet.id}`
+        shareUrl: `https://asopets.com/share/pet/${pet.shareToken}`
       };
 
       res.json(shareableProfile);
