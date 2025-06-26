@@ -59,11 +59,21 @@ export default function SharedPetProfile() {
   const { data: petProfile, isLoading, error } = useQuery({
     queryKey: [`/api/pets/share/${shareToken}`],
     queryFn: async (): Promise<ShareablePetProfile> => {
-      const response = await fetch(`/api/pets/share/${shareToken}`);
+      console.log('Fetching pet profile for token:', shareToken);
+      const response = await fetch(`/api/pets/share/${shareToken}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Response status:', response.status);
       if (!response.ok) {
+        console.error('Failed to fetch pet profile:', response.status, response.statusText);
         throw new Error('Pet profile not found');
       }
-      return response.json();
+      const data = await response.json();
+      console.log('Pet profile data:', data);
+      return data;
     },
     enabled: !!shareToken,
     retry: false

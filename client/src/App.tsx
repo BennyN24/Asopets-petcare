@@ -88,7 +88,7 @@ function Router() {
 
   return (
     <Switch>
-      {/* Public routes - always available */}
+      {/* Public routes - always available without authentication */}
       <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/terms" component={TermsOfService} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
