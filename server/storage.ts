@@ -569,6 +569,26 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(vetClinics.id, clinicId));
   }
+
+  private generateShareToken(): string {
+    // Generate a unique 12-character alphanumeric token
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 12; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  async getPetByShareToken(shareToken: string): Promise<Pet | undefined> {
+    try {
+      const [pet] = await db.select().from(pets).where(eq(pets.shareToken, shareToken));
+      return pet || undefined;
+    } catch (error) {
+      console.error("Error fetching pet by share token:", error);
+      return undefined;
+    }
+  }
 }
 
 // Import subscription methods

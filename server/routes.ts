@@ -749,7 +749,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           emergencyPhone: owner.emergencyPhone
         },
         lastUpdated: pet.updatedAt || pet.createdAt,
-        shareUrl: `https://asopets.com/share/pet/${pet.shareToken}`
+        shareUrl: `https://asopets.com/share/pet/${pet.shareToken || pet.id}`
       };
 
       res.json(shareableProfile);
