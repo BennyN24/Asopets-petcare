@@ -47,20 +47,37 @@ const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 console.log("📱 Mobile detection:", { isMobile, isIOS, userAgent: navigator.userAgent });
 
+function PublicShareRouter() {
+  console.log('Rendering public share route without authentication');
+  return (
+    <div className="min-h-screen">
+      <Switch>
+        <Route path="/share/pet/:id" component={SharedPetProfile} />
+        <Route component={NotFound} />
+      </Switch>
+    </div>
+  );
+}
+
 function Router() {
   const [location] = useLocation();
   const isPublicShareRoute = location.startsWith('/share/pet/');
   
-  // Skip authentication for public share routes
+  // Render public routes immediately without any authentication
+  if (isPublicShareRoute) {
+    return <PublicShareRouter />;
+  }
+  
+  // For all other routes, use authentication
   const { isAuthenticated, isLoading, user, error } = useAuth();
   const [, setLocation] = useLocation();
 
   // Debug authentication state
-  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error, isPublicShareRoute, location });
+  console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error, location });
 
-  // Handle authentication-based redirects - skip for public routes
+  // Handle authentication-based redirects
   useEffect(() => {
-    if (isLoading || isPublicShareRoute) return; // Don't redirect while loading or for public routes
+    if (isLoading) return; // Don't redirect while loading
 
     const currentPath = window.location.pathname;
 
@@ -75,10 +92,10 @@ function Router() {
       setLocation("/dashboard");
       return;
     }
-  }, [isAuthenticated, isLoading, setLocation, isPublicShareRoute]);
+  }, [isAuthenticated, isLoading, setLocation]);
 
-  // Show loading while authentication is being determined (skip for public routes)
-  if (isLoading && !isPublicShareRoute) {
+  // Show loading while authentication is being determined
+  if (isLoading) {
     console.log('Showing loader - authentication in progress');
     return <LoadingSpinner />;
   }
@@ -89,19 +106,6 @@ function Router() {
   }
 
   console.log('Rendering routes with auth state:', { isAuthenticated, isLoading });
-
-  // Render public share route immediately without authentication
-  if (isPublicShareRoute) {
-    console.log('Rendering public share route directly');
-    return (
-      <div className="min-h-screen">
-        <Switch>
-          <Route path="/share/pet/:id" component={SharedPetProfile} />
-          <Route component={NotFound} />
-        </Switch>
-      </div>
-    );
-  }
 
   return (
     <Switch>

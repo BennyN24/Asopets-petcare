@@ -56,23 +56,30 @@ export default function SharedPetProfile() {
   const { toast } = useToast();
   const shareToken = id || "";
 
+  console.log('SharedPetProfile component rendered with token:', shareToken);
+  console.log('Current URL:', window.location.href);
+
   const { data: petProfile, isLoading, error } = useQuery({
     queryKey: [`/api/pets/share/${shareToken}`],
     queryFn: async (): Promise<ShareablePetProfile> => {
       console.log('Fetching pet profile for token:', shareToken);
       const response = await fetch(`/api/pets/share/${shareToken}`, {
+        method: 'GET',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'omit' // Don't send cookies for public access
       });
       console.log('Response status:', response.status);
       if (!response.ok) {
         console.error('Failed to fetch pet profile:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
         throw new Error('Pet profile not found');
       }
       const data = await response.json();
-      console.log('Pet profile data:', data);
+      console.log('Pet profile data received:', data);
       return data;
     },
     enabled: !!shareToken,
