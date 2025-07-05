@@ -3,31 +3,72 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { insertPetSchema, type InsertPet, type PetCategory } from "@shared/schema";
+import {
+  insertPetSchema,
+  type InsertPet,
+  type PetCategory,
+} from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { ArrowLeft, Camera, Image, X } from "lucide-react";
 
 const petCategories: { value: PetCategory; label: string; icon: any }[] = [
-  { value: "dog", label: "Dogs", icon: () => <span className="text-lg">🐕</span> },
-  { value: "cat", label: "Cats", icon: () => <span className="text-lg">🐱</span> },
-  { value: "bird", label: "Birds", icon: () => <span className="text-lg">🐦</span> },
-  { value: "rabbit", label: "Rabbits", icon: () => <span className="text-lg">🐰</span> },
-  { value: "horse", label: "Horses", icon: () => <span className="text-lg">🐴</span> },
-  { value: "exotic", label: "Exotic", icon: () => <span className="text-lg">🦎</span> },
-  { value: "other", label: "Others", icon: () => <span className="text-lg">❤️</span> },
+  {
+    value: "dog",
+    label: "Dogs",
+    icon: () => <span className="text-lg">🐕</span>,
+  },
+  {
+    value: "cat",
+    label: "Cats",
+    icon: () => <span className="text-lg">🐱</span>,
+  },
+  {
+    value: "bird",
+    label: "Birds",
+    icon: () => <span className="text-lg">🐦</span>,
+  },
+  {
+    value: "rabbit",
+    label: "Rabbits",
+    icon: () => <span className="text-lg">🐰</span>,
+  },
+  {
+    value: "horse",
+    label: "Horses",
+    icon: () => <span className="text-lg">🐴</span>,
+  },
+  {
+    value: "exotic",
+    label: "Exotic",
+    icon: () => <span className="text-lg">🦎</span>,
+  },
+  {
+    value: "other",
+    label: "Others",
+    icon: () => <span className="text-lg">❤️</span>,
+  },
 ];
 
 export default function AddPet() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<PetCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PetCategory | null>(
+    null,
+  );
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,26 +92,26 @@ export default function AddPet() {
   const formValues = form.watch();
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      localStorage.setItem('petFormDraft', JSON.stringify(formValues));
+      localStorage.setItem("petFormDraft", JSON.stringify(formValues));
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [formValues]);
 
   // Load saved draft on mount
   useEffect(() => {
-    const savedDraft = localStorage.getItem('petFormDraft');
+    const savedDraft = localStorage.getItem("petFormDraft");
     if (savedDraft) {
       try {
         const draftData = JSON.parse(savedDraft);
         form.reset(draftData);
       } catch (error) {
-        console.error('Failed to load draft:', error);
+        console.error("Failed to load draft:", error);
       }
     }
   }, [form]);
 
   const handleFileSelect = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       toast({
         title: "Error",
         description: "Please select an image file",
@@ -79,8 +120,8 @@ export default function AddPet() {
       return;
     }
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Check file size (max 8MB)
+    if (file.size > 8 * 1024 * 1024) {
       toast({
         title: "Error",
         description: "Image size should be less than 5MB",
@@ -92,15 +133,15 @@ export default function AddPet() {
     setIsUploading(true);
     try {
       // Compress image before upload
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
       const img = new Image();
-      
+
       img.onload = () => {
         // Calculate new dimensions (max 800px width/height)
         const maxSize = 800;
         let { width, height } = img;
-        
+
         if (width > height && width > maxSize) {
           height = (height * maxSize) / width;
           width = maxSize;
@@ -108,19 +149,19 @@ export default function AddPet() {
           width = (width * maxSize) / height;
           height = maxSize;
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
+
         ctx?.drawImage(img, 0, 0, width, height);
-        
+
         // Convert to compressed JPEG
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
         setSelectedImage(compressedDataUrl);
-        form.setValue('imageUrl', compressedDataUrl);
+        form.setValue("imageUrl", compressedDataUrl);
         setIsUploading(false);
       };
-      
+
       img.src = URL.createObjectURL(file);
     } catch (error) {
       toast({
@@ -146,13 +187,13 @@ export default function AddPet() {
 
   const removeSelectedImage = () => {
     setSelectedImage(null);
-    form.setValue('imageUrl', '');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    if (cameraInputRef.current) cameraInputRef.current.value = '';
+    form.setValue("imageUrl", "");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   const createPetMutation = useMutation({
-    mutationFn: async (data: Omit<InsertPet, 'userId'>) => {
+    mutationFn: async (data: Omit<InsertPet, "userId">) => {
       await apiRequest("POST", "/api/pets", data);
     },
     onSuccess: () => {
@@ -172,7 +213,7 @@ export default function AddPet() {
     },
   });
 
-  const onSubmit = (data: Omit<InsertPet, 'userId'>) => {
+  const onSubmit = (data: Omit<InsertPet, "userId">) => {
     if (!selectedCategory) {
       toast({
         title: "Error",
@@ -198,7 +239,9 @@ export default function AddPet() {
           </button>
           <div className="flex-1">
             <h2 className="text-xl font-bold">Add New Pet</h2>
-            <p className="text-white/80 text-sm">Create a complete profile for your pet</p>
+            <p className="text-white/80 text-sm">
+              Create a complete profile for your pet
+            </p>
           </div>
         </div>
       </div>
@@ -208,16 +251,18 @@ export default function AddPet() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Pet Category Selection */}
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-3">Pet Category</Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-3">
+                Pet Category
+              </Label>
               <div className="grid grid-cols-3 gap-3">
                 {petCategories.map(({ value, label, icon: Icon }) => (
                   <button
                     key={value}
                     type="button"
-                    className={`pet-category-btn ${selectedCategory === value ? 'selected' : ''}`}
+                    className={`pet-category-btn ${selectedCategory === value ? "selected" : ""}`}
                     onClick={() => {
                       setSelectedCategory(value);
-                      form.setValue('category', value);
+                      form.setValue("category", value);
                     }}
                   >
                     <Icon className="w-6 h-6 text-gray-600 mb-2" />
@@ -229,7 +274,9 @@ export default function AddPet() {
 
             {/* Pet Photo Upload */}
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-3">Pet Photo</Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-3">
+                Pet Photo
+              </Label>
 
               {/* Hidden file inputs */}
               <input
@@ -271,8 +318,8 @@ export default function AddPet() {
                 </div>
               ) : (
                 <div className="flex space-x-3">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={handleCameraCapture}
                     disabled={isUploading}
                     className="flex-1 flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-gray-50 transition-colors"
@@ -280,8 +327,8 @@ export default function AddPet() {
                     <Camera className="w-8 h-8 text-gray-400 mb-2" />
                     <span className="text-sm text-gray-600">Take Photo</span>
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={handleFileUpload}
                     disabled={isUploading}
                     className="flex-1 flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-gray-50 transition-colors"
@@ -294,7 +341,9 @@ export default function AddPet() {
 
               {isUploading && (
                 <div className="mt-2 text-center">
-                  <span className="text-sm text-gray-500">Processing image...</span>
+                  <span className="text-sm text-gray-500">
+                    Processing image...
+                  </span>
                 </div>
               )}
             </div>
@@ -322,7 +371,11 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Breed</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter breed" {...field} value={field.value || ""} />
+                      <Input
+                        placeholder="Enter breed"
+                        {...field}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -350,12 +403,18 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Age (in months)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Enter age in months" 
-                        {...field} 
-                        value={field.value || ""} 
-                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                      <Input
+                        type="number"
+                        placeholder="Enter age in months"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value
+                              ? parseInt(e.target.value)
+                              : undefined,
+                          )
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -370,7 +429,11 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Microchip ID (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter microchip ID" {...field} value={field.value || ""} />
+                      <Input
+                        placeholder="Enter microchip ID"
+                        {...field}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -384,7 +447,7 @@ export default function AddPet() {
                   <FormItem>
                     <FormLabel>Birthmarks / Remarks</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Enter any distinctive marks or remarks"
                         className="h-24 resize-none"
                         {...field}
@@ -397,8 +460,8 @@ export default function AddPet() {
               />
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-primary text-white py-3 font-semibold hover:bg-green-600"
               disabled={createPetMutation.isPending}
             >

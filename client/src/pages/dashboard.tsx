@@ -7,7 +7,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode, Trash2 } from "lucide-react";
+import { Bell, Plus, Calendar, Syringe, BarChart3, MapPin, QrCode, Trash2, Upload } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
