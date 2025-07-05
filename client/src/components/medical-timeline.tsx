@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,15 +17,12 @@ import {
   FileText,
   Image as ImageIcon,
   Trash2,
-  Eye,
-  Camera,
   Filter,
   SortAsc,
   SortDesc
 } from "lucide-react";
 import MedicalAttachmentViewer from "@/components/medical-attachment-viewer";
 import { format, isValid } from "date-fns";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { MedicalRecord, MedicalRecordType } from "@shared/schema";
@@ -38,6 +36,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
+  const [selectedRecordWithAttachments, setSelectedRecordWithAttachments] = useState<MedicalRecord | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [attachmentIndex, setAttachmentIndex] = useState(0);
@@ -48,22 +47,47 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Query to get full record with attachments when viewing details
+  const { data: fullRecordData } = useQuery({
+    queryKey: [`/api/pets/${petId}/medical-records-full`],
+    queryFn: async () => {
+      const response = await fetch(`/api/pets/${petId}/medical-records?includeAttachments=true&limit=1000`, {
+        credentials: 'include'
+      });
+      return response.json();
+    },
+    enabled: !!selectedRecord && isDialogOpen,
+  });
+
+  // Update full record data when query completes
+  React.useEffect(() => {
+    if (fullRecordData?.records && selectedRecord) {
+      const fullRecord = fullRecordData.records.find((r: MedicalRecord) => r.id === selectedRecord.id);
+      if (fullRecord) {
+        setSelectedRecordWithAttachments(fullRecord);
+      }
+    }
+  }, [fullRecordData, selectedRecord]);
+
   const deleteRecordMutation = useMutation({
     mutationFn: async (recordId: number) => {
-      await apiRequest("DELETE", `/api/pets/${petId}/medical-records/${recordId}`);
+      await apiRequest("DELETE", `/api/medical-records/${recordId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "medical-records"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/pets", petId, "reminders"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/pets/${petId}/medical-records`] });
       toast({
         title: "Record deleted",
         description: "Medical record has been removed successfully.",
       });
+      setIsDialogOpen(false);
+      setSelectedRecord(null);
+      setSelectedRecordWithAttachments(null);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to delete record",
         variant: "destructive",
       });
     },
@@ -77,30 +101,21 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
       case 'treatment': return <MedicalKit {...iconProps} />;
       case 'surgery': return <UserCog {...iconProps} />;
       case 'checkup': return <Stethoscope {...iconProps} />;
-      case 'lab-test': return <FileText {...iconProps} />;
-      default: return <Stethoscope {...iconProps} />;
+      case 'grooming': return <UserCog {...iconProps} />;
+      default: return <FileText {...iconProps} />;
     }
   };
 
-  const getTypeColor = (type: string) => {
+  const getBadgeColor = (type: string) => {
     switch (type) {
-      case 'vaccine': return 'bg-green-100 text-green-800 border-green-200';
-      case 'deworming': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'treatment': return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'surgery': return 'bg-red-100 text-red-800 border-red-200';
-      case 'checkup': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'lab-test': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'vaccine': return 'bg-green-100 text-green-800';
+      case 'deworming': return 'bg-orange-100 text-orange-800';
+      case 'treatment': return 'bg-blue-100 text-blue-800';
+      case 'surgery': return 'bg-red-100 text-red-800';
+      case 'checkup': return 'bg-purple-100 text-purple-800';
+      case 'grooming': return 'bg-pink-100 text-pink-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return isValid(date) ? format(date, "MMM d, yyyy") : "Invalid date";
-  };
-
-  const formatType = (type: string) => {
-    return type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Unknown';
   };
 
   const handleDeleteRecord = (recordId: number, title: string) => {
@@ -111,6 +126,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
 
   const handleRecordClick = (record: MedicalRecord) => {
     setSelectedRecord(record);
+    setSelectedRecordWithAttachments(null); // Reset while loading
     setIsDialogOpen(true);
   };
 
@@ -153,23 +169,13 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
     return Array.from(types).sort();
   }, [medicalRecords]);
 
-  const toggleSortOrder = () => {
-    setSortOrder(current => current === 'asc' ? 'desc' : 'asc');
+  // Check if record has images (excluding placeholders)
+  const hasValidImages = (record: MedicalRecord) => {
+    const hasValidAttachments = record.attachments && record.attachments.length > 0 && 
+      !record.attachments.every(a => typeof a === 'string' && a.includes('attachment(s)'));
+    const hasValidImageUrl = record.imageUrl && record.imageUrl !== '[image_available]';
+    return hasValidAttachments || hasValidImageUrl;
   };
-
-  if (medicalRecords.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <Stethoscope className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <h3 className="font-medium text-gray-900 mb-2">No Medical Records</h3>
-          <p className="text-gray-500 text-sm">
-            Start tracking your pet's health by adding their first medical record.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -209,7 +215,7 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Sort By */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Sort by</label>
@@ -224,366 +230,304 @@ export default function MedicalTimeline({ petId, medicalRecords }: MedicalTimeli
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Sort Order */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Sort Order</label>
-              <Button
-                variant="outline"
-                onClick={toggleSortOrder}
-                className="w-full justify-start"
-              >
-                {sortOrder === 'desc' ? (
-                  <SortDesc className="w-4 h-4 mr-2" />
-                ) : (
-                  <SortAsc className="w-4 h-4 mr-2" />
-                )}
-                {sortBy === 'date' 
-                  ? (sortOrder === 'desc' ? 'Newest First' : 'Oldest First')
-                  : (sortOrder === 'desc' ? 'Z to A' : 'A to Z')
-                }
-              </Button>
+              <label className="text-sm font-medium text-gray-700">Order</label>
+              <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as 'asc' | 'desc')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="desc">
+                    <div className="flex items-center gap-2">
+                      <SortDesc className="w-4 h-4" />
+                      Newest First
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="asc">
+                    <div className="flex items-center gap-2">
+                      <SortAsc className="w-4 h-4" />
+                      Oldest First
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+          </div>
+        )}
+
+        {showFilters && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setFilterType('all');
+                setSortBy('date');
+                setSortOrder('desc');
+              }}
+            >
+              Reset Filters
+            </Button>
           </div>
         )}
       </div>
 
-      {/* Results Summary */}
-      {filterType !== 'all' && (
-        <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-          Showing {filteredAndSortedRecords.length} {filterType.replace('-', ' ')} record{filteredAndSortedRecords.length !== 1 ? 's' : ''} 
-          {filteredAndSortedRecords.length < medicalRecords.length && (
-            <span> out of {medicalRecords.length} total</span>
-          )}
-        </div>
-      )}
-
-      {/* No filtered results */}
-      {filteredAndSortedRecords.length === 0 && filterType !== 'all' && (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <Stethoscope className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-600 mb-2">No {filterType.replace('-', ' ')} records found</h3>
-          <p className="text-gray-500">Try adjusting your filters or add new records.</p>
-          <Button
-            variant="outline"
-            onClick={() => setFilterType('all')}
-            className="mt-4"
-          >
-            Show All Records
-          </Button>
-        </div>
-      )}
-
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-        
-        <div className="space-y-6">
-          {filteredAndSortedRecords.map((record, index) => (
-            <div key={record.id} className="relative">
-              {/* Timeline dot */}
-              <div className={`absolute left-4 w-4 h-4 rounded-full border-2 border-white ${
-                index === 0 ? 'bg-primary' : 'bg-gray-300'
-              } shadow-sm`}></div>
-              
-              {/* Record card */}
-              <Card className="ml-12 hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleRecordClick(record)}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+      {/* Medical Records Timeline */}
+      <div className="space-y-4">
+        {filteredAndSortedRecords.length === 0 ? (
+          <div className="text-center py-8">
+            <Stethoscope className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No medical records</h3>
+            <p className="text-gray-500">
+              {filterType !== 'all' ? `No ${filterType} records found.` : 'No medical records have been added yet.'}
+            </p>
+          </div>
+        ) : (
+          filteredAndSortedRecords.map((record) => (
+            <Card key={record.id} className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4" onClick={() => handleRecordClick(record)}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3 flex-1">
+                    <div className="flex-shrink-0 mt-1">
+                      {getActivityIcon(record.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={`activity-icon ${record.type}`}>
-                          {getActivityIcon(record.type)}
-                        </div>
-                        <Badge variant="outline" className={getTypeColor(record.type)}>
-                          {formatType(record.type)}
+                        <Badge className={getBadgeColor(record.type)}>
+                          {record.type}
                         </Badge>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(record.dateAdministered)}
-                        </span>
+                        {hasValidImages(record) && (
+                          <ImageIcon className="w-4 h-4 text-blue-600" />
+                        )}
                       </div>
-                      
-                      <h4 className="font-medium text-gray-900 mb-1">{record.title}</h4>
-                      
-                      {record.description && (
-                        <p className="text-sm text-gray-600 mb-2">{record.description}</p>
-                      )}
-
-                      <div className="grid grid-cols-1 gap-2 text-xs text-gray-500">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        {record.title || `${record.type.charAt(0).toUpperCase()}${record.type.slice(1)} Record`}
+                      </h4>
+                      <div className="space-y-1 text-sm text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>
+                            {isValid(new Date(record.dateAdministered)) 
+                              ? format(new Date(record.dateAdministered), "MMM dd, yyyy")
+                              : "No date"
+                            }
+                          </span>
+                        </div>
                         {record.veterinarian && (
-                          <div className="flex items-center">
-                            <Stethoscope className="w-3 h-3 mr-1" />
+                          <div className="flex items-center gap-1">
+                            <UserCog className="w-3 h-3" />
                             <span>Dr. {record.veterinarian}</span>
                           </div>
                         )}
-                        
                         {record.clinic && (
-                          <div className="flex items-center">
-                            <MapPin className="w-3 h-3 mr-1" />
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
                             <span>{record.clinic}</span>
                           </div>
                         )}
-                        
                         {record.cost && (
-                          <div className="flex items-center">
-                            <DollarSign className="w-3 h-3 mr-1" />
-                            <span>₱{record.cost}</span>
-                          </div>
-                        )}
-                        
-                        {record.batchNumber && (
-                          <div className="flex items-center">
-                            <FileText className="w-3 h-3 mr-1" />
-                            <span>Batch: {record.batchNumber}</span>
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="w-3 h-3" />
+                            <span>{record.cost}</span>
                           </div>
                         )}
                       </div>
-
-                      {/* Images preview */}
-                      {record.attachments && record.attachments.length > 0 && (
-                        <div className="mt-2">
-                          <div className="flex items-center gap-1 mb-2">
-                            <ImageIcon className="w-3 h-3 text-gray-500" />
-                            <span className="text-xs text-gray-500">{record.attachments.length} image{record.attachments.length > 1 ? 's' : ''}</span>
-                          </div>
-                          <div className="flex gap-2 flex-wrap">
-                            {record.attachments.slice(0, 3).map((attachment, idx) => (
-                              <div 
-                                key={idx}
-                                className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedRecord(record);
-                                  setAttachmentIndex(idx);
-                                  setShowAttachments(true);
-                                }}
-                              >
-                                <img
-                                  src={attachment}
-                                  alt={`Medical record attachment ${idx + 1}`}
-                                  className="w-full h-full object-cover"
-                                />
-                                {idx === 2 && record.attachments.length > 3 && (
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                    <span className="text-white text-xs font-medium">+{record.attachments.length - 3}</span>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {record.nextDueDate && (
-                        <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs">
-                          <Calendar className="w-3 h-3 inline mr-1" />
-                          <span className="text-amber-800">
-                            Next due: {formatDate(record.nextDueDate)}
-                          </span>
-                        </div>
-                      )}
-
-                      {record.notes && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
-                          <p className="text-gray-600">{record.notes}</p>
-                        </div>
-                      )}
-
-                      {record.imageUrl && (
-                        <div className="mt-2">
-                          <div className="flex items-center text-xs text-gray-500 mb-1">
-                            <ImageIcon className="w-3 h-3 mr-1" />
-                            <span>Attached document</span>
-                          </div>
-                          <div 
-                            className="cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedRecord(record);
-                              const allImages = [
-                                ...(record.attachments || []),
-                                ...(record.imageUrl ? [record.imageUrl] : [])
-                              ];
-                              setAttachmentIndex(allImages.findIndex(img => img === record.imageUrl));
-                              setShowAttachments(true);
-                            }}
-                          >
-                            <img 
-                              src={record.imageUrl} 
-                              alt="Medical record"
-                              className="max-w-32 h-auto rounded border"
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 hover:text-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteRecord(record.id, record.title);
-                      }}
-                      disabled={deleteRecordMutation.isPending}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
-      {/* Detailed Record Dialog */}
+      {/* Medical Record Detail Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md" aria-describedby="record-details">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedRecord && getActivityIcon(selectedRecord.type)}
-              {selectedRecord?.title}
+              <span>{selectedRecord?.title || `${selectedRecord?.type} Record`}</span>
             </DialogTitle>
           </DialogHeader>
-          <div id="record-details">
-            {selectedRecord && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={getTypeColor(selectedRecord.type)}>
-                    {formatType(selectedRecord.type)}
-                  </Badge>
-                  <span className="text-sm text-gray-500">
-                    {formatDate(selectedRecord.dateAdministered)}
-                  </span>
-                </div>
+          
+          {selectedRecord && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Badge className={getBadgeColor(selectedRecord.type)}>
+                  {selectedRecord.type}
+                </Badge>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDeleteRecord(selectedRecord.id, selectedRecord.title || selectedRecord.type)}
+                  disabled={deleteRecordMutation.isPending}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
 
-                {selectedRecord.description && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">Description</h4>
-                    <p className="text-sm text-gray-600">{selectedRecord.description}</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 gap-3">
-                  {selectedRecord.veterinarian && (
-                    <div>
-                      <h4 className="font-medium text-sm text-gray-900 mb-1">Veterinarian</h4>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Stethoscope className="w-4 h-4 mr-2" />
-                        Dr. {selectedRecord.veterinarian}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedRecord.clinic && (
-                    <div>
-                      <h4 className="font-medium text-sm text-gray-900 mb-1">Clinic</h4>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        {selectedRecord.clinic}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedRecord.cost && (
-                    <div>
-                      <h4 className="font-medium text-sm text-gray-900 mb-1">Cost</h4>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <DollarSign className="w-4 h-4 mr-2" />
-                        ₱{selectedRecord.cost}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedRecord.batchNumber && (
-                    <div>
-                      <h4 className="font-medium text-sm text-gray-900 mb-1">Batch Number</h4>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <FileText className="w-4 h-4 mr-2" />
-                        {selectedRecord.batchNumber}
-                      </div>
-                    </div>
-                  )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Date Administered</label>
+                  <p className="text-sm">
+                    {isValid(new Date(selectedRecord.dateAdministered))
+                      ? format(new Date(selectedRecord.dateAdministered), "MMMM dd, yyyy")
+                      : "No date specified"
+                    }
+                  </p>
                 </div>
 
                 {selectedRecord.nextDueDate && (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded">
-                    <h4 className="font-medium text-sm text-amber-800 mb-1">Next Due Date</h4>
-                    <div className="flex items-center text-sm text-amber-700">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {formatDate(selectedRecord.nextDueDate)}
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Next Due Date</label>
+                    <p className="text-sm">
+                      {isValid(new Date(selectedRecord.nextDueDate))
+                        ? format(new Date(selectedRecord.nextDueDate), "MMMM dd, yyyy")
+                        : "No date specified"
+                      }
+                    </p>
                   </div>
                 )}
 
-                {selectedRecord.notes && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-1">Notes</h4>
-                    <div className="p-3 bg-gray-50 rounded text-sm text-gray-600">
-                      {selectedRecord.notes}
-                    </div>
+                {selectedRecord.veterinarian && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      {selectedRecord.type === 'grooming' ? 'Groomer' : 'Veterinarian'}
+                    </label>
+                    <p className="text-sm">Dr. {selectedRecord.veterinarian}</p>
                   </div>
                 )}
 
-                {/* Images section */}
-                {((selectedRecord.attachments && selectedRecord.attachments.length > 0) || selectedRecord.imageUrl) && (
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-900 mb-2">
-                      Attached Images ({(selectedRecord.attachments?.length || 0) + (selectedRecord.imageUrl ? 1 : 0)})
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {selectedRecord.attachments?.map((attachment, idx) => (
+                {selectedRecord.clinic && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      {selectedRecord.type === 'grooming' ? 'Grooming Salon' : 'Clinic'}
+                    </label>
+                    <p className="text-sm">{selectedRecord.clinic}</p>
+                  </div>
+                )}
+
+                {selectedRecord.batchNumber && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Batch Number</label>
+                    <p className="text-sm">{selectedRecord.batchNumber}</p>
+                  </div>
+                )}
+
+                {selectedRecord.weight && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Weight</label>
+                    <p className="text-sm">{selectedRecord.weight}</p>
+                  </div>
+                )}
+
+                {selectedRecord.cost && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Cost</label>
+                    <p className="text-sm">{selectedRecord.cost}</p>
+                  </div>
+                )}
+              </div>
+
+              {selectedRecord.description && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Description</label>
+                  <p className="text-sm text-gray-600">{selectedRecord.description}</p>
+                </div>
+              )}
+
+              {/* Attachments Section */}
+              {selectedRecordWithAttachments ? (
+                hasValidImages(selectedRecordWithAttachments) ? (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-900">Attachments</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      {selectedRecordWithAttachments.attachments?.map((attachment, idx) => {
+                        // Skip placeholder text from pagination
+                        if (typeof attachment === 'string' && attachment.includes('attachment(s)')) {
+                          return null;
+                        }
+                        return (
+                          <div 
+                            key={idx}
+                            className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border"
+                            onClick={() => {
+                              setAttachmentIndex(idx);
+                              setShowAttachments(true);
+                            }}
+                          >
+                            <img
+                              src={attachment}
+                              alt={`Medical record attachment ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                console.error('Failed to load attachment:', attachment);
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                      {selectedRecordWithAttachments.imageUrl && selectedRecordWithAttachments.imageUrl !== '[image_available]' && (
                         <div 
-                          key={idx}
                           className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border"
                           onClick={() => {
-                            setAttachmentIndex(idx);
-                            setShowAttachments(true);
-                          }}
-                        >
-                          <img
-                            src={attachment}
-                            alt={`Medical record attachment ${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
-                      {selectedRecord.imageUrl && (
-                        <div 
-                          className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity border"
-                          onClick={() => {
+                            const validAttachments = selectedRecordWithAttachments.attachments?.filter(
+                              a => typeof a === 'string' && !a.includes('attachment(s)')
+                            ) || [];
                             const allImages = [
-                              ...(selectedRecord.attachments || []),
-                              selectedRecord.imageUrl!
+                              ...validAttachments,
+                              selectedRecordWithAttachments.imageUrl!
                             ];
                             setAttachmentIndex(allImages.length - 1);
                             setShowAttachments(true);
                           }}
                         >
                           <img 
-                            src={selectedRecord.imageUrl} 
+                            src={selectedRecordWithAttachments.imageUrl} 
                             alt="Medical record document"
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Failed to load image:', selectedRecordWithAttachments.imageUrl);
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         </div>
                       )}
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+                ) : null
+              ) : (
+                hasValidImages(selectedRecord) && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-900">Attachments</h4>
+                    <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-blue-600" />
+                        <span>Loading attachments...</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
       {/* Image Lightbox */}
-      {showAttachments && selectedRecord && (
+      {showAttachments && selectedRecordWithAttachments && (
         <MedicalAttachmentViewer
           attachments={[
-            ...(selectedRecord.attachments || []),
-            ...(selectedRecord.imageUrl ? [selectedRecord.imageUrl] : [])
+            ...(selectedRecordWithAttachments.attachments?.filter(a => 
+              typeof a === 'string' && !a.includes('attachment(s)')
+            ) || []),
+            ...(selectedRecordWithAttachments.imageUrl && selectedRecordWithAttachments.imageUrl !== '[image_available]' 
+              ? [selectedRecordWithAttachments.imageUrl] : [])
           ]}
           isOpen={showAttachments}
           onClose={() => setShowAttachments(false)}
