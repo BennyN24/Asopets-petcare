@@ -120,8 +120,8 @@ export default function AddPet() {
       return;
     }
 
-    // Check file size (max 8MB)
-    if (file.size > 8 * 1024 * 1024) {
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "Error",
         description: "Image size should be less than 5MB",
@@ -218,6 +218,16 @@ export default function AddPet() {
       toast({
         title: "Error",
         description: "Please select a pet category",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate birth date is not in the future
+    if (data.dateOfBirth && new Date(data.dateOfBirth) > new Date()) {
+      toast({
+        title: "Error",
+        description: "Birth date cannot be in the future",
         variant: "destructive",
       });
       return;
