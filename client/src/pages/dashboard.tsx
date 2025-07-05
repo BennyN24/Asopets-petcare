@@ -263,6 +263,17 @@ export default function Dashboard() {
                 <Plus className="text-gray-400 text-2xl mb-2" />
                 <p className="text-gray-500 text-sm font-medium">Add Pet</p>
               </div>
+              
+              {/* Bulk Add Pets Card */}
+              <div
+                className="bg-green-50 p-4 rounded-xl border-2 border-dashed border-green-300 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-colors touch-manipulation active:scale-95"
+                onClick={() => setLocation("/bulk-add-pets")}
+                onTouchStart={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                onTouchEnd={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <Upload className="text-green-400 text-2xl mb-2" />
+                <p className="text-green-500 text-sm font-medium">Bulk Import</p>
+              </div>
               {/* QR Scanner Card */}
               <div
                 className="bg-blue-50 p-4 rounded-xl border-2 border-dashed border-blue-300 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors touch-manipulation active:scale-95"

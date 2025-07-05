@@ -47,6 +47,28 @@ export default function AddPet() {
     },
   });
 
+  // Auto-save form data to localStorage
+  const formValues = form.watch();
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem('petFormDraft', JSON.stringify(formValues));
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [formValues]);
+
+  // Load saved draft on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('petFormDraft');
+    if (savedDraft) {
+      try {
+        const draftData = JSON.parse(savedDraft);
+        form.reset(draftData);
+      } catch (error) {
+        console.error('Failed to load draft:', error);
+      }
+    }
+  }, [form]);
+
   const handleFileSelect = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast({
@@ -57,23 +79,55 @@ export default function AddPet() {
       return;
     }
 
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "Image size should be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
     try {
-      // Create a data URL for preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string;
-        setSelectedImage(dataUrl);
-        form.setValue('imageUrl', dataUrl);
+      // Compress image before upload
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 800px width/height)
+        const maxSize = 800;
+        let { width, height } = img;
+        
+        if (width > height && width > maxSize) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        } else if (height > maxSize) {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Convert to compressed JPEG
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setSelectedImage(compressedDataUrl);
+        form.setValue('imageUrl', compressedDataUrl);
+        setIsUploading(false);
       };
-      reader.readAsDataURL(file);
+      
+      img.src = URL.createObjectURL(file);
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to process image",
         variant: "destructive",
       });
-    } finally {
       setIsUploading(false);
     }
   };
@@ -142,7 +196,10 @@ export default function AddPet() {
           <button onClick={() => setLocation("/")} className="mr-4">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h2 className="text-xl font-bold">Add New Pet</h2>
+          <div className="flex-1">
+            <h2 className="text-xl font-bold">Add New Pet</h2>
+            <p className="text-white/80 text-sm">Create a complete profile for your pet</p>
+          </div>
         </div>
       </div>
 
