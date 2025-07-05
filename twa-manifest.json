@@ -1,0 +1,40 @@
+
+{
+  "packageId": "com.asopets.petcare",
+  "host": "asopets.com",
+  "name": "ASOPETS",
+  "launcherName": "ASOPETS",
+  "display": "standalone",
+  "orientation": "default",
+  "themeColor": "#3b82f6",
+  "backgroundColor": "#ffffff",
+  "startUrl": "/",
+  "iconUrl": "https://asopets.com/icon-512x512.png",
+  "maskableIconUrl": "https://asopets.com/icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableSiteSettingsShortcut": true,
+  "shortcuts": [
+    {
+      "name": "Add Pet",
+      "short_name": "Add Pet",
+      "url": "/add-pet",
+      "icons": [
+        {
+          "src": "https://asopets.com/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "https://asopets.com/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
