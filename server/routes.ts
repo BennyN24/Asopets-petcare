@@ -820,7 +820,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Medical record routes
+  // Medical record routes with pagination and filtering
   app.get("/api/pets/:petId/medical-records", isAuthenticated, async (req: any, res) => {
     try {
       const petId = parseInt(req.params.petId);
@@ -835,8 +835,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const records = await storage.getMedicalRecordsByPetId(petId);
-      res.json(records);
+      // Parse pagination and filtering parameters
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 50); // Max 50 records
+      const includeAttachments = req.query.includeAttachments === 'true';
+      const types = req.query.types ? (req.query.types as string).split(',') : [];
+
+      const records = await storage.getMedicalRecordsByPetId(petId, {
+        page,
+        limit,
+        includeAttachments,
+        types
+      });
+
+      // Add pagination metadata
+      const totalRecords = await storage.getMedicalRecordCountByPetId(petId, types);
+      const totalPages = Math.ceil(totalRecords / limit);
+
+      console.log(`Medical records API: Returning ${records.length}/${totalRecords} records (page ${page}/${totalPages})`);
+
+      res.json({
+        records,
+        pagination: {
+          page,
+          limit,
+          totalRecords,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1
+        }
+      });
     } catch (error) {
       console.error("Error fetching medical records:", error);
       res.status(500).json({ message: "Failed to fetch medical records" });

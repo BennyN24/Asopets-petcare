@@ -23,7 +23,7 @@ import {
   type InsertScannedPet,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, lt, isNull, or, gt, sql } from "drizzle-orm";
+import { eq, and, desc, lt, isNull, or, gt, sql, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -246,13 +246,62 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Medical record operations
-  async getMedicalRecordsByPetId(petId: number): Promise<MedicalRecord[]> {
-    return await db
+  // Medical record operations with pagination and compression
+  async getMedicalRecordsByPetId(petId: number, options: { 
+    page?: number; 
+    limit?: number; 
+    includeAttachments?: boolean;
+    types?: string[];
+  } = {}): Promise<MedicalRecord[]> {
+    const { 
+      page = 1, 
+      limit = 20, 
+      includeAttachments = false,
+      types = []
+    } = options;
+    
+    const offset = (page - 1) * limit;
+    
+    let query = db
       .select()
       .from(medicalRecords)
-      .where(eq(medicalRecords.petId, petId))
-      .orderBy(desc(medicalRecords.dateAdministered));
+      .where(eq(medicalRecords.petId, petId));
+    
+    // Filter by types if specified
+    if (types.length > 0) {
+      query = query.where(or(...types.map(type => eq(medicalRecords.type, type))));
+    }
+    
+    // Limit attachments for performance
+    const records = await query
+      .orderBy(desc(medicalRecords.dateAdministered))
+      .limit(limit)
+      .offset(offset);
+    
+    // Remove large attachments if not specifically requested
+    if (!includeAttachments) {
+      return records.map(record => ({
+        ...record,
+        attachments: record.attachments ? [`${record.attachments.length} attachment(s)`] : [],
+        imageUrl: record.imageUrl ? '[image_available]' : null
+      }));
+    }
+    
+    return records;
+  }
+
+  async getMedicalRecordCountByPetId(petId: number, types: string[] = []): Promise<number> {
+    let query = db
+      .select({ count: sql<number>`count(*)` })
+      .from(medicalRecords)
+      .where(eq(medicalRecords.petId, petId));
+    
+    if (types.length > 0) {
+      query = query.where(or(...types.map(type => eq(medicalRecords.type, type))));
+    }
+    
+    const [result] = await query;
+    return result.count;
   }
 
   async getMedicalRecordById(id: number): Promise<MedicalRecord | undefined> {
