@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePushNotifications, createReminderNotification, createOverdueNotification } from '@/hooks/use-push-notifications';
 import { useAuth } from '@/hooks/useAuth';
