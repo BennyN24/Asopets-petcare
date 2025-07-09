@@ -5,12 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Calendar, 
   Clock, 
   CheckCircle, 
   AlertTriangle, 
   Bell,
+  BellRing,
+  Settings,
   Syringe,
   PillBottle,
   Heart as MedicalKit,
@@ -25,6 +28,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import BottomNavigation from "@/components/bottom-navigation";
 import NotificationDropdown from "@/components/notification-dropdown";
+import PushNotificationManager from "@/components/push-notification-manager";
+import NotificationSettings from "@/components/notification-settings";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
 import { useMemo } from "react";
@@ -39,6 +45,8 @@ export default function Schedule() {
   const [selectedPet, setSelectedPet] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "type" | "pet">("date");
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const { isSupported: pushSupported, isSubscribed: pushEnabled } = usePushNotifications();
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],
