@@ -284,6 +284,9 @@ export default function Schedule() {
 
   return (
     <div className="mobile-container pb-20">
+      {/* Push Notification Manager */}
+      <PushNotificationManager enabled={isAuthenticated} />
+      
       {/* Header */}
       <div className="bg-primary text-white p-4">
         <div className="flex items-center justify-between">
@@ -292,6 +295,30 @@ export default function Schedule() {
             <p className="text-white/80 text-sm">Manage Reminders</p>
           </div>
           <div className="flex items-center space-x-3">
+            {/* Push Notification Settings */}
+            <Dialog open={showNotificationSettings} onOpenChange={setShowNotificationSettings}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 relative p-2"
+                >
+                  {pushEnabled ? (
+                    <BellRing className="w-5 h-5 text-green-300" />
+                  ) : (
+                    <Settings className="w-5 h-5" />
+                  )}
+                  {pushSupported && !pushEnabled && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <NotificationSettings onClose={() => setShowNotificationSettings(false)} />
+              </DialogContent>
+            </Dialog>
+
+            {/* Notification Dropdown */}
             <Button
               variant="ghost"
               size="sm"

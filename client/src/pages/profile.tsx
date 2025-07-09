@@ -1016,6 +1016,24 @@ export default function Profile() {
               FAQ & Help
             </Button>
 
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => (window.location.href = "/privacy-policy")}
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Privacy Policy
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => (window.location.href = "/terms-of-service")}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Terms & Conditions
+            </Button>
+
             <Separator />
 
             <Button
