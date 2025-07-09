@@ -807,13 +807,9 @@ export default function QRScanner({ onClose, onScanSuccess }: QRScannerProps) {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-center">
                 <Button onClick={stopCamera} variant="outline" size="sm">
                   Stop Camera
-                </Button>
-                <Button onClick={handleUploadClick} variant="ghost" size="sm">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload Image
                 </Button>
               </div>
 
