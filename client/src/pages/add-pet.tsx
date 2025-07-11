@@ -145,7 +145,7 @@ export default function AddPet() {
             return;
           }
 
-          const img = new Image();
+          const img = document.createElement("img");
           
           img.onload = () => {
             try {
@@ -168,6 +168,10 @@ export default function AddPet() {
 
               // Convert to compressed JPEG
               const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+              
+              // Clean up the object URL
+              URL.revokeObjectURL(img.src);
+              
               resolve(compressedDataUrl);
             } catch (error) {
               reject(error);
@@ -175,6 +179,7 @@ export default function AddPet() {
           };
 
           img.onerror = () => {
+            URL.revokeObjectURL(img.src);
             reject(new Error("Failed to load image"));
           };
 
