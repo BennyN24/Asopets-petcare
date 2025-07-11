@@ -1,6 +1,5 @@
 import * as React from "react"
 import { ComponentProps } from "react"
-"use client"
 
 import { Drawer as DrawerPrimitive } from "vaul"
 

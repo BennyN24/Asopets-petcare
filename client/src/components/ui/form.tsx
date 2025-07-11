@@ -1,6 +1,4 @@
 import * as React from "react"
-"use client"
-
 import { useContext, createContext, forwardRef, useId } from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
