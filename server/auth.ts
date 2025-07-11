@@ -43,11 +43,6 @@ export function getSession() {
 }
 
 export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
-  // Minimal auth check logging
-  if (isDevelopment && !req.session?.userId) {
-    console.log(`[AUTH-CHECK] Unauthorized access to ${req.path}`);
-  }
-
   // Set no-cache headers for authenticated endpoints
   res.set({
     "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -56,7 +51,8 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
   });
 
   if (!req.session || !req.session.userId) {
-    if (isDevelopment) {
+    // Only log authentication failures for non-user-check endpoints to reduce noise
+    if (isDevelopment && !req.path.includes('/api/auth/user')) {
       console.log(`[AUTH-CHECK] No valid session found for ${req.path}`);
     }
     return res.status(401).json({ message: "Unauthorized" });
