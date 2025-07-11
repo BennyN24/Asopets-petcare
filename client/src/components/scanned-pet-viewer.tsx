@@ -17,7 +17,7 @@ import {
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { QrCode } from "lucide-react";
-import React from "react";
+import * as React from "react";
 import {
   Dialog,
   DialogContent,

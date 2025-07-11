@@ -1,5 +1,5 @@
 
-import React from "react";
+import * as React from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import PageLoader from "@/components/loading-spinner";
