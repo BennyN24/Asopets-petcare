@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -48,13 +49,13 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import PhotoUpload from "@/components/photo-upload";
+import MultiPhotoUpload from "@/components/multi-photo-upload";
 import AdBanner from "@/components/ad-banner";
 import BottomNavigation from "@/components/bottom-navigation";
 import { useBiometric } from "@/hooks/useBiometric";
 import { useAdMob } from "@/hooks/useAdMob";
 import { ADMOB_CONFIG } from "@/lib/admob-config";
 import { adUtils } from "@/utils/ad-utils";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import type { User as UserType, Pet, Reminder, MedicalRecord } from "@shared/schema";
@@ -83,6 +84,7 @@ interface UserProfile {
 const contactSupportSchema = z.object({
   subject: z.string().min(5, "Subject must be at least 5 characters"),
   message: z.string().min(20, "Message must be at least 20 characters"),
+  attachments: z.array(z.string()).max(3, "Maximum 3 attachments allowed").optional(),
 });
 
 const passwordChangeSchema = z.object({
@@ -1236,6 +1238,7 @@ function ContactSupportForm({
     defaultValues: {
       subject: "",
       message: "",
+      attachments: [],
     },
   });
 
@@ -1298,6 +1301,30 @@ function ContactSupportForm({
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="attachments"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Attachments (Optional)</FormLabel>
+              <FormControl>
+                <MultiPhotoUpload
+                  onPhotosUploaded={(photos) => {
+                    form.setValue("attachments", photos);
+                  }}
+                  currentPhotos={field.value || []}
+                  maxPhotos={3}
+                  className="w-full"
+                />
+              </FormControl>
+              <FormMessage />
+              <p className="text-sm text-gray-500 mt-1">
+                Upload up to 3 images (max 10MB each) to help us understand your issue better.
+              </p>
             </FormItem>
           )}
         />

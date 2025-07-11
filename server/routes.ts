@@ -1264,7 +1264,7 @@ const petId = parseInt(req.params.petId);
   // Support contact endpoint
   app.post("/api/support/contact", isAuthenticated, async (req: any, res) => {
     try {
-      const { subject, message, userEmail, userName } = req.body;
+      const { subject, message, userEmail, userName, attachments } = req.body;
 
       if (!subject || !message) {
         return res.status(400).json({ message: "Subject and message are required" });
@@ -1272,6 +1272,39 @@ const petId = parseInt(req.params.petId);
 
       // Import sendEmail function
       const { sendEmail } = await import("./emailService");
+
+      // Prepare attachments for email
+      const emailAttachments = [];
+      if (attachments && attachments.length > 0) {
+        for (let i = 0; i < attachments.length; i++) {
+          const attachment = attachments[i];
+          if (attachment && attachment.startsWith('data:image/')) {
+            // Extract base64 data and mime type
+            const [mimeType, base64Data] = attachment.split(',');
+            const fileType = mimeType.split(':')[1].split(';')[0];
+            const extension = fileType.split('/')[1];
+            
+            emailAttachments.push({
+              content: base64Data,
+              filename: `attachment_${i + 1}.${extension}`,
+              type: fileType,
+              disposition: 'attachment'
+            });
+          }
+        }
+      }
+
+      const attachmentText = attachments && attachments.length > 0 
+        ? `\n\nAttachments: ${attachments.length} image(s) attached`
+        : '';
+
+      const attachmentHtml = attachments && attachments.length > 0 
+        ? `
+  <div style="margin: 20px 0;">
+    <h3 style="color: #374151;">Attachments:</h3>
+    <p style="color: #6b7280;">${attachments.length} image(s) attached to this email</p>
+  </div>` 
+        : '';
 
       const emailSent = await sendEmail({
         to: "support@asopets.com",
@@ -1284,7 +1317,7 @@ User ID: ${req.user.id || 'Unknown'}
 Subject: ${subject}
 
 Message:
-${message}
+${message}${attachmentText}
 
 ---
 This message was sent via the ASOPETS app contact form.
@@ -1308,12 +1341,15 @@ Reply directly to this email to respond to the user.
     <div style="background-color: #ffffff; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; white-space: pre-wrap;">${message}</div>
   </div>
 
+  ${attachmentHtml}
+
   <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
     <p>This message was sent via the ASOPETS app contact form.</p>
     <p>Reply directly to this email to respond to the user.</p>
   </div>
 </div>
         `,
+        attachments: emailAttachments,
       });
 
       if (emailSent) {

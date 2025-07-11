@@ -13,11 +13,17 @@ interface EmailParams {
   subject: string;
   text?: string;
   html?: string;
+  attachments?: Array<{
+    content: string;
+    filename: string;
+    type: string;
+    disposition: string;
+  }>;
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
-    await mailService.send({
+    const emailData: any = {
       to: params.to,
       from: params.from,
       subject: params.subject,
@@ -28,7 +34,14 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
           enable: false,
         },
       },
-    });
+    };
+
+    // Add attachments if provided
+    if (params.attachments && params.attachments.length > 0) {
+      emailData.attachments = params.attachments;
+    }
+
+    await mailService.send(emailData);
     
     console.log(`Email sent successfully to ${params.to}`);
     return true;
