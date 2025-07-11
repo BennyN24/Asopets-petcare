@@ -61,16 +61,17 @@ function PublicShareRouter() {
 
 function Router() {
   const [location] = useLocation();
+  const [, setLocation] = useLocation();
+  
+  // Always call useAuth hook to maintain consistent hook order
+  const { isAuthenticated, isLoading, user, error } = useAuth();
+  
   const isPublicShareRoute = location.startsWith('/share/pet/');
   
   // Render public routes immediately without any authentication
   if (isPublicShareRoute) {
     return <PublicShareRouter />;
   }
-  
-  // For all other routes, use authentication
-  const { isAuthenticated, isLoading, user, error } = useAuth();
-  const [, setLocation] = useLocation();
 
   // Debug authentication state
   console.log('Router state:', { isAuthenticated, isLoading, hasUser: !!user, error, location });
