@@ -132,44 +132,74 @@ export default function AddPet() {
     }
 
     setIsUploading(true);
+    
     try {
-      // Compress image before upload
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
+      // Create a promise-based image processing function
+      const processImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          
+          if (!ctx) {
+            reject(new Error("Canvas context not available"));
+            return;
+          }
 
-      img.onload = () => {
-        // Calculate new dimensions (max 800px width/height)
-        const maxSize = 800;
-        let { width, height } = img;
+          const img = new Image();
+          
+          img.onload = () => {
+            try {
+              // Calculate new dimensions (max 800px width/height)
+              const maxSize = 800;
+              let { width, height } = img;
 
-        if (width > height && width > maxSize) {
-          height = (height * maxSize) / width;
-          width = maxSize;
-        } else if (height > maxSize) {
-          width = (width * maxSize) / height;
-          height = maxSize;
-        }
+              if (width > height && width > maxSize) {
+                height = (height * maxSize) / width;
+                width = maxSize;
+              } else if (height > maxSize) {
+                width = (width * maxSize) / height;
+                height = maxSize;
+              }
 
-        canvas.width = width;
-        canvas.height = height;
+              canvas.width = width;
+              canvas.height = height;
 
-        ctx?.drawImage(img, 0, 0, width, height);
+              ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to compressed JPEG
-        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
-        setSelectedImage(compressedDataUrl);
-        form.setValue("imageUrl", compressedDataUrl);
-        setIsUploading(false);
+              // Convert to compressed JPEG
+              const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+              resolve(compressedDataUrl);
+            } catch (error) {
+              reject(error);
+            }
+          };
+
+          img.onerror = () => {
+            reject(new Error("Failed to load image"));
+          };
+
+          img.src = URL.createObjectURL(file);
+        });
       };
 
-      img.src = URL.createObjectURL(file);
+      // Process the image
+      const compressedDataUrl = await processImage(file);
+      setSelectedImage(compressedDataUrl);
+      form.setValue("imageUrl", compressedDataUrl);
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+      
     } catch (error) {
+      console.error("Image processing error:", error);
       toast({
         title: "Error",
-        description: "Failed to process image",
+        description: `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"}`,
         variant: "destructive",
       });
+    } finally {
       setIsUploading(false);
     }
   };
