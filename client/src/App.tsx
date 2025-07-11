@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -60,8 +60,7 @@ function PublicShareRouter() {
 }
 
 function Router() {
-  const [location] = useLocation();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   
   // Always call useAuth hook to maintain consistent hook order
   const { isAuthenticated, isLoading, user, error } = useAuth();
