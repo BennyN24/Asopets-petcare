@@ -95,11 +95,11 @@ export default function MultiPhotoUpload({
           continue;
         }
 
-        // Validate file size (8MB limit)
-        if (file.size > 8 * 1024 * 1024) {
+        // Validate file size (10MB limit)
+        if (file.size > 10 * 1024 * 1024) {
           toast({
             title: "File too large",
-            description: "Please select images smaller than 8MB.",
+            description: "Please select images smaller than 10MB.",
             variant: "destructive",
           });
           continue;

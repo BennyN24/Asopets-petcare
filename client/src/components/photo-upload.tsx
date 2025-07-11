@@ -196,7 +196,7 @@ export default function PhotoUpload({ onPhotoUploaded, currentPhoto, className =
                 </Button>
               </div>
               <p className="text-xs text-gray-400 mt-2">
-                Max file size: 8MB
+                Max file size: 10MB
               </p>
             </div>
           </CardContent>

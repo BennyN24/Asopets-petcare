@@ -75,7 +75,9 @@ export async function compressImage(
 
 export function getImageCompressionSettings(originalSize: number): CompressionOptions {
   // More aggressive compression for larger images
-  if (originalSize > 5 * 1024 * 1024) { // 5MB+
+  if (originalSize > 10 * 1024 * 1024) { // 10MB+
+    return { maxWidth: 500, maxHeight: 375, quality: 25, format: 'jpeg' };
+  } else if (originalSize > 5 * 1024 * 1024) { // 5MB+
     return { maxWidth: 600, maxHeight: 450, quality: 30, format: 'jpeg' };
   } else if (originalSize > 2 * 1024 * 1024) { // 2MB+
     return { maxWidth: 700, maxHeight: 525, quality: 35, format: 'jpeg' };
