@@ -1261,6 +1261,7 @@ const petId = parseInt(req.params.petId);
     }
   });
 
+
   // Support contact endpoint
   app.post("/api/support/contact", isAuthenticated, async (req: any, res) => {
     try {
