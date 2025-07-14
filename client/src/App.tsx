@@ -41,6 +41,7 @@ import QRScannerPage from "@/pages/qr-scanner";
 import VetClinicsPage from "@/pages/vet-clinics";
 import Premium from "@/pages/premium";
 import SharedPetProfile from "@/pages/shared-pet-profile";
+import BulkAddPets from "@/pages/bulk-add-pets";
 
 // Mobile debugging
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -127,6 +128,7 @@ function Router() {
           <Route path="/expenses" component={Expenses} />
           <Route path="/profile" component={Profile} />
           <Route path="/add-pet" component={AddPet} />
+          <Route path="/bulk-add-pets" component={BulkAddPets} />
           <Route path="/pet/:id" component={PetProfile} />
           <Route path="/pet/:id/vaccine" component={VaccineForm} />
           <Route path="/pet/:id/deworming" component={DewormingForm} />
