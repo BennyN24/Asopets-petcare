@@ -542,6 +542,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete account route
+  app.delete('/api/auth/account', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      console.log(`[DELETE_ACCOUNT] Deleting account for user: ${userId}`);
+
+      // Get user info for logging
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Delete all user data (cascading deletion)
+      await storage.deleteUser(userId);
+
+      console.log(`[DELETE_ACCOUNT] Successfully deleted account for user: ${user.email}`);
+
+      // Destroy session
+      req.session.destroy((err: any) => {
+        if (err) {
+          console.error("[DELETE_ACCOUNT] Session destroy error:", err);
+        }
+      });
+
+      // Clear cookie
+      res.clearCookie('connect.sid', {
+        path: '/',
+        httpOnly: true,
+        secure: !isDevelopment,
+        sameSite: 'lax'
+      });
+
+      res.json({ message: "Account and all associated data have been permanently deleted" });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ message: "Failed to delete account. Please try again." });
+    }
+  });
+
   // Pet routes with pagination and size limits
   app.get("/api/pets", isAuthenticated, async (req: any, res) => {
     try {

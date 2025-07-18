@@ -34,6 +34,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUser(id: string, user: UpdateUser): Promise<User>;
   confirmUserEmail(token: string): Promise<User | null>;
+  deleteUser(id: string): Promise<void>;
 
   // Pet operations
   getPetsByUserId(userId: string, options?: { page?: number; limit?: number; includePhotos?: boolean }): Promise<Pet[]>;
@@ -160,6 +161,32 @@ export class DatabaseStorage implements IStorage {
       .from(users)
       .where(eq(users.passwordResetToken, token));
     return user;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    // Get all pets for this user
+    const userPets = await this.getPetsByUserId(id);
+    
+    // Delete all data associated with each pet
+    for (const pet of userPets) {
+      // Delete medical records for this pet
+      await db.delete(medicalRecords).where(eq(medicalRecords.petId, pet.id));
+      
+      // Delete reminders for this pet
+      await db.delete(reminders).where(eq(reminders.petId, pet.id));
+    }
+    
+    // Delete all pets for this user
+    await db.delete(pets).where(eq(pets.userId, id));
+    
+    // Delete clinic ratings by this user
+    await db.delete(clinicRatings).where(eq(clinicRatings.userId, id));
+    
+    // Delete scanned pets by this user
+    await db.delete(scannedPets).where(eq(scannedPets.userId, id));
+    
+    // Finally, delete the user
+    await db.delete(users).where(eq(users.id, id));
   }
 
   // Pet operations
