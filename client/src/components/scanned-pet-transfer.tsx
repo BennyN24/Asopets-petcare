@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -149,7 +148,7 @@ export default function ScannedPetTransfer({ data, onClose }: ScannedPetTransfer
           {/* Pet Info */}
           <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
             <div className="text-3xl">
-              {getPetIcon(data.category)}
+              {getPetIcon(data.category || 'other')}
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-900">

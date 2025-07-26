@@ -17,7 +17,6 @@ import {
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { QrCode } from "lucide-react";
-import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -396,7 +395,7 @@ export default function ScannedPetViewer({
                               variant="outline"
                               className={`text-xs ${recordTypeColors[record.type as keyof typeof recordTypeColors] || "bg-gray-100 text-gray-800"}`}
                             >
-                              {record.type}{record.title}
+                              {record.type}
                             </Badge>
                             <span className="text-xs text-gray-600">
                               {record.date
