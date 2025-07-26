@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -6,7 +5,11 @@ import { queryClient } from "@/lib/queryClient";
 export function useAuth() {
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const { data: user, isLoading, error } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -25,7 +28,7 @@ export function useAuth() {
   const isAuthenticated = !!user && !error;
 
   const logout = async () => {
-    console.log('[CLIENT-LOGOUT] Starting logout process...');
+    console.log("[CLIENT-LOGOUT] Starting logout process...");
 
     try {
       // Call logout endpoint
@@ -33,9 +36,9 @@ export function useAuth() {
         method: "GET",
         credentials: "include",
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
       });
 
       if (!response.ok) {
@@ -46,7 +49,7 @@ export function useAuth() {
     }
 
     // Always clear client state and redirect
-    console.log('[CLIENT-LOGOUT] Clearing client state and redirecting...');
+    console.log("[CLIENT-LOGOUT] Clearing client state and redirecting...");
 
     // Clear React Query cache
     queryClient.clear();
@@ -60,7 +63,7 @@ export function useAuth() {
 
     // Small delay to ensure state is cleared, then redirect
     setTimeout(() => {
-      console.log('[CLIENT-LOGOUT] Redirecting to login page...');
+      console.log("[CLIENT-LOGOUT] Redirecting to login page...");
       window.location.replace("/");
     }, 100);
   };
