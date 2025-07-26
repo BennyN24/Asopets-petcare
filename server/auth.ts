@@ -175,11 +175,9 @@ export async function setupAuth(app: Express) {
 
       // Check if user's email is confirmed
       if (!user.isEmailConfirmed) {
-        return res
-          .status(401)
-          .json({
-            message: "Email not confirmed. Please verify your email first.",
-          });
+        return res.status(401).json({
+          message: "Email not confirmed. Please verify your email first.",
+        });
       }
 
       // In a real implementation, you would:
@@ -221,9 +219,7 @@ if (env.SENDGRID_API_KEY) {
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
   // Use Replit domain if available, otherwise fallback to production URL
-  const baseUrl = process.env.REPLIT_DOMAINS
-    ? `https://${process.env.REPLIT_DOMAINS}`
-    : env.BASE_URL || "https://asopets.com";
+  const baseUrl = env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
   // Log confirmation link in development only
@@ -314,9 +310,7 @@ export const sendPasswordResetEmail = async (
   resetToken: string,
 ) => {
   // Use Replit domain if available, otherwise fallback to production URL
-  const baseUrl = process.env.REPLIT_DOMAINS
-    ? `https://${process.env.REPLIT_DOMAINS}`
-    : env.BASE_URL || "https://asopets.com";
+  const baseUrl = env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
   // Log reset link in development only
