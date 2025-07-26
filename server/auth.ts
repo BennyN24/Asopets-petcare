@@ -37,8 +37,8 @@ export function getSession() {
     unset: "destroy", // Ensures session is completely removed on logout
     proxy: true, // Trust first proxy for proper session handling
     genid: () => {
-      return crypto.randomBytes(32).toString('hex');
-    }
+      return crypto.randomBytes(32).toString("hex");
+    },
   });
 }
 
@@ -52,7 +52,7 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
 
   if (!req.session || !req.session.userId) {
     // Only log authentication failures for non-user-check endpoints to reduce noise
-    if (isDevelopment && !req.path.includes('/api/auth/user')) {
+    if (isDevelopment && !req.path.includes("/api/auth/user")) {
       console.log(`[AUTH-CHECK] No valid session found for ${req.path}`);
     }
     return res.status(401).json({ message: "Unauthorized" });
@@ -106,12 +106,14 @@ export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
   app.use(getSession());
 
-    // Login route
+  // Login route
   app.post("/api/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     try {
@@ -121,17 +123,19 @@ export async function setupAuth(app: Express) {
       req.session!.userId = user.id;
 
       // Log session creation
-      console.log(`[AUTH] POST /api/auth/login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`);
+      console.log(
+        `[AUTH] POST /api/auth/login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`,
+      );
 
-      res.json({ 
-        message: "Login successful", 
-        user: { 
-          id: user.id, 
-          email: user.email, 
+      res.json({
+        message: "Login successful",
+        user: {
+          id: user.id,
+          email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
-          isEmailConfirmed: user.isEmailConfirmed 
-        } 
+          isEmailConfirmed: user.isEmailConfirmed,
+        },
       });
     } catch (error: any) {
       console.error("Login error:", error.message);
@@ -143,7 +147,9 @@ export async function setupAuth(app: Express) {
     const { email, biometricData } = req.body;
 
     if (!email || !biometricData) {
-      return res.status(400).json({ message: "Email and biometric data required" });
+      return res
+        .status(400)
+        .json({ message: "Email and biometric data required" });
     }
 
     // Validate biometric data structure
@@ -153,17 +159,27 @@ export async function setupAuth(app: Express) {
 
     try {
       // Verify the user exists and is confirmed
-      const userRows = await db.select().from(users).where(eq(users.email, email)).execute();
+      const userRows = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .execute();
 
       if (userRows.length === 0) {
-        return res.status(401).json({ message: "Invalid credentials or email not confirmed" });
+        return res
+          .status(401)
+          .json({ message: "Invalid credentials or email not confirmed" });
       }
 
       const user = userRows[0];
 
       // Check if user's email is confirmed
       if (!user.isEmailConfirmed) {
-        return res.status(401).json({ message: "Email not confirmed. Please verify your email first." });
+        return res
+          .status(401)
+          .json({
+            message: "Email not confirmed. Please verify your email first.",
+          });
       }
 
       // In a real implementation, you would:
@@ -176,18 +192,20 @@ export async function setupAuth(app: Express) {
       req.session!.userId = user.id;
 
       // Log session creation
-      console.log(`[AUTH] POST /api/auth/biometric-login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`);
+      console.log(
+        `[AUTH] POST /api/auth/biometric-login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`,
+      );
 
-      res.json({ 
-        message: "Biometric login successful", 
-        user: { 
-          id: user.id, 
-          email: user.email, 
+      res.json({
+        message: "Biometric login successful",
+        user: {
+          id: user.id,
+          email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           isEmailConfirmed: user.isEmailConfirmed,
-          createdAt: user.createdAt
-        } 
+          createdAt: user.createdAt,
+        },
       });
     } catch (error: any) {
       console.error("Biometric login error:", error.message);
@@ -203,7 +221,7 @@ if (env.SENDGRID_API_KEY) {
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
   // Use Replit domain if available, otherwise fallback to production URL
-  const baseUrl = process.env.REPLIT_DOMAINS 
+  const baseUrl = process.env.REPLIT_DOMAINS
     ? `https://${process.env.REPLIT_DOMAINS}`
     : env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
@@ -261,6 +279,11 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         subject: "Confirm Your ASOPets Account",
         html: emailHtml,
         text: `Welcome to ASOPets! Please confirm your email address by visiting: ${confirmationLink}`,
+        trackingSettings: {
+          clickTracking: {
+            enable: false,
+          },
+        },
       });
       console.log(`Confirmation email sent to ${email}`);
     } else {
@@ -291,7 +314,7 @@ export const sendPasswordResetEmail = async (
   resetToken: string,
 ) => {
   // Use Replit domain if available, otherwise fallback to production URL
-  const baseUrl = process.env.REPLIT_DOMAINS 
+  const baseUrl = process.env.REPLIT_DOMAINS
     ? `https://${process.env.REPLIT_DOMAINS}`
     : env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
@@ -383,7 +406,11 @@ export const sendPasswordResetEmail = async (
 
 async function loginUser(email: string, password: string) {
   // Use Drizzle ORM to query the database
-  const userRows = await db.select().from(users).where(eq(users.email, email)).execute();
+  const userRows = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .execute();
 
   if (userRows.length === 0) {
     throw new Error("Invalid credentials");
@@ -406,6 +433,6 @@ async function loginUser(email: string, password: string) {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    isEmailConfirmed: user.isEmailConfirmed
+    isEmailConfirmed: user.isEmailConfirmed,
   };
 }
