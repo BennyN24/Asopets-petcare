@@ -12,7 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ArrowLeft, Bell } from "lucide-react";
-import * as React from "react";
 import MultiPhotoUpload from "@/components/multi-photo-upload";
 
 interface ExtraField {

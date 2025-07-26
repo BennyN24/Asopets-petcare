@@ -1,4 +1,3 @@
-import * as React from "react";
 import { memo } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

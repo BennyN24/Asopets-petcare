@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft } from "lucide-react";

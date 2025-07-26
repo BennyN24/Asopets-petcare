@@ -86,7 +86,7 @@ export default function Dashboard() {
   });
 
   // Fetch scanned pets from database
-  const { data: scannedPets = [] } = useQuery({
+  const { data: scannedPets = [] } = useQuery<any[]>({
     queryKey: ["/api/scanned-pets"],
     enabled: !!user,
   });
