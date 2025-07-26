@@ -202,8 +202,9 @@ if (env.SENDGRID_API_KEY) {
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
-  const baseUrl = isDevelopment
-    ? `http://localhost:5000`
+  // Use Replit domain if available, otherwise fallback to production URL
+  const baseUrl = process.env.REPLIT_DOMAINS 
+    ? `https://${process.env.REPLIT_DOMAINS}`
     : env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
@@ -289,8 +290,9 @@ export const sendPasswordResetEmail = async (
   email: string,
   resetToken: string,
 ) => {
-  const baseUrl = isDevelopment
-    ? "http://localhost:5000"
+  // Use Replit domain if available, otherwise fallback to production URL
+  const baseUrl = process.env.REPLIT_DOMAINS 
+    ? `https://${process.env.REPLIT_DOMAINS}`
     : env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
