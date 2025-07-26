@@ -128,7 +128,8 @@ export async function setupAuth(app: Express) {
         user: { 
           id: user.id, 
           email: user.email, 
-          displayName: user.displayName,
+          firstName: user.firstName,
+          lastName: user.lastName,
           isEmailConfirmed: user.isEmailConfirmed 
         } 
       });
@@ -182,7 +183,6 @@ export async function setupAuth(app: Express) {
         user: { 
           id: user.id, 
           email: user.email, 
-          displayName: user.displayName,
           firstName: user.firstName,
           lastName: user.lastName,
           isEmailConfirmed: user.isEmailConfirmed,
@@ -404,7 +404,8 @@ async function loginUser(email: string, password: string) {
   return {
     id: user.id,
     email: user.email,
-    displayName: user.displayName,
+    firstName: user.firstName,
+    lastName: user.lastName,
     isEmailConfirmed: user.isEmailConfirmed
   };
 }
