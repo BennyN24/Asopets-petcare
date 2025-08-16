@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+//import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useLocation } from "wouter";
 import MedicalRecordForm from "@/components/medical-record-form";
 
@@ -10,7 +10,7 @@ const checkupTypes = [
   "Pre-Surgery Exam",
   "Follow-up Visit",
   "Emergency Visit",
-  "Other"
+  "Other",
 ];
 
 export default function CheckupForm() {
@@ -41,7 +41,7 @@ export default function CheckupForm() {
       label: "Visit Cost",
       type: "text" as const,
       placeholder: "Enter cost (optional)",
-    }
+    },
   ];
 
   return (

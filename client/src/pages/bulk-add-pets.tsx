@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -31,14 +30,14 @@ export default function BulkAddPets() {
     },
     onSuccess: (results) => {
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
-      const successful = results.filter(r => r.success).length;
-      const failed = results.filter(r => !r.success).length;
-      
+      const successful = results.filter((r) => r.success).length;
+      const failed = results.filter((r) => !r.success).length;
+
       toast({
         title: "Bulk Import Complete",
-        description: `${successful} pets added successfully${failed > 0 ? `, ${failed} failed` : ''}`,
+        description: `${successful} pets added successfully${failed > 0 ? `, ${failed} failed` : ""}`,
       });
-      
+
       if (successful > 0) {
         setCsvData("");
         setLocation("/");
@@ -58,45 +57,48 @@ export default function BulkAddPets() {
 
     setIsProcessing(true);
     try {
-      const lines = csvData.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      
-      const pets = lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim());
-        const pet: any = {};
-        
-        headers.forEach((header, index) => {
-          const value = values[index] || "";
-          switch (header.toLowerCase()) {
-            case 'name':
-              pet.name = value;
-              break;
-            case 'category':
-              pet.category = value || 'other';
-              break;
-            case 'breed':
-              pet.breed = value;
-              break;
-            case 'date_of_birth':
-            case 'dateofbirth':
-              pet.dateOfBirth = value;
-              break;
-            case 'age':
-              pet.age = value ? parseInt(value) : 0;
-              break;
-            case 'microchip_id':
-            case 'microchipid':
-              pet.microchipId = value;
-              break;
-            case 'birthmarks':
-            case 'notes':
-              pet.birthmarks = value;
-              break;
-          }
-        });
-        
-        return pet;
-      }).filter(pet => pet.name); // Only include pets with names
+      const lines = csvData.trim().split("\n");
+      const headers = lines[0].split(",").map((h) => h.trim());
+
+      const pets = lines
+        .slice(1)
+        .map((line) => {
+          const values = line.split(",").map((v) => v.trim());
+          const pet: any = {};
+
+          headers.forEach((header, index) => {
+            const value = values[index] || "";
+            switch (header.toLowerCase()) {
+              case "name":
+                pet.name = value;
+                break;
+              case "category":
+                pet.category = value || "other";
+                break;
+              case "breed":
+                pet.breed = value;
+                break;
+              case "date_of_birth":
+              case "dateofbirth":
+                pet.dateOfBirth = value;
+                break;
+              case "age":
+                pet.age = value ? parseInt(value) : 0;
+                break;
+              case "microchip_id":
+              case "microchipid":
+                pet.microchipId = value;
+                break;
+              case "birthmarks":
+              case "notes":
+                pet.birthmarks = value;
+                break;
+            }
+          });
+
+          return pet;
+        })
+        .filter((pet) => pet.name); // Only include pets with names
 
       if (pets.length === 0) {
         throw new Error("No valid pets found in CSV data");
@@ -115,12 +117,13 @@ export default function BulkAddPets() {
   };
 
   const downloadTemplate = () => {
-    const template = "name,category,breed,date_of_birth,age,microchip_id,birthmarks\nFluffy,cat,Persian,2020-01-15,48,,White patch on chest\nBuddy,dog,Golden Retriever,2019-05-20,60,123456789,Scar on left ear";
-    const blob = new Blob([template], { type: 'text/csv' });
+    const template =
+      "name,category,breed,date_of_birth,age,microchip_id,birthmarks\nFluffy,cat,Persian,2020-01-15,48,,White patch on chest\nBuddy,dog,Golden Retriever,2019-05-20,60,123456789,Scar on left ear";
+    const blob = new Blob([template], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'pet_template.csv';
+    a.download = "pet_template.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -171,7 +174,9 @@ export default function BulkAddPets() {
               className="w-full"
             >
               <Upload className="w-4 h-4 mr-2" />
-              {isProcessing || bulkCreateMutation.isPending ? "Processing..." : "Import Pets"}
+              {isProcessing || bulkCreateMutation.isPending
+                ? "Processing..."
+                : "Import Pets"}
             </Button>
           </CardContent>
         </Card>
@@ -182,12 +187,16 @@ export default function BulkAddPets() {
           </CardHeader>
           <CardContent>
             <div className="text-sm space-y-2">
-              <p><strong>Required columns:</strong></p>
+              <p>
+                <strong>Required columns:</strong>
+              </p>
               <ul className="list-disc list-inside space-y-1 text-gray-600">
                 <li>name - Pet's name</li>
                 <li>category - dog, cat, bird, rabbit, horse, exotic, other</li>
               </ul>
-              <p><strong>Optional columns:</strong></p>
+              <p>
+                <strong>Optional columns:</strong>
+              </p>
               <ul className="list-disc list-inside space-y-1 text-gray-600">
                 <li>breed - Pet's breed</li>
                 <li>date_of_birth - YYYY-MM-DD format</li>
