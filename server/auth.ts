@@ -2,13 +2,21 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import sgMail from "@sendgrid/mail";
 import { storage } from "./storage";
-import type { Express, RequestHandler } from "express";
+import type { Express, RequestHandler, Request, Response } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { env, isDevelopment } from "./config";
 import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
+
+// Extend Express Session interface
+declare module "express-session" {
+  interface SessionData {
+    userId: string;
+    email?: string;
+  }
+}
 
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days for better persistence
@@ -120,7 +128,7 @@ export async function setupAuth(app: Express) {
       const user = await loginUser(email, password);
 
       // Store user session
-      req.session!.userId = user.id;
+      req.session.userId = user.id;
 
       // Log session creation
       console.log(
@@ -143,7 +151,7 @@ export async function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/auth/biometric-login", async (req: Request, res: Response) => {
+  app.post("/api/auth/biometric-login", async (req: any, res: any) => {
     const { email, biometricData } = req.body;
 
     if (!email || !biometricData) {
@@ -187,7 +195,8 @@ export async function setupAuth(app: Express) {
       // For now, we'll verify basic biometric data presence and user existence
 
       // Store user session
-      req.session!.userId = user.id;
+      req.session.userId = user.id;
+      req.session.email = user.email;
 
       // Log session creation
       console.log(
@@ -414,6 +423,10 @@ async function loginUser(email: string, password: string) {
 
   if (!user.isEmailConfirmed) {
     throw new Error("Invalid credentials or email not confirmed");
+  }
+
+  if (!user.passwordHash) {
+    throw new Error("Invalid credentials");
   }
 
   const passwordMatch = await verifyPassword(password, user.passwordHash);

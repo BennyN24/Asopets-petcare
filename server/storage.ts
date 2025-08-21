@@ -289,18 +289,20 @@ export class DatabaseStorage implements IStorage {
     
     const offset = (page - 1) * limit;
     
-    let query = db
-      .select()
-      .from(medicalRecords)
-      .where(eq(medicalRecords.petId, petId));
+    // Build the where conditions
+    let whereConditions = eq(medicalRecords.petId, petId);
     
     // Filter by types if specified
     if (types.length > 0) {
-      query = query.where(or(...types.map(type => eq(medicalRecords.type, type))));
+      const typeConditions = or(...types.map(type => eq(medicalRecords.type, type)));
+      whereConditions = and(whereConditions, typeConditions!) as any;
     }
     
     // Limit attachments for performance
-    const records = await query
+    const records = await db
+      .select()
+      .from(medicalRecords)
+      .where(whereConditions)
       .orderBy(desc(medicalRecords.dateAdministered))
       .limit(limit)
       .offset(offset);
@@ -318,16 +320,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMedicalRecordCountByPetId(petId: number, types: string[] = []): Promise<number> {
-    let query = db
-      .select({ count: sql<number>`count(*)` })
-      .from(medicalRecords)
-      .where(eq(medicalRecords.petId, petId));
+    // Build the where conditions
+    let whereConditions = eq(medicalRecords.petId, petId);
     
     if (types.length > 0) {
-      query = query.where(or(...types.map(type => eq(medicalRecords.type, type))));
+      const typeConditions = or(...types.map(type => eq(medicalRecords.type, type)));
+      whereConditions = and(whereConditions, typeConditions!) as any;
     }
     
-    const [result] = await query;
+    const [result] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(medicalRecords)
+      .where(whereConditions);
+    
     return result.count;
   }
 
