@@ -15,7 +15,6 @@ import { insertClinicRatingSchema, type VetClinic, type InsertClinicRating } fro
 import { MapPin, Phone, Mail, Star, Plus, Stethoscope, User, Calendar, Map, RefreshCw } from "lucide-react";
 import GoogleMap from "./google-map";
 import SimpleMap from "./simple-map";
-import MapDebugPanel from "./map-debug-panel";
 
 interface VetClinicsProps {
   onRatingAdded?: (clinicId: number, medicalRecordId?: number) => void;
@@ -123,7 +122,6 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
-  const [showDebugPanel, setShowDebugPanel] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -317,13 +315,6 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
                     >
                       {useGoogleMaps ? "Simple Map" : "Google Maps"}
                     </Button>
-                    <Button
-                      variant={showDebugPanel ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setShowDebugPanel(!showDebugPanel)}
-                    >
-                      Debug
-                    </Button>
                   </>
                 )}
               </div>
@@ -336,23 +327,13 @@ export default function VetClinics({ onRatingAdded, medicalRecordId }: VetClinic
             </div>
           ) : showMap ? (
             <div className="space-y-4">
-              {showDebugPanel && (
-                <MapDebugPanel
-                  userLocation={userLocation}
-                  clinicsCount={clinics.length}
-                  googleMapsLoaded={googleMapsLoaded}
-                  onLocationRefresh={handleRefresh}
-                />
-              )}
               <div className="h-96">
                 {useGoogleMaps ? (
                   <GoogleMap
                     clinics={clinics}
                     userLocation={userLocation}
                     onClinicSelect={setSelectedClinic}
-                    onNearbyPlacesFound={(places) => {
-                      console.log("Google Places found:", places.length, "nearby clinics");
-                    }}
+                    onNearbyPlacesFound={() => {}}
                     onMapLoaded={setGoogleMapsLoaded}
                     className="h-full"
                   />

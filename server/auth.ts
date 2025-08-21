@@ -59,10 +59,7 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
   });
 
   if (!req.session || !req.session.userId) {
-    // Only log authentication failures for non-user-check endpoints to reduce noise
-    if (isDevelopment && !req.path.includes("/api/auth/user")) {
-      console.log(`[AUTH-CHECK] No valid session found for ${req.path}`);
-    }
+    // Authentication check failed
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -76,11 +73,7 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (isDevelopment) {
-      console.log(
-        `[AUTH-CHECK] User authenticated: ${user.email} (${user.id})`,
-      );
-    }
+    // User authenticated successfully
 
     req.user = user;
     next();
@@ -130,10 +123,7 @@ export async function setupAuth(app: Express) {
       // Store user session
       req.session.userId = user.id;
 
-      // Log session creation
-      console.log(
-        `[AUTH] POST /api/auth/login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`,
-      );
+      // Session created
 
       res.json({
         message: "Login successful",
@@ -198,10 +188,7 @@ export async function setupAuth(app: Express) {
       req.session.userId = user.id;
       req.session.email = user.email;
 
-      // Log session creation
-      console.log(
-        `[AUTH] POST /api/auth/biometric-login - Session: ${req.sessionID?.slice(0, 8)}... - User: ${user.email} (${user.id})`,
-      );
+      // Session created
 
       res.json({
         message: "Biometric login successful",
@@ -231,10 +218,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
   const baseUrl = env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
 
-  // Log confirmation link in development only
-  if (isDevelopment) {
-    console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
-  }
+  // Development email confirmation
 
   try {
     // Check if SendGrid is configured
@@ -290,13 +274,8 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
           },
         },
       });
-      console.log(`Confirmation email sent to ${email}`);
     } else {
-      // Development mode - log the link
-      console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
-      console.log(
-        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
-      );
+      // Development mode - email confirmation available
     }
   } catch (error: any) {
     console.error("Failed to send confirmation email:", error);
@@ -309,8 +288,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
     if (error.code) {
       console.error("SendGrid error code:", error.code);
     }
-    // Still log the link as fallback
-    console.log(`Email confirmation link for ${email}: ${confirmationLink}`);
+    // Email confirmation link available
   }
 };
 
@@ -322,10 +300,7 @@ export const sendPasswordResetEmail = async (
   const baseUrl = env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
 
-  // Log reset link in development only
-  if (isDevelopment) {
-    console.log(`Password reset link for ${email}: ${resetLink}`);
-  }
+  // Development password reset
 
   try {
     if (process.env.SENDGRID_API_KEY) {
@@ -385,12 +360,8 @@ export const sendPasswordResetEmail = async (
       };
 
       await sgMail.send(msg);
-      console.log(`Password reset email sent to ${email}`);
     } else {
-      console.log(`Password reset link for ${email}: ${resetLink}`);
-      console.log(
-        "Note: Configure SENDGRID_API_KEY environment variable to send actual emails",
-      );
+      // Development mode - password reset available
     }
   } catch (error: any) {
     console.error("Failed to send password reset email:", error);
@@ -403,7 +374,7 @@ export const sendPasswordResetEmail = async (
     if (error.code) {
       console.error("SendGrid error code:", error.code);
     }
-    console.log(`Password reset link for ${email}: ${resetLink}`);
+    // Password reset link available
   }
 };
 

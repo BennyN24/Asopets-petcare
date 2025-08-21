@@ -33,7 +33,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
   // Load Google Maps API
   useEffect(() => {
     if (window.google) {
-      console.log("Google Maps already loaded");
       setIsLoaded(true);
       return;
     }
@@ -41,7 +40,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
     // Fetch API key from server endpoint
     const loadGoogleMaps = async () => {
       try {
-        console.log("Fetching Google Maps configuration...");
         const response = await fetch('/api/google-maps-config');
         
         if (!response.ok) {
@@ -49,7 +47,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
         }
         
         const data = await response.json();
-        console.log("Google Maps config response:", data);
         
         if (!data.apiKey) {
           console.error("Google Maps API key not available from server");
@@ -61,12 +58,10 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
           return;
         }
 
-        console.log("Loading Google Maps with API key:", data.apiKey.substring(0, 10) + "...");
         
         // Check if script already exists
         const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
         if (existingScript) {
-          console.log("Google Maps script already exists, removing...");
           existingScript.remove();
         }
         
@@ -77,7 +72,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
         
         // Global callback for Google Maps
         window.initMap = () => {
-          console.log("Google Maps initialized via callback");
           setIsLoaded(true);
           onMapLoaded?.(true);
         };
@@ -94,7 +88,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
         // Set a timeout for loading
         const loadTimeout = setTimeout(() => {
           if (!window.google) {
-            console.warn("Google Maps loading timeout");
             toast({
               title: "Map Loading Timeout",
               description: "Google Maps is taking too long to load. Try refreshing.",
@@ -106,13 +99,11 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
         script.onload = () => {
           clearTimeout(loadTimeout);
           if (window.google) {
-            console.log("Google Maps script loaded successfully");
             // The callback will handle setting isLoaded
           }
         };
         
         document.head.appendChild(script);
-        console.log("Google Maps script added to document");
         
       } catch (error) {
         console.error("Error fetching Google Maps config:", error);
@@ -130,11 +121,9 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
   // Initialize map
   useEffect(() => {
     if (!isLoaded || !mapRef.current || !userLocation) {
-      console.log("Map initialization skipped:", { isLoaded, hasMapRef: !!mapRef.current, userLocation });
       return;
     }
 
-    console.log("Initializing Google Map at location:", userLocation);
 
     try {
       const mapInstance = new window.google.maps.Map(mapRef.current, {
@@ -150,7 +139,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
       });
 
       setMap(mapInstance);
-      console.log("Map instance created successfully");
 
       // Initialize Google Places service
       const placesService = GooglePlacesService.getInstance();
@@ -160,11 +148,9 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
       if (onNearbyPlacesFound) {
         placesService.searchNearbyVetClinics(userLocation, 25000)
           .then(places => {
-            console.log("Found nearby vet clinics from Google Places:", places);
             onNearbyPlacesFound(places);
           })
           .catch(error => {
-            console.log("Google Places search error:", error);
           });
       }
 
@@ -184,7 +170,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
         }
       });
 
-      console.log("User location marker added");
     } catch (error) {
       console.error("Error initializing Google Map:", error);
       toast({
@@ -198,7 +183,6 @@ export default function GoogleMap({ clinics, userLocation, onClinicSelect, onNea
   // Add clinic markers
   useEffect(() => {
     if (!map || !clinics.length) {
-      console.log("Clinic markers skipped:", { hasMap: !!map, clinicsCount: clinics.length });
       return;
     }
 

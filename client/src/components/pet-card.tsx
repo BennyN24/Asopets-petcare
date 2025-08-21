@@ -27,7 +27,6 @@ export default memo(function PetCard({ pet, reminders, onDelete }: PetCardProps)
   const [, setLocation] = useLocation();
 
   const handleCardClick = () => {
-    console.log('Navigating to pet profile:', `/pet/${pet.id}`);
     setLocation(`/pet/${pet.id}`);
   };
 
@@ -72,7 +71,6 @@ export default memo(function PetCard({ pet, reminders, onDelete }: PetCardProps)
             alt={pet.name}
             className="w-16 h-16 rounded-full mx-auto mb-3 object-cover border-2 border-white shadow-sm"
             onError={(e) => {
-              console.log('Image failed to load for pet:', pet.name);
               e.currentTarget.style.display = 'none';
               e.currentTarget.nextElementSibling?.classList.remove('hidden');
             }}

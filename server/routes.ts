@@ -32,20 +32,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Force session middleware to be applied early
-  console.log('[AUTH-SETUP] Session middleware configured');
 
   // Minimal auth logging
   if (isDevelopment) {
     app.use((req, res, next) => {
       if (req.path.includes('/api/auth') && req.method === 'POST') {
-        console.log(`[AUTH] ${req.method} ${req.path}`);
       }
       next();
     });
   }
 
   // Email/Password Authentication Routes
-  console.log('[AUTH-SETUP] Setting up email/password authentication routes');
 
   app.post('/api/auth/signup', async (req: any, res) => {
     try {
@@ -106,7 +103,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Set user ID in session
       req.session.userId = user.id;
-      console.log(`[LOGIN] Setting session for user: ${user.email} (${user.id})`);
 
       // Force session save and send response
       req.session.save((err: any) => {
@@ -115,7 +111,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Login failed - session error" });
         }
 
-        console.log(`[LOGIN] Session saved successfully for user: ${user.email}`);
 
         // Set cache headers for auth endpoint
         res.set({
@@ -162,7 +157,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // If decoding fails, use the original token
       }
 
-      console.log(`Attempting email confirmation with token: ${cleanToken.substring(0, 20)}...`);
 
       const user = await storage.confirmUserEmail(cleanToken);
       if (!user) {
@@ -204,7 +198,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       });
 
-      console.log(`[BIOMETRIC-AUTH] User logged in: ${user.email} (${user.id})`);
       
       res.json({ 
         success: true, 
@@ -254,7 +247,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Logout handler function
   const logoutHandler = (req: any, res: any) => {
-    console.log(`[LOGOUT] Processing logout request for session: ${req.sessionID?.substring(0, 8)}...`);
 
     // Set no-cache headers
     res.set({
@@ -272,7 +264,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
 
     if (!req.session) {
-      console.log('[LOGOUT] No session found');
       return res.json({ message: "Logout successful" });
     }
 
@@ -280,7 +271,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (err) {
         console.error("[LOGOUT] Session destroy error:", err);
       }
-      console.log('[LOGOUT] Logout complete');
       res.json({ message: "Logout successful" });
     });
   };
@@ -323,38 +313,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/reset-password', async (req: any, res) => {
     try {
       const { token, password } = req.body;
-      console.log("Password reset request - Token:", token, "Password length:", password?.length);
 
       if (!token || !password) {
-        console.log("Missing token or password");
         return res.status(400).json({ message: "Token and password are required" });
       }
 
       if (password.length < 8) {
-        console.log("Password too short");
         return res.status(400).json({ message: "Password must be at least 8 characters" });
       }
 
       // Find user by reset token
       const user = await storage.getUserByResetToken(token);
-      console.log("User found by token:", user ? `${user.email} (${user.id})` : 'none');
 
       if (!user) {
-        console.log("No user found with reset token");
         return res.status(400).json({ message: "Invalid reset token" });
       }
 
       if (!user.passwordResetExpires) {
-        console.log("No expiration date set for reset token");
         return res.status(400).json({ message: "Invalid reset token" });
       }
 
       if (user.passwordResetExpires < new Date()) {
-        console.log("Reset token expired:", user.passwordResetExpires, "vs", new Date());
         return res.status(400).json({ message: "Reset token has expired" });
       }
 
-      console.log("Updating password for user:", user.email);
       const passwordHash = await hashPassword(password);
       await storage.updateUser(user.id, {
         passwordHash,
@@ -362,7 +344,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordResetExpires: null,
       });
 
-      console.log("Password reset successful for:", user.email);
       res.json({ message: "Password reset successful. You can now log in with your new password." });
     } catch (error) {
       console.error("Password reset error:", error);
@@ -389,7 +370,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP
       otpStore.set(phoneNumber, { otp, expires, verified: false });
 
-      console.log(`[SMS] Generated OTP for ${phoneNumber}: ${otp}`);
 
       // Production-ready SMS implementation
       if (isDevelopment) {
@@ -401,7 +381,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         // Production mode: For now, log OTP (replace with actual SMS service)
-        console.log(`[PRODUCTION SMS] OTP for ${phoneNumber}: ${otp}`);
         res.json({ 
           message: "OTP sent successfully", 
           note: "Check server logs for OTP (temporary production setup)"
@@ -550,7 +529,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      console.log(`[DELETE_ACCOUNT] Deleting account for user: ${userId}`);
 
       // Get user info for logging
       const user = await storage.getUser(userId);
@@ -561,7 +539,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Delete all user data (cascading deletion)
       await storage.deleteUser(userId);
 
-      console.log(`[DELETE_ACCOUNT] Successfully deleted account for user: ${user.email}`);
 
       // Destroy session
       req.session.destroy((err: any) => {
@@ -895,7 +872,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalRecords = await storage.getMedicalRecordCountByPetId(petId, types);
       const totalPages = Math.ceil(totalRecords / limit);
 
-      console.log(`Medical records API: Returning ${records.length}/${totalRecords} records (page ${page}/${totalPages})`);
 
       res.json({
         records,
@@ -1102,7 +1078,6 @@ const petId = parseInt(req.params.petId);
   // Google Maps configuration endpoint
   app.get("/api/google-maps-config", isAuthenticated, (req: any, res) => {
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-    console.log("Google Maps config requested, API key available:", !!apiKey);
     res.json({
       apiKey: apiKey || null
     });
@@ -1125,7 +1100,6 @@ const petId = parseInt(req.params.petId);
         // Enhance with Google Places data if API key is available and we have few results
         if (process.env.GOOGLE_MAPS_API_KEY && clinics.length < 5) {
           try {
-            console.log("Attempting to enhance results with Google Places API");
             const { searchNearbyVetClinics } = await import('./google-places');
             const googleClinics = await searchNearbyVetClinics(
               parseFloat(lat), 
@@ -1143,12 +1117,10 @@ const petId = parseInt(req.params.petId);
 
             // Merge Google Places results with database results
             const allClinics = [...clinics, ...uniqueGoogleClinics];
-            console.log(`Found ${clinics.length} database clinics and ${uniqueGoogleClinics.length} unique Google Places clinics`);
 
             res.json(allClinics);
             return;
           } catch (error) {
-            console.log("Google Places integration error:", error);
             // Fall back to database-only results
           }
         }
