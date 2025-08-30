@@ -300,7 +300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordResetExpires: resetExpires,
       });
 
-      // Send reset email with SendGrid
+      // Send reset email with Resend
       await sendPasswordResetEmail(email, resetToken);
 
       res.json({ message: "If the email exists, a reset link has been sent" });

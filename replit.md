@@ -57,5 +57,5 @@ Preferred communication style: Simple, everyday language.
 - **express-session**: Session management
 - **connect-pg-simple**: PostgreSQL session store
 - **Google Maps API / Google Places API**: For vet clinic finder
-- **SendGrid**: For email services (confirmation, password reset, contact support)
+- **Resend**: For email services (confirmation, password reset, contact support)
 - **Sharp**: For image compression
