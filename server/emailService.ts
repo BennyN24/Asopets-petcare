@@ -1,11 +1,10 @@
-import { MailService } from '@sendgrid/mail';
+import { Resend } from 'resend';
 
-if (!process.env.SENDGRID_API_KEY) {
-  throw new Error("SENDGRID_API_KEY environment variable must be set");
+if (!process.env.RESEND_API_KEY) {
+  throw new Error("RESEND_API_KEY environment variable must be set");
 }
 
-const mailService = new MailService();
-mailService.setApiKey(process.env.SENDGRID_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface EmailParams {
   to: string;
@@ -29,11 +28,6 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       subject: params.subject,
       text: params.text || "",
       html: params.html,
-      trackingSettings: {
-        clickTracking: {
-          enable: false,
-        },
-      },
     };
 
     // Add attachments if provided
@@ -41,12 +35,12 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       emailData.attachments = params.attachments;
     }
 
-    await mailService.send(emailData);
+    await resend.emails.send(emailData);
     
     console.log(`Email sent successfully to ${params.to}`);
     return true;
   } catch (error) {
-    console.error('SendGrid email error:', error);
+    console.error('Resend email error:', error);
     return false;
   }
 }

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import sgMail from "@sendgrid/mail";
+import { Resend } from 'resend';
 import { storage } from "./storage";
 import type { Express, RequestHandler, Request, Response } from "express";
 import session from "express-session";
@@ -208,9 +208,10 @@ export async function setupAuth(app: Express) {
   });
 }
 
-// Configure SendGrid
-if (env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(env.SENDGRID_API_KEY);
+// Configure Resend
+let resend: Resend | null = null;
+if (env.RESEND_API_KEY) {
+  resend = new Resend(env.RESEND_API_KEY);
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
@@ -221,8 +222,8 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
   // Development email confirmation
 
   try {
-    // Check if SendGrid is configured
-    if (process.env.SENDGRID_API_KEY) {
+    // Check if Resend is configured
+    if (resend) {
       const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -262,32 +263,18 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         </html>
       `;
 
-      await sgMail.send({
+      await resend.emails.send({
         to: email,
         from: "noreply@asopets.com",
         subject: "Confirm Your ASOPets Account",
         html: emailHtml,
         text: `Welcome to ASOPets! Please confirm your email address by visiting: ${confirmationLink}`,
-        trackingSettings: {
-          clickTracking: {
-            enable: false,
-          },
-        },
       });
     } else {
       // Development mode - email confirmation available
     }
   } catch (error: any) {
     console.error("Failed to send confirmation email:", error);
-    if (error.response?.body?.errors) {
-      console.error(
-        "SendGrid detailed errors:",
-        JSON.stringify(error.response.body.errors, null, 2),
-      );
-    }
-    if (error.code) {
-      console.error("SendGrid error code:", error.code);
-    }
     // Email confirmation link available
   }
 };
@@ -303,7 +290,7 @@ export const sendPasswordResetEmail = async (
   // Development password reset
 
   try {
-    if (process.env.SENDGRID_API_KEY) {
+    if (resend) {
       const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -346,34 +333,18 @@ export const sendPasswordResetEmail = async (
         </html>
       `;
 
-      const msg: any = {
+      await resend.emails.send({
         to: email,
         from: "noreply@asopets.com",
         subject: "Reset Your ASOPets Password",
         html: emailHtml,
         text: `Reset your ASOPets password by visiting: ${resetLink} (This link expires in 1 hour)`,
-        trackingSettings: {
-          clickTracking: {
-            enable: false,
-          },
-        },
-      };
-
-      await sgMail.send(msg);
+      });
     } else {
       // Development mode - password reset available
     }
   } catch (error: any) {
     console.error("Failed to send password reset email:", error);
-    if (error.response?.body?.errors) {
-      console.error(
-        "SendGrid detailed errors:",
-        JSON.stringify(error.response.body.errors, null, 2),
-      );
-    }
-    if (error.code) {
-      console.error("SendGrid error code:", error.code);
-    }
     // Password reset link available
   }
 };
