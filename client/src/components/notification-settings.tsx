@@ -27,7 +27,8 @@ export default function NotificationSettings({ onClose }: NotificationSettingsPr
     permission, 
     isSubscribed, 
     enableNotifications, 
-    disableNotifications 
+    disableNotifications,
+    sendNotification
   } = usePushNotifications();
   const { toast } = useToast();
   const [isEnabling, setIsEnabling] = useState(false);
@@ -234,13 +235,25 @@ export default function NotificationSettings({ onClose }: NotificationSettingsPr
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => {
-                // Send a test notification
-                if ('Notification' in window && Notification.permission === 'granted') {
-                  new Notification('🐾 ASOPETS Test', {
-                    body: 'Push notifications are working correctly!',
-                    icon: '/icon-192x192.png',
-                    tag: 'test-notification'
+              onClick={async () => {
+                // Send a test notification using the proper mobile-compatible method
+                const success = await sendNotification({
+                  title: '🐾 ASOPETS Test',
+                  body: 'Push notifications are working correctly!',
+                  icon: '/icon-192x192.png',
+                  tag: 'test-notification'
+                });
+                
+                if (success) {
+                  toast({
+                    title: "Test notification sent",
+                    description: "Check your device for the notification.",
+                  });
+                } else {
+                  toast({
+                    title: "Test failed",
+                    description: "Could not send test notification.",
+                    variant: "destructive",
                   });
                 }
               }}
