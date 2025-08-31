@@ -59,3 +59,47 @@ Preferred communication style: Simple, everyday language.
 - **Google Maps API / Google Places API**: For vet clinic finder
 - **Resend**: For email services (confirmation, password reset, contact support)
 - **Sharp**: For image compression
+
+## Android APK Build Process
+
+### Prerequisites & Environment Setup
+- **Java Requirements**: Java 21 (required by Capacitor) - set JAVA_HOME to Java 21 path
+- **Android SDK**: Full Android SDK with platform-tools, build-tools, and target platform
+- **Key Environment Variables**: ANDROID_HOME, PATH (including SDK tools)
+
+### Build Commands & Steps
+When requested to build Android APK:
+
+1. **Install System Dependencies**:
+   ```bash
+   # Install Java 21 and Android tools
+   packager_tool: openjdk21, android-tools
+   ```
+
+2. **Set Up Android SDK** (if not already done):
+   ```bash
+   # Download and extract Android command line tools to ~/android-sdk
+   # Accept SDK licenses: sdkmanager --licenses
+   # Install required components: sdkmanager --install "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+   ```
+
+3. **Configure local.properties**:
+   ```
+   sdk.dir=/home/runner/android-sdk
+   ```
+
+4. **Set Environment Variables & Build**:
+   ```bash
+   export JAVA_HOME=/nix/store/[java-21-path]/openjdk-21+35
+   export PATH=$JAVA_HOME/bin:$PATH
+   export ANDROID_HOME=~/android-sdk
+   export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+   cd android && ./gradlew assembleDebug
+   ```
+
+5. **APK Location**: `android/app/build/outputs/apk/debug/app-debug.apk`
+
+### Common Issues & Solutions
+- **Java Version Conflicts**: Ensure Java 21 is active (capacitor.build.gradle requires VERSION_21)
+- **SDK Not Found**: Verify ANDROID_HOME points to ~/android-sdk and local.properties exists
+- **Missing SDK Components**: Install platform-tools, build-tools;34.0.0, platforms;android-34
