@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ASOPETS</string>
+    <string name="title_activity_main">ASOPETS</string>
+    <string name="package_name">com.asopets.app</string>
+    <string name="custom_url_scheme">com.asopets.app</string>
+</resources>
