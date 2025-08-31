@@ -53,8 +53,9 @@ cd android && ./gradlew clean assembleDebug
 ## Current APK Status
 ✅ **Debug APK Successfully Generated**
 - Location: `android/app/build/outputs/apk/debug/app-debug.apk`
-- Size: 10.7 MB
-- Build Date: August 31, 2025 (Updated 5:09 PM)
+- Size: 14.4 MB
+- Build Date: August 31, 2025 (Updated 5:17 PM)
+- **New Features**: Push notifications support added
 
 ## Google Play Store Requirements
 
@@ -85,8 +86,10 @@ cd android && ./gradlew clean assembleDebug
 - Camera access for pet photos
 - Location services for vet clinics
 - File storage for medical records
-- Push notifications for reminders
+- **Push notifications for reminders** (newly configured)
 - QR code scanning for pet profiles
+- Firebase Cloud Messaging support
+- Notification permissions (POST_NOTIFICATIONS)
 
 ## Troubleshooting
 

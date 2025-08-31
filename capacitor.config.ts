@@ -23,6 +23,11 @@ const config: CapacitorConfig = {
       releaseType: 'APK'
     },
     allowMixedContent: false
+  },
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"]
+    }
   }
 };
 
