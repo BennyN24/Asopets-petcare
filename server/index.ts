@@ -1,9 +1,29 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { env, isDevelopment } from "./config";
 
 const app = express();
+
+// CORS configuration for mobile app support
+app.use(cors({
+  origin: [
+    'https://7767d013-98a9-476c-9458-5bf49e1da2a1-00-39bhyddb787f0.picard.replit.dev',
+    'https://*.replit.dev',
+    'https://asopets.com',
+    'capacitor://localhost',
+    'ionic://localhost',
+    'http://localhost',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie']
+}));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 

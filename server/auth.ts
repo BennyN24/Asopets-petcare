@@ -39,7 +39,7 @@ export function getSession() {
       httpOnly: true,
       secure: !isDevelopment,
       maxAge: sessionTtl,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     },
     unset: "destroy", // Ensures session is completely removed on logout
