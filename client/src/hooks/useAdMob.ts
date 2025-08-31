@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import * as React from 'react';
 
 interface AdMobConfig {
   clientId: string;
@@ -9,10 +9,10 @@ interface AdMobConfig {
 }
 
 export function useAdMob(config?: AdMobConfig) {
-  const [adsLoaded, setAdsLoaded] = useState(false);
-  const [showInterstitial, setShowInterstitial] = useState(false);
+  const [adsLoaded, setAdsLoaded] = React.useState(false);
+  const [showInterstitial, setShowInterstitial] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Check if AdSense script is loaded
     const checkAdSense = () => {
       if (typeof window !== 'undefined' && window.adsbygoogle) {

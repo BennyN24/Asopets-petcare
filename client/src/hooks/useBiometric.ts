@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 
 export interface BiometricCredential {
   id: string;
@@ -7,12 +7,12 @@ export interface BiometricCredential {
 }
 
 export function useBiometric() {
-  const [isSupported, setIsSupported] = useState(false);
-  const [isEnrolled, setIsEnrolled] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSupported, setIsSupported] = React.useState(false);
+  const [isEnrolled, setIsEnrolled] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     checkBiometricSupport();
   }, []);
 

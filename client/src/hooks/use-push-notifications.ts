@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import * as React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -27,12 +27,12 @@ interface UsePushNotificationsReturn {
 }
 
 export function usePushNotifications(): UsePushNotificationsReturn {
-  const [isSupported, setIsSupported] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission | null>(null);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSupported, setIsSupported] = React.useState(false);
+  const [permission, setPermission] = React.useState<NotificationPermission | null>(null);
+  const [isSubscribed, setIsSubscribed] = React.useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Check if notifications are supported
     if (Capacitor.isNativePlatform()) {
       // Mobile platform - use Capacitor
@@ -46,7 +46,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, []);
 
-  const initializeMobileNotifications = useCallback(async () => {
+  const initializeMobileNotifications = React.useCallback(async () => {
     try {
       const pushPermissions = await PushNotifications.checkPermissions();
       const localPermissions = await LocalNotifications.checkPermissions();
@@ -71,7 +71,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, []);
 
-  const requestPermission = useCallback(async (): Promise<boolean> => {
+  const requestPermission = React.useCallback(async (): Promise<boolean> => {
     if (!isSupported) {
       toast({
         title: "Notifications not supported",
@@ -140,7 +140,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, [isSupported, toast]);
 
-  const sendNotification = useCallback(async (options: PushNotificationOptions): Promise<boolean> => {
+  const sendNotification = React.useCallback(async (options: PushNotificationOptions): Promise<boolean> => {
     if (!isSupported || permission !== 'granted') {
       console.log('Notifications not available or not permitted');
       return false;
@@ -199,7 +199,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, [isSupported, permission]);
 
-  const scheduleNotification = useCallback(async (options: PushNotificationOptions, delay: number) => {
+  const scheduleNotification = React.useCallback(async (options: PushNotificationOptions, delay: number) => {
     if (!isSupported || permission !== 'granted') {
       console.log('Cannot schedule notification - not supported or not permitted');
       return;
@@ -234,7 +234,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, [isSupported, permission, sendNotification]);
 
-  const enableNotifications = useCallback(async (): Promise<boolean> => {
+  const enableNotifications = React.useCallback(async (): Promise<boolean> => {
     if (permission === 'granted') {
       setIsSubscribed(true);
       return true;
@@ -243,7 +243,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     return await requestPermission();
   }, [permission, requestPermission]);
 
-  const disableNotifications = useCallback(() => {
+  const disableNotifications = React.useCallback(() => {
     setIsSubscribed(false);
     toast({
       title: "Notifications disabled",

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import type { User } from "@shared/schema";
 
 export function useAuth() {
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = React.useState(false);
 
   const {
     data: user,
@@ -20,7 +20,7 @@ export function useAuth() {
     refetchOnReconnect: false,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isLoading && !isInitialized) {
       setIsInitialized(true);
     }

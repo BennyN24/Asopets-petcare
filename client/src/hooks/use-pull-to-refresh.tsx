@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import * as React from 'react';
 
 interface UsePullToRefreshOptions {
   onRefresh: () => Promise<void> | void;
@@ -13,15 +13,15 @@ export function usePullToRefresh({
   maxPullDistance = 120,
   isEnabled = true,
 }: UsePullToRefreshOptions) {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isPulling, setIsPulling] = useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [pullDistance, setPullDistance] = React.useState(0);
+  const [isPulling, setIsPulling] = React.useState(false);
   
-  const startY = useRef<number>(0);
-  const currentY = useRef<number>(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const startY = React.useRef<number>(0);
+  const currentY = React.useRef<number>(0);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
+  const handleTouchStart = React.useCallback((e: TouchEvent) => {
     if (!isEnabled || isRefreshing) return;
     
     const container = containerRef.current;
@@ -34,7 +34,7 @@ export function usePullToRefresh({
     }
   }, [isEnabled, isRefreshing]);
 
-  const handleTouchMove = useCallback((e: TouchEvent) => {
+  const handleTouchMove = React.useCallback((e: TouchEvent) => {
     if (!isEnabled || isRefreshing || !isPulling) return;
     
     const container = containerRef.current;
@@ -61,7 +61,7 @@ export function usePullToRefresh({
     }
   }, [isEnabled, isRefreshing, isPulling, maxPullDistance]);
 
-  const handleTouchEnd = useCallback(async () => {
+  const handleTouchEnd = React.useCallback(async () => {
     if (!isEnabled || isRefreshing || !isPulling) return;
 
     if (pullDistance >= refreshThreshold) {
@@ -79,7 +79,7 @@ export function usePullToRefresh({
     setPullDistance(0);
   }, [isEnabled, isRefreshing, isPulling, pullDistance, refreshThreshold, onRefresh]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 

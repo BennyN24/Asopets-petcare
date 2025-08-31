@@ -1,13 +1,13 @@
 
-import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { useAuth } from './useAuth';
 import type { User } from '@shared/schema';
 
 export function useWelcome() {
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [showWelcome, setShowWelcome] = React.useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isAuthenticated && user && user.createdAt) {
       // Check if this is a new user by checking account creation date
       const accountCreatedAt = new Date(user.createdAt);
