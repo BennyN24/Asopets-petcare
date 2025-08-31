@@ -282,16 +282,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/forgot-password', async (req: any, res) => {
     try {
       const { email } = req.body;
+      console.log('Forgot password request for email:', email);
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
 
       const user = await storage.getUserByEmail(email);
+      console.log('User found:', !!user);
       if (!user) {
         // For security, don't reveal if email exists
+        console.log('User not found, returning generic message');
         return res.json({ message: "If the email exists, a reset link has been sent" });
       }
 
+      console.log('Generating reset token for user:', user.id);
       const resetToken = generateToken();
       const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
@@ -300,8 +304,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         passwordResetExpires: resetExpires,
       });
 
+      console.log('Calling sendPasswordResetEmail...');
       // Send reset email with Resend
       await sendPasswordResetEmail(email, resetToken);
+      console.log('sendPasswordResetEmail completed');
 
       res.json({ message: "If the email exists, a reset link has been sent" });
     } catch (error) {

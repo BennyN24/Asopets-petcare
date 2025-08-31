@@ -22,6 +22,16 @@ interface EmailParams {
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
   try {
+    console.log('Attempting to send email with Resend...');
+    console.log('Email params:', { 
+      to: params.to, 
+      from: params.from, 
+      subject: params.subject,
+      hasHtml: !!params.html,
+      hasText: !!params.text,
+      hasAttachments: !!(params.attachments && params.attachments.length > 0)
+    });
+
     const emailData: any = {
       to: params.to,
       from: params.from,
@@ -35,12 +45,15 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       emailData.attachments = params.attachments;
     }
 
-    await resend.emails.send(emailData);
+    console.log('Sending email via Resend API...');
+    const result = await resend.emails.send(emailData);
+    console.log('Resend API response:', result);
     
     console.log(`Email sent successfully to ${params.to}`);
     return true;
   } catch (error) {
     console.error('Resend email error:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     return false;
   }
 }

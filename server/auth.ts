@@ -210,11 +210,18 @@ export async function setupAuth(app: Express) {
 
 // Configure Resend
 let resend: Resend | null = null;
+console.log('Checking Resend configuration...');
+console.log('RESEND_API_KEY exists:', !!env.RESEND_API_KEY);
 if (env.RESEND_API_KEY) {
+  console.log('Initializing Resend client...');
   resend = new Resend(env.RESEND_API_KEY);
+  console.log('Resend client initialized successfully');
+} else {
+  console.log('RESEND_API_KEY not found in environment variables');
 }
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
+  console.log('sendConfirmationEmail called for:', email);
   // Use Replit domain if available, otherwise fallback to production URL
   const baseUrl = env.BASE_URL || "https://asopets.com";
   const confirmationLink = `${baseUrl}/email-confirmed?token=${encodeURIComponent(token)}`;
@@ -223,7 +230,9 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
 
   try {
     // Check if Resend is configured
+    console.log('Resend client available:', !!resend);
     if (resend) {
+      console.log('Sending confirmation email via Resend...');
       const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -263,13 +272,14 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
         </html>
       `;
 
-      await resend.emails.send({
+      const result = await resend.emails.send({
         to: email,
         from: "noreply@asopets.com",
         subject: "Confirm Your ASOPets Account",
         html: emailHtml,
         text: `Welcome to ASOPets! Please confirm your email address by visiting: ${confirmationLink}`,
       });
+      console.log('Confirmation email sent successfully, result:', result);
     } else {
       // Development mode - email confirmation available
     }
@@ -283,6 +293,7 @@ export const sendPasswordResetEmail = async (
   email: string,
   resetToken: string,
 ) => {
+  console.log('sendPasswordResetEmail called for:', email);
   // Use Replit domain if available, otherwise fallback to production URL
   const baseUrl = env.BASE_URL || "https://asopets.com";
   const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(resetToken)}`;
@@ -290,7 +301,9 @@ export const sendPasswordResetEmail = async (
   // Development password reset
 
   try {
+    console.log('Resend client available for password reset:', !!resend);
     if (resend) {
+      console.log('Sending password reset email via Resend...');
       const emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -333,13 +346,14 @@ export const sendPasswordResetEmail = async (
         </html>
       `;
 
-      await resend.emails.send({
+      const result = await resend.emails.send({
         to: email,
         from: "noreply@asopets.com",
         subject: "Reset Your ASOPets Password",
         html: emailHtml,
         text: `Reset your ASOPets password by visiting: ${resetLink} (This link expires in 1 hour)`,
       });
+      console.log('Password reset email sent successfully, result:', result);
     } else {
       // Development mode - password reset available
     }
