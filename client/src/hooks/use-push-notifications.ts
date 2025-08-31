@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -95,7 +94,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         requireInteraction: options.requireInteraction || false,
         silent: options.silent || false,
         data: options.data,
-        timestamp: Date.now(),
       });
 
       // Handle notification click

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
+import type { User } from "@shared/schema";
 
 export function useAuth() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -9,7 +10,7 @@ export function useAuth() {
     data: user,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -74,5 +75,11 @@ export function useAuth() {
     isAuthenticated,
     error,
     logout,
+  } as {
+    user: User | null;
+    isLoading: boolean;
+    isAuthenticated: boolean;
+    error: any;
+    logout: () => Promise<void>;
   };
 }
