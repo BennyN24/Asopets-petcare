@@ -39,12 +39,31 @@ try {
   console.log('App rendered successfully');
 } catch (error) {
   console.error('Failed to start application:', error);
-  document.body.innerHTML = `
-    <div style="padding: 20px; font-family: Arial, sans-serif;">
-      <h1>Application Error</h1>
-      <p>Failed to start ASOPETS application:</p>
-      <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px;">${error}</pre>
-      <p>Please refresh the page or contact support.</p>
-    </div>
-  `;
+  
+  // Clear body content safely
+  document.body.innerHTML = '';
+  
+  // Create error display using safe DOM methods
+  const container = document.createElement('div');
+  container.style.cssText = 'padding: 20px; font-family: Arial, sans-serif;';
+  
+  const title = document.createElement('h1');
+  title.textContent = 'Application Error';
+  
+  const description = document.createElement('p');
+  description.textContent = 'Failed to start ASOPETS application:';
+  
+  const errorPre = document.createElement('pre');
+  errorPre.style.cssText = 'background: #f5f5f5; padding: 10px; border-radius: 4px;';
+  errorPre.textContent = String(error); // Safe text content, no HTML injection
+  
+  const support = document.createElement('p');
+  support.textContent = 'Please refresh the page or contact support.';
+  
+  // Append elements safely
+  container.appendChild(title);
+  container.appendChild(description);
+  container.appendChild(errorPre);
+  container.appendChild(support);
+  document.body.appendChild(container);
 }
