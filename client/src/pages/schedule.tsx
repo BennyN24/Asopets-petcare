@@ -35,6 +35,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Reminder, Pet as PetType } from "@shared/schema";
 import { useMemo } from "react";
 import { Label } from "@/components/ui/label";
+import PullToRefresh from "@/components/pull-to-refresh";
 
 export default function Schedule() {
   const { isAuthenticated } = useAuth();
@@ -47,6 +48,15 @@ export default function Schedule() {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const { isSupported: pushSupported, isSubscribed: pushEnabled } = usePushNotifications();
+
+  // Pull to refresh handler
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders/with-pets"] }),
+    ]);
+  }, [queryClient]);
 
   const { data: reminders = [], isLoading: remindersLoading } = useQuery<Reminder[]>({
     queryKey: ["/api/reminders"],
@@ -335,7 +345,9 @@ export default function Schedule() {
           </div>
         </div>
       </div>
-      <div className="p-4 space-y-6">
+      
+      <PullToRefresh onRefresh={handleRefresh} className="flex-1">
+        <div className="p-4 space-y-6">
 
         {/* Filter Controls - Moved above tabs */}
         <div className="bg-white rounded-lg border shadow-sm p-4">
@@ -599,7 +611,8 @@ export default function Schedule() {
             )}
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+      </PullToRefresh>
 
       <BottomNavigation activeTab="schedule" />
 

@@ -31,6 +31,7 @@ import ScannedPetViewer from "@/components/scanned-pet-viewer";
 import ScannedPetTransfer from "@/components/scanned-pet-transfer";
 import { apiRequest } from "@/lib/queryClient";
 import MedicationReminderManager from "@/components/medication-reminder-manager";
+import PullToRefresh from "@/components/pull-to-refresh";
 import type { Pet, Reminder, MedicalRecord } from "@shared/schema";
 
 export default function Dashboard() {
@@ -47,6 +48,17 @@ export default function Dashboard() {
   const [transferPetData, setTransferPetData] = useState<any>(null);
 
   const [petToDelete, setPetToDelete] = useState<Pet | null>(null);
+
+  // Pull to refresh handler
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/reminders/overdue"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/scanned-pets"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/medical-records/all"] }),
+    ]);
+  }, [queryClient]);
 
   // Remove localStorage scanned pets logic since we're using database now
 
@@ -198,7 +210,8 @@ export default function Dashboard() {
         </div>
       </div>
       {/* Content */}
-      <div className="p-4 pb-20">
+      <PullToRefresh onRefresh={handleRefresh} className="flex-1">
+        <div className="p-4 pb-20">
         {/* Offline Sync Indicator */}
         <OfflineSyncIndicator />
 
@@ -342,7 +355,9 @@ export default function Dashboard() {
             />
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+      </PullToRefresh>
+      
       {/* Find Vet Clinics Modal */}
       {showVetClinics && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-10">
@@ -507,6 +522,7 @@ export default function Dashboard() {
           </AlertDialogContent>
         </AlertDialog>
       )}
+      
       <BottomNavigation activeTab="home" />
     </div>
   );

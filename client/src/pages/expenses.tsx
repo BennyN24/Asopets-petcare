@@ -34,6 +34,7 @@ import { format, startOfYear, endOfYear, startOfMonth, endOfMonth, isThisYear, i
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import BottomNavigation from "@/components/bottom-navigation";
+import PullToRefresh from "@/components/pull-to-refresh";
 import type { Pet, MedicalRecord } from "@shared/schema";
 
 export default function Expenses() {
@@ -51,6 +52,14 @@ export default function Expenses() {
     return saved ? Number(saved) : 100;
   });
   const [isSettingBudget, setIsSettingBudget] = useState(false);
+
+  // Pull to refresh handler
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] }),
+      queryClient.invalidateQueries({ queryKey: ["/api/medical-records/all"] }),
+    ]);
+  }, [queryClient]);
 
   // Save budget to localStorage whenever it changes
   useEffect(() => {
@@ -293,7 +302,9 @@ export default function Expenses() {
           </div>
         </div>
       </div>
-      <div className="p-4">
+      
+      <PullToRefresh onRefresh={handleRefresh} className="flex-1">
+        <div className="p-4">
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -773,7 +784,9 @@ export default function Expenses() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+      </PullToRefresh>
+      
       {/* Bottom spacing to prevent cutoff from bottom navigation */}
       <div className="h-20"></div>
       <BottomNavigation activeTab="expenses" />
