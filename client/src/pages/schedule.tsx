@@ -31,6 +31,7 @@ import NotificationDropdown from "@/components/notification-dropdown";
 import PushNotificationManager from "@/components/push-notification-manager";
 import NotificationSettings from "@/components/notification-settings";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { Capacitor } from "@capacitor/core";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Reminder, Pet as PetType } from "@shared/schema";
 import { useMemo } from "react";

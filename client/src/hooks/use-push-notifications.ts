@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 interface PushNotificationOptions {
   title: string;
@@ -31,10 +34,40 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
   useEffect(() => {
     // Check if notifications are supported
-    if ('Notification' in window && 'serviceWorker' in navigator) {
+    if (Capacitor.isNativePlatform()) {
+      // Mobile platform - use Capacitor
+      setIsSupported(true);
+      initializeMobileNotifications();
+    } else if ('Notification' in window && 'serviceWorker' in navigator) {
+      // Web platform - use web notifications
       setIsSupported(true);
       setPermission(Notification.permission);
       setIsSubscribed(Notification.permission === 'granted');
+    }
+  }, []);
+
+  const initializeMobileNotifications = useCallback(async () => {
+    try {
+      const pushPermissions = await PushNotifications.checkPermissions();
+      const localPermissions = await LocalNotifications.checkPermissions();
+      
+      setPermission(pushPermissions.receive as NotificationPermission);
+      setIsSubscribed(pushPermissions.receive === 'granted' && localPermissions.display === 'granted');
+      
+      // Add mobile event listeners
+      PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+        if (notification.notification.data?.type === 'reminder') {
+          window.location.href = '/schedule';
+        }
+      });
+      
+      LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
+        if (notification.notification.extra?.type === 'reminder') {
+          window.location.href = '/schedule';
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing mobile notifications:', error);
     }
   }, []);
 
@@ -42,32 +75,60 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     if (!isSupported) {
       toast({
         title: "Notifications not supported",
-        description: "Your browser doesn't support push notifications.",
+        description: "Your device doesn't support push notifications.",
         variant: "destructive",
       });
       return false;
     }
 
     try {
-      const result = await Notification.requestPermission();
-      setPermission(result);
-      const granted = result === 'granted';
-      setIsSubscribed(granted);
-
-      if (granted) {
-        toast({
-          title: "Notifications enabled",
-          description: "You'll receive reminders for your pet's schedule.",
-        });
+      if (Capacitor.isNativePlatform()) {
+        // Mobile platform
+        const pushPermissions = await PushNotifications.requestPermissions();
+        const localPermissions = await LocalNotifications.requestPermissions();
+        
+        await PushNotifications.register();
+        
+        const granted = pushPermissions.receive === 'granted' && localPermissions.display === 'granted';
+        setPermission(pushPermissions.receive as NotificationPermission);
+        setIsSubscribed(granted);
+        
+        if (granted) {
+          toast({
+            title: "Notifications enabled",
+            description: "You'll receive reminders for your pet's schedule.",
+          });
+        } else {
+          toast({
+            title: "Notifications blocked",
+            description: "Please enable notifications in your device settings.",
+            variant: "destructive",
+          });
+        }
+        
+        return granted;
       } else {
-        toast({
-          title: "Notifications blocked",
-          description: "You can enable them in your browser settings.",
-          variant: "destructive",
-        });
-      }
+        // Web platform
+        const result = await Notification.requestPermission();
+        setPermission(result);
+        const granted = result === 'granted';
+        setIsSubscribed(granted);
 
-      return granted;
+        if (granted) {
+          toast({
+            title: "Notifications enabled",
+            description: "You'll receive reminders for your pet's schedule.",
+          });
+        } else {
+          toast({
+            title: "Notifications blocked",
+            description: "You can enable them in your browser settings.",
+            variant: "destructive",
+          });
+        }
+
+        return granted;
+      }
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       toast({
@@ -86,34 +147,48 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
 
     try {
-      const notification = new Notification(options.title, {
-        body: options.body,
-        icon: options.icon || '/icon-192x192.png',
-        badge: options.badge || '/icon-192x192.png',
-        tag: options.tag || 'asopets-reminder',
-        requireInteraction: options.requireInteraction || false,
-        silent: options.silent || false,
-        data: options.data,
-      });
+      if (Capacitor.isNativePlatform()) {
+        // Mobile platform - use local notifications
+        await LocalNotifications.schedule({
+          notifications: [{
+            id: Date.now(),
+            title: options.title,
+            body: options.body,
+            extra: options.data || {},
+            schedule: { at: new Date(Date.now() + 1000) }, // Schedule 1 second from now
+          }]
+        });
+      } else {
+        // Web platform - use web notifications
+        const notification = new Notification(options.title, {
+          body: options.body,
+          icon: options.icon || '/icon-192x192.png',
+          badge: options.badge || '/icon-192x192.png',
+          tag: options.tag || 'asopets-reminder',
+          requireInteraction: options.requireInteraction || false,
+          silent: options.silent || false,
+          data: options.data,
+        });
 
-      // Handle notification click
-      notification.onclick = (event) => {
-        event.preventDefault();
-        window.focus();
-        
-        // Navigate to schedule page if data contains reminder info
-        if (options.data?.type === 'reminder') {
-          window.location.href = '/schedule';
-        }
-        
-        notification.close();
-      };
-
-      // Auto-close after 10 seconds unless requireInteraction is true
-      if (!options.requireInteraction) {
-        setTimeout(() => {
+        // Handle notification click
+        notification.onclick = (event) => {
+          event.preventDefault();
+          window.focus();
+          
+          // Navigate to schedule page if data contains reminder info
+          if (options.data?.type === 'reminder') {
+            window.location.href = '/schedule';
+          }
+          
           notification.close();
-        }, 10000);
+        };
+
+        // Auto-close after 10 seconds unless requireInteraction is true
+        if (!options.requireInteraction) {
+          setTimeout(() => {
+            notification.close();
+          }, 10000);
+        }
       }
 
       console.log('Push notification sent:', options.title);
@@ -124,17 +199,39 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, [isSupported, permission]);
 
-  const scheduleNotification = useCallback((options: PushNotificationOptions, delay: number) => {
+  const scheduleNotification = useCallback(async (options: PushNotificationOptions, delay: number) => {
     if (!isSupported || permission !== 'granted') {
       console.log('Cannot schedule notification - not supported or not permitted');
       return;
     }
 
-    setTimeout(() => {
-      sendNotification(options);
-    }, delay);
-
-    console.log(`Notification scheduled for ${delay}ms from now:`, options.title);
+    try {
+      if (Capacitor.isNativePlatform()) {
+        // Mobile platform - use local notifications with proper scheduling
+        const scheduleDate = new Date(Date.now() + delay);
+        
+        await LocalNotifications.schedule({
+          notifications: [{
+            id: Date.now(),
+            title: options.title,
+            body: options.body,
+            extra: options.data || {},
+            schedule: { at: scheduleDate },
+          }]
+        });
+        
+        console.log(`Mobile notification scheduled for ${scheduleDate.toISOString()}:`, options.title);
+      } else {
+        // Web platform - use setTimeout
+        setTimeout(() => {
+          sendNotification(options);
+        }, delay);
+        
+        console.log(`Web notification scheduled for ${delay}ms from now:`, options.title);
+      }
+    } catch (error) {
+      console.error('Error scheduling notification:', error);
+    }
   }, [isSupported, permission, sendNotification]);
 
   const enableNotifications = useCallback(async (): Promise<boolean> => {
