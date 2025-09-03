@@ -1,4 +1,4 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient, QueryFunctionContext } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -7,21 +7,48 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-export async function apiRequest(
-  method: string,
+// Determine the base URL for API requests
+const getBaseUrl = () => {
+  // Check if we're in a mobile app context
+  if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+    // We're in a mobile app, use the Replit production URL
+    return 'https://rest-express-c26cbkdwgrvp.replit.app';
+  }
+
+  // Check if we're in development
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:5000';
+  }
+
+  // Production web environment
+  return '';
+};
+
+const BASE_URL = getBaseUrl();
+
+export const apiRequest = async (
+  method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
-  const res = await fetch(url, {
+  data?: any
+): Promise<any> => {
+  const fullUrl = BASE_URL + url;
+
+  const response = await fetch(fullUrl, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
+    headers: {
+      "Content-Type": "application/json",
+    },
     credentials: "include",
+    ...(data && { body: JSON.stringify(data) }),
   });
 
-  await throwIfResNotOk(res);
-  return res;
-}
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: "Request failed" }));
+    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
 
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
@@ -44,42 +71,12 @@ export const getQueryFn: <T>(options: {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: async ({ queryKey, signal }) => {
-        const [url, ...params] = queryKey as [string, ...unknown[]];
-
-        try {
-          const response = await fetch(url, {
-            credentials: "include",
-            signal,
-          });
-
-          if (!response.ok) {
-            if (response.status === 401) {
-              // Clear any existing auth data on 401
-              queryClient.setQueryData(["/api/auth/user"], null);
-            }
-            const errorText = await response.text();
-            console.error(`API Error ${response.status}:`, errorText);
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-
-          const data = await response.json();
-          return data;
-        } catch (error) {
-          console.error(`Query failed for ${url}:`, error);
-          throw error;
-        }
+      queryFn: async ({ queryKey }: QueryFunctionContext) => {
+        const [url] = queryKey as [string];
+        return apiRequest("GET", url);
       },
-      retry: (failureCount, error: any) => {
-        // Don't retry on 401 Unauthorized
-        if (error?.message?.includes('401')) {
-          return false;
-        }
-        return failureCount < 3;
-      },
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
