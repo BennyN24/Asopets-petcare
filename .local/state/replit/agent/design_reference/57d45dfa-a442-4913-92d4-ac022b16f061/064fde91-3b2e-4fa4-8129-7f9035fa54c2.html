@@ -1,0 +1,591 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetBB - Pet Care Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                        success: '#10B981'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Mobile Container -->
+    <div class="max-w-sm mx-auto bg-white min-h-screen relative">
+        
+        <!-- @COMPONENT: LoginScreen -->
+        <div id="loginScreen" class="p-6 min-h-screen flex flex-col justify-center">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-paw text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">VetBB</h1>
+                <p class="text-gray-600">Pet Care Solutions</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email or Phone Number</label>
+                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter email or phone">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter password">
+                </div>
+                
+                <button class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                    Sign In
+                </button>
+                
+                <div class="text-center">
+                    <button class="text-primary font-medium hover:underline" onclick="showRegistration()">
+                        Don't have an account? Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: LoginScreen -->
+        
+        <!-- @COMPONENT: RegistrationScreen -->
+        <div id="registrationScreen" class="p-6 min-h-screen hidden">
+            <div class="flex items-center mb-6">
+                <button onclick="showLogin()" class="mr-4">
+                    <i class="fas fa-arrow-left text-gray-600 text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold text-gray-900">Create Account</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter your full name">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter email address">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter phone number">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Create password">
+                </div>
+                
+                <button class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                    Create Account
+                </button>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: RegistrationScreen -->
+        
+        <!-- @COMPONENT: MainDashboard -->
+        <div id="mainDashboard" class="hidden">
+            <!-- Header -->
+            <div class="bg-primary text-white p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-bold">Welcome back!</h1>
+                        <p class="text-green-100 text-sm" data-bind="user.name">Sarah Johnson</p>
+                    </div>
+                    <button class="relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Pet Grid -->
+            <div class="p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Your Pets</h2>
+                    <button onclick="showAddPet()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        <i class="fas fa-plus mr-2"></i>Add Pet
+                    </button>
+                </div>
+                
+                <!-- @MAP: pets.map(pet => ( -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <!-- Pet Card 1 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative" onclick="showPetProfile('buddy')">
+                        <!-- Dog portrait with golden retriever -->
+                        <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300" alt="Golden Retriever dog" class="w-16 h-16 rounded-full mx-auto mb-3 object-cover">
+                        <h3 class="text-center font-semibold text-gray-900">Buddy</h3>
+                        <p class="text-center text-xs text-gray-500 mb-2">Golden Retriever</p>
+                        <div class="absolute -top-2 -right-2 bg-danger text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">2</div>
+                    </div>
+                    
+                    <!-- Pet Card 2 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative" onclick="showPetProfile('luna')">
+                        <!-- Cat portrait with siamese cat -->
+                        <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300" alt="Siamese cat with blue eyes" class="w-16 h-16 rounded-full mx-auto mb-3 object-cover">
+                        <h3 class="text-center font-semibold text-gray-900">Luna</h3>
+                        <p class="text-center text-xs text-gray-500 mb-2">Siamese Cat</p>
+                        <div class="absolute -top-2 -right-2 bg-accent text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">1</div>
+                    </div>
+                    
+                    <!-- Pet Card 3 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100" onclick="showPetProfile('charlie')">
+                        <!-- Bird portrait with colorful parrot -->
+                        <img src="https://images.unsplash.com/photo-1552728089-57bdde30beb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300" alt="Colorful parrot with vibrant feathers" class="w-16 h-16 rounded-full mx-auto mb-3 object-cover">
+                        <h3 class="text-center font-semibold text-gray-900">Charlie</h3>
+                        <p class="text-center text-xs text-gray-500 mb-2">African Grey</p>
+                    </div>
+                    
+                    <!-- Add Pet Card -->
+                    <div class="bg-gray-50 p-4 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center" onclick="showAddPet()">
+                        <i class="fas fa-plus text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-gray-500 text-sm font-medium">Add Pet</p>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+                
+                <!-- Quick Actions -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button class="w-full flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                            <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-calendar-plus text-white"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">Schedule Appointment</p>
+                                <p class="text-sm text-gray-500">Book vet visits & checkups</p>
+                            </div>
+                        </button>
+                        
+                        <button class="w-full flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-syringe text-white"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-gray-900">Vaccination Reminders</p>
+                                <p class="text-sm text-gray-500">Manage vaccine schedules</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-white border-t border-gray-200">
+                <div class="flex justify-around py-2">
+                    <button class="flex flex-col items-center py-2 px-3 text-primary">
+                        <i class="fas fa-home text-xl mb-1"></i>
+                        <span class="text-xs">Home</span>
+                    </button>
+                    <button class="flex flex-col items-center py-2 px-3 text-gray-400">
+                        <i class="fas fa-calendar text-xl mb-1"></i>
+                        <span class="text-xs">Schedule</span>
+                    </button>
+                    <button class="flex flex-col items-center py-2 px-3 text-gray-400">
+                        <i class="fas fa-bell text-xl mb-1"></i>
+                        <span class="text-xs">Alerts</span>
+                    </button>
+                    <button class="flex flex-col items-center py-2 px-3 text-gray-400">
+                        <i class="fas fa-user text-xl mb-1"></i>
+                        <span class="text-xs">Profile</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: MainDashboard -->
+        
+        <!-- @COMPONENT: AddPetScreen -->
+        <div id="addPetScreen" class="hidden">
+            <div class="bg-primary text-white p-4">
+                <div class="flex items-center">
+                    <button onclick="showDashboard()" class="mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-bold">Add New Pet</h2>
+                </div>
+            </div>
+            
+            <div class="p-4 space-y-6">
+                <!-- Pet Category Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Pet Category</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors" onclick="selectCategory('dog')">
+                            <i class="fas fa-dog text-2xl text-gray-600 mb-2"></i>
+                            <span class="text-sm font-medium">Dogs</span>
+                        </button>
+                        <button class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors" onclick="selectCategory('cat')">
+                            <i class="fas fa-cat text-2xl text-gray-600 mb-2"></i>
+                            <span class="text-sm font-medium">Cats</span>
+                        </button>
+                        <button class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors" onclick="selectCategory('bird')">
+                            <i class="fas fa-dove text-2xl text-gray-600 mb-2"></i>
+                            <span class="text-sm font-medium">Birds</span>
+                        </button>
+                        <button class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors" onclick="selectCategory('rabbit')">
+                            <i class="fas fa-rabbit text-2xl text-gray-600 mb-2"></i>
+                            <span class="text-sm font-medium">Rabbits</span>
+                        </button>
+                        <button class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary transition-colors" onclick="selectCategory('other')">
+                            <i class="fas fa-paw text-2xl text-gray-600 mb-2"></i>
+                            <span class="text-sm font-medium">Others</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pet Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Pet Photo</label>
+                    <div class="flex space-x-3">
+                        <button class="flex-1 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                            <i class="fas fa-camera text-2xl text-gray-400 mb-2"></i>
+                            <span class="text-sm text-gray-500">Take Photo</span>
+                        </button>
+                        <button class="flex-1 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                            <i class="fas fa-image text-2xl text-gray-400 mb-2"></i>
+                            <span class="text-sm text-gray-500">Choose Photo</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Pet Details Form -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pet Name</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter pet name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Breed</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter breed">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                        <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Microchip ID (Optional)</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter microchip ID">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Birthmarks / Remarks</label>
+                        <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent h-24 resize-none" placeholder="Enter any distinctive marks or remarks"></textarea>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                    Save Pet Profile
+                </button>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: AddPetScreen -->
+        
+        <!-- @COMPONENT: PetProfileScreen -->
+        <div id="petProfileScreen" class="hidden">
+            <div class="bg-primary text-white p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button onclick="showDashboard()" class="mr-4">
+                            <i class="fas fa-arrow-left text-xl"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-xl font-bold">Buddy</h2>
+                            <p class="text-green-100 text-sm">Golden Retriever</p>
+                        </div>
+                    </div>
+                    <!-- Dog portrait with golden retriever -->
+                    <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300" alt="Golden Retriever dog" class="w-12 h-12 rounded-full object-cover">
+                </div>
+            </div>
+            
+            <div class="p-4 space-y-6">
+                <!-- Quick Actions Menu -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow" onclick="showVaccineForm()">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-syringe text-primary text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900 text-sm">Vaccines</p>
+                        </div>
+                    </button>
+                    
+                    <button class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow" onclick="showDewormForm()">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-pills text-secondary text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900 text-sm">Deworming</p>
+                        </div>
+                    </button>
+                    
+                    <button class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow" onclick="showTreatmentForm()">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-medical-kit text-accent text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900 text-sm">Treatment</p>
+                        </div>
+                    </button>
+                    
+                    <button class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-user-md text-danger text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900 text-sm">Surgery</p>
+                        </div>
+                    </button>
+                    
+                    <button class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow col-span-2">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-stethoscope text-purple-600 text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900 text-sm">Check Up</p>
+                        </div>
+                    </button>
+                </div>
+                
+                <!-- Recent Activities -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-semibold text-gray-900 mb-4">Recent Activities</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-syringe text-primary text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Rabies Vaccination</p>
+                                <p class="text-xs text-gray-500">Completed on March 15, 2024</p>
+                                <p class="text-xs text-accent font-medium">Next due: March 15, 2025</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-pills text-secondary text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Deworming Treatment</p>
+                                <p class="text-xs text-gray-500">Completed on February 28, 2024</p>
+                                <p class="text-xs text-danger font-medium">Overdue: Next due March 28, 2024</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-stethoscope text-purple-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Annual Check-up</p>
+                                <p class="text-xs text-gray-500">Completed on January 10, 2024</p>
+                                <p class="text-xs text-gray-600">All clear - healthy condition</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Reminders -->
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-exclamation-triangle text-accent mr-2"></i>
+                        <h3 class="font-semibold text-gray-900">Upcoming Reminders</h3>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Deworming overdue</span>
+                            <span class="text-xs bg-danger text-white px-2 py-1 rounded-full">Overdue</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-700">Flea treatment due</span>
+                            <span class="text-xs bg-accent text-white px-2 py-1 rounded-full">Due Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: PetProfileScreen -->
+        
+        <!-- @COMPONENT: VaccineForm -->
+        <div id="vaccineForm" class="hidden">
+            <div class="bg-primary text-white p-4">
+                <div class="flex items-center">
+                    <button onclick="showPetProfile()" class="mr-4">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-bold">Add Vaccination Record</h2>
+                </div>
+            </div>
+            
+            <div class="p-4 space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vaccine Type</label>
+                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option>Select vaccine type</option>
+                            <option>Rabies</option>
+                            <option>DHPP (Distemper, Hepatitis, Parvovirus, Parainfluenza)</option>
+                            <option>Bordetella</option>
+                            <option>Lyme Disease</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date Administered</label>
+                        <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Next Due Date</label>
+                        <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Veterinarian/Clinic</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter vet name or clinic">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Batch/Lot Number</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter batch number">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Upload Certificate/Record</label>
+                        <div class="flex space-x-3">
+                            <button class="flex-1 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                                <i class="fas fa-camera text-2xl text-gray-400 mb-2"></i>
+                                <span class="text-sm text-gray-500">Take Photo</span>
+                            </button>
+                            <button class="flex-1 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary transition-colors">
+                                <i class="fas fa-file-upload text-2xl text-gray-400 mb-2"></i>
+                                <span class="text-sm text-gray-500">Upload File</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent h-24 resize-none" placeholder="Any additional notes or reactions"></textarea>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-bell text-secondary mr-3 mt-1"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900 mb-1">Reminder Settings</p>
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="form-checkbox text-primary" checked>
+                                    <span class="ml-2 text-sm text-gray-700">Send reminder 2 weeks before due date</span>
+                                </label>
+                                <label class="flex items-center mt-2">
+                                    <input type="checkbox" class="form-checkbox text-primary">
+                                    <span class="ml-2 text-sm text-gray-700">Send SMS reminder</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold">
+                        Cancel
+                    </button>
+                    <button class="flex-1 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                        Save Record
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: VaccineForm -->
+    </div>
+
+    <script>
+        (function() {
+            // Screen navigation functions
+            function hideAllScreens() {
+                const screens = ['loginScreen', 'registrationScreen', 'mainDashboard', 'addPetScreen', 'petProfileScreen', 'vaccineForm'];
+                screens.forEach(screen => {
+                    document.getElementById(screen).classList.add('hidden');
+                });
+            }
+
+            window.showLogin = function() {
+                hideAllScreens();
+                document.getElementById('loginScreen').classList.remove('hidden');
+            };
+
+            window.showRegistration = function() {
+                hideAllScreens();
+                document.getElementById('registrationScreen').classList.remove('hidden');
+            };
+
+            window.showDashboard = function() {
+                hideAllScreens();
+                document.getElementById('mainDashboard').classList.remove('hidden');
+            };
+
+            window.showAddPet = function() {
+                hideAllScreens();
+                document.getElementById('addPetScreen').classList.remove('hidden');
+            };
+
+            window.showPetProfile = function(petId) {
+                hideAllScreens();
+                document.getElementById('petProfileScreen').classList.remove('hidden');
+            };
+
+            window.showVaccineForm = function() {
+                hideAllScreens();
+                document.getElementById('vaccineForm').classList.remove('hidden');
+            };
+
+            window.showDewormForm = function() {
+                // Similar to vaccine form but for deworming
+                console.log('Show deworming form');
+            };
+
+            window.showTreatmentForm = function() {
+                // Similar to vaccine form but for treatments
+                console.log('Show treatment form');
+            };
+
+            window.selectCategory = function(category) {
+                // Handle category selection
+                const buttons = document.querySelectorAll('#addPetScreen button');
+                buttons.forEach(btn => btn.classList.remove('border-primary', 'bg-green-50'));
+                event.target.closest('button').classList.add('border-primary', 'bg-green-50');
+            };
+
+            // Initialize app
+            document.addEventListener('DOMContentLoaded', function() {
+                // Start with dashboard for demo purposes, normally would be login
+                showDashboard();
+            });
+        })();
+    </script>
+</body>
+</html>
