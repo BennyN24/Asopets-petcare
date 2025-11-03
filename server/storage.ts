@@ -673,6 +673,9 @@ export class DatabaseStorage implements IStorage {
 }
 
 // Import subscription methods
-export * from "./subscription-storage";
+import * as subscriptionMethods from "./subscription-storage";
 
-export const storage = new DatabaseStorage();
+export const storage = {
+  ...new DatabaseStorage(),
+  ...subscriptionMethods,
+};

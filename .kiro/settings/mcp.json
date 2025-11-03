@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "uvx",
+      "args": ["mcp-server-supabase"],
+      "env": {
+        "SUPABASE_URL": "https://gszinnwhntxzrfdxejyo.supabase.co",
+        "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzemlubndobnR4enJmZHhlanlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0OTQyODgsImV4cCI6MjA3NzA3MDI4OH0.fC-9bUkdqsqQHm17RJHyYYJvFkdmf_hIdCpPVBRWAXk"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "create_table",
+        "insert_row",
+        "update_row",
+        "delete_row",
+        "select_rows",
+        "run_sql"
+      ]
+    }
+  }
+}

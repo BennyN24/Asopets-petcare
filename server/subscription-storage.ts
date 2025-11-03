@@ -1,6 +1,6 @@
 
 import { db } from "./db";
-import { subscriptionPlans, userSubscriptions } from "@shared/schema";
+import { subscriptionPlans, userSubscriptions, pets } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export async function getSubscriptionPlans() {

@@ -11,6 +11,9 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required for email functionality").optional(),
   GOOGLE_MAPS_API_KEY: z.string().optional(),
   BASE_URL: z.string().url().optional(),
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_ANON_KEY: z.string().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);
